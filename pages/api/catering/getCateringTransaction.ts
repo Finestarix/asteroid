@@ -1,12 +1,12 @@
 import {NextApiRequest, NextApiResponse} from "next";
 
+import {TokenData} from "types/userType";
 import {prisma} from "utils/database";
-import {TokenData} from "../../../types/userType";
-import {checkMultipleUndefined} from "../../../utils/validate";
-import {getTokenData} from "../../../utils/token";
+import {checkMultipleUndefined} from "utils/validate";
+import {getTokenData} from "utils/token";
 
 
-export default async function viewCateringFood(request: NextApiRequest, response: NextApiResponse) {
+export default async function getCateringTransaction(request: NextApiRequest, response: NextApiResponse) {
 
     const data = {data: {}, error: ""};
     let tokenData: TokenData;
@@ -22,7 +22,7 @@ export default async function viewCateringFood(request: NextApiRequest, response
     }
 
     try {
-        data.data = await prisma.cateringFood.findMany({
+        data.data = await prisma.cateringHeader.findMany({
             include: {
                 createdBy: {
                     select: {
@@ -40,7 +40,7 @@ export default async function viewCateringFood(request: NextApiRequest, response
         });
     } catch (_) {
         data.data = [];
-        data.error = "Failed to fetch catering food data.";
+        data.error = "Failed to fetch catering transaction data.";
     }
 
     return response.status(200).json(data);

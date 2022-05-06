@@ -15,8 +15,8 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
-import Paper from "@mui/material/Paper";
 import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
 import Snackbar from "@mui/material/Snackbar";
 import Switch from "@mui/material/Switch";
 import Table from "@mui/material/Table";
@@ -46,12 +46,13 @@ import {convertToIDR} from "utils/currency";
 import {getSessionToken} from "utils/storage";
 
 
-export default function CateringFoodPage() {
+export default function ManageCateringFoodPage() {
 
     const foodTableHeader: TableHeadKey[] = [
         {id: "active", label: "Active?"},
         {id: "name", label: "Name"},
-        {id: "price", label: "Price"},
+        {id: "additionalPrice", label: "Additional Price"},
+        {id: "reductionPrice", label: "Reduction Price"},
         {id: "category", label: "Category"},
         {id: "createdBy", label: "Created By"},
         {id: "lastUpdatedBy", label: "Last Updated By"}
@@ -63,7 +64,8 @@ export default function CateringFoodPage() {
     const [filteredFoods, setFilteredFoods] = useState<CateringFood[]>([]);
     const [name, setName] = useState<string>("");
     const [category, setCategory] = useState<CateringFoodCategory | string>("");
-    const [price, setPrice] = useState<number>(0);
+    const [additionalPrice, setAdditionalPrice] = useState<number>(0);
+    const [reductionPrice, setReductionPrice] = useState<number>(0);
     const [typeAlert, setTypeAlert] = useState<AlertColor>("error");
     const [messageAlert, setMessageAlert] = useState<string>("");
     const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -79,7 +81,7 @@ export default function CateringFoodPage() {
         const handleViewCateringFood = async () => {
             setShowLoading(true);
 
-            const cateringFoodFetch = await fetch("http://localhost:3000/api/catering/viewCateringFood", {
+            const cateringFoodFetch = await fetch("http://localhost:3000/api/catering/getCateringFood", {
                 method: "POST",
                 headers: {
                     "authorization": getSessionToken()
@@ -96,7 +98,8 @@ export default function CateringFoodPage() {
 
     const changeName = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setName(event.target.value);
     const changeCategory = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setCategory(event.target.value);
-    const changePrice = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setPrice(parseInt(event.target.value));
+    const changeAdditionalPrice = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setAdditionalPrice(parseInt(event.target.value));
+    const changeReductionPrice = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setReductionPrice(parseInt(event.target.value));
 
     const handleFilterCateringFood = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         let filteredFoods = foods;
@@ -104,9 +107,11 @@ export default function CateringFoodPage() {
             filteredFoods = foods.filter((food) =>
                 food.name.toLowerCase().indexOf(event.target.value) !== -1 ||
                 food.category.toLowerCase().indexOf(event.target.value) !== -1 ||
-                food.price.toString().indexOf(event.target.value) !== -1);
+                food.additionalPrice.toString().indexOf(event.target.value) !== -1 ||
+                food.reductionPrice.toString().indexOf(event.target.value) !== -1);
         }
 
+        setPage(0);
         setFilter(event.target.value);
         setFilteredFoods(filteredFoods);
     };
@@ -167,7 +172,8 @@ export default function CateringFoodPage() {
             body: JSON.stringify({
                 name: name,
                 category: category,
-                price: price
+                additionalPrice: additionalPrice,
+                reductionPrice: reductionPrice
             }),
         });
 
@@ -176,20 +182,11 @@ export default function CateringFoodPage() {
             setMessageAlert(createCateringFoodData.error);
             setTypeAlert(AlertTypeEnum.ERROR);
         } else {
-            foods.push({
-                id: createCateringFoodData.data.id,
-                name: createCateringFoodData.data.name,
-                category: createCateringFoodData.data.category,
-                price: createCateringFoodData.data.price,
-                active: createCateringFoodData.data.active,
-                createdBy: createCateringFoodData.data.createdBy,
-                createdById: createCateringFoodData.data.createdById,
-                lastUpdatedBy: createCateringFoodData.data.lastUpdatedBy,
-                lastUpdatedById: createCateringFoodData.data.lastUpdatedById,
-            });
+            foods.push(createCateringFoodData.data);
             setName("");
             setCategory("");
-            setPrice(0);
+            setAdditionalPrice(0);
+            setReductionPrice(0);
             setMessageAlert(createCateringFoodData.success);
             setTypeAlert(AlertTypeEnum.SUCCESS);
         }
@@ -216,17 +213,7 @@ export default function CateringFoodPage() {
             setTypeAlert(AlertTypeEnum.ERROR);
         } else {
             const updatedIndex = foods.findIndex((food) => food.id === id);
-            foods[updatedIndex] = {
-                id: updateActiveCateringFoodData.data.id,
-                name: updateActiveCateringFoodData.data.name,
-                category: updateActiveCateringFoodData.data.category,
-                price: updateActiveCateringFoodData.data.price,
-                active: updateActiveCateringFoodData.data.active,
-                createdBy: updateActiveCateringFoodData.data.createdBy,
-                createdById: updateActiveCateringFoodData.data.createdById,
-                lastUpdatedBy: updateActiveCateringFoodData.data.lastUpdatedBy,
-                lastUpdatedById: updateActiveCateringFoodData.data.lastUpdatedById
-            };
+            foods[updatedIndex].active = updateActiveCateringFoodData.data.active;
             setMessageAlert(updateActiveCateringFoodData.success);
             setTypeAlert(AlertTypeEnum.SUCCESS);
         }
@@ -266,8 +253,9 @@ export default function CateringFoodPage() {
     };
 
     return (
-        <HomeLayout title="Manage Food">
+        <HomeLayout title="Manage Catering Food">
             <>
+
                 <Backdrop open={showLoading}
                           sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
                     <CircularProgress size={50}
@@ -313,7 +301,7 @@ export default function CateringFoodPage() {
                 <Paper sx={{padding: 2, paddingBottom: 3, marginBottom: 2}}>
 
                     <Typography variant="h6">
-                        Create Food
+                        Create Catering Food
                     </Typography>
 
                     <Box component="form"
@@ -327,15 +315,27 @@ export default function CateringFoodPage() {
                         <TextField select label="Category" variant="outlined" size="medium"
                                    fullWidth={true} disabled={showLoadingForm} value={category}
                                    sx={{marginBottom: 2}}
-                                   onChange={changeCategory} onKeyDown={handleEnter}>
+                                   onChange={changeCategory}>
                             {Object.keys(CateringFoodCategory).map((option) => (
-                                <MenuItem key={option} value={option}>{option}</MenuItem>))}
+                                <MenuItem key={option} value={option}>
+                                    {option}
+                                </MenuItem>))}
                         </TextField>
 
-                        <TextField type="number" label="Price" variant="outlined" size="medium"
-                                   fullWidth={true} disabled={showLoadingForm} value={price}
+                        <TextField type="number" label="Additional Price" variant="outlined" size="medium"
+                                   fullWidth={true} disabled={showLoadingForm} value={additionalPrice}
                                    sx={{marginBottom: 2}}
-                                   onChange={changePrice} onKeyDown={handleEnter}
+                                   onChange={changeAdditionalPrice} onKeyDown={handleEnter}
+                                   InputProps={{
+                                       startAdornment: (
+                                           <InputAdornment position="start">Rp.</InputAdornment>
+                                       ),
+                                   }}/>
+
+                        <TextField type="number" label="Reduction Price" variant="outlined" size="medium"
+                                   fullWidth={true} disabled={showLoadingForm} value={reductionPrice}
+                                   sx={{marginBottom: 2}}
+                                   onChange={changeReductionPrice} onKeyDown={handleEnter}
                                    InputProps={{
                                        startAdornment: (
                                            <InputAdornment position="start">Rp.</InputAdornment>
@@ -363,104 +363,121 @@ export default function CateringFoodPage() {
 
                 </Paper>
 
-                <TextField type="text" label="Filter" variant="standard" size="medium"
-                           fullWidth={true} value={filter}
-                           sx={{marginBottom: 2}}
-                           onChange={handleFilterCateringFood}/>
+                {(foods.length !== 0) ? (
+                    <>
+                        <TextField type="text" label="Filter" variant="standard" size="medium"
+                                   fullWidth={true} value={filter}
+                                   sx={{marginBottom: 2}}
+                                   onChange={handleFilterCateringFood}/>
 
-                <Paper>
+                        <Paper>
 
-                    <Toolbar variant="dense"
-                             sx={{
-                                 paddingLeft: {sm: 2}, paddingRight: {xs: 1, sm: 1},
-                                 ...(selectedFoods.length > 0 && {
-                                     bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity)
-                                 })
-                             }}>
-                        {selectedFoods.length > 0 ?
-                            <Typography sx={{flex: "1 1 100%"}}>{selectedFoods.length} selected</Typography> :
-                            <Typography sx={{flex: "1 1 100%"}}>Foods</Typography>}
-                        {selectedFoods.length > 0 &&
-                            <Tooltip title="Delete">
-                                <IconButton onClick={handleOpenDialog}>
-                                    <DeleteIcon/>
-                                </IconButton>
-                            </Tooltip>}
-                    </Toolbar>
+                            <Toolbar variant="dense"
+                                     sx={{
+                                         paddingLeft: {sm: 2}, paddingRight: {xs: 1, sm: 1},
+                                         ...(selectedFoods.length > 0 && {
+                                             bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity)
+                                         })
+                                     }}>
+                                {selectedFoods.length > 0 ?
+                                    <Typography sx={{flex: "1 1 100%"}}>{selectedFoods.length} selected</Typography> :
+                                    <Typography sx={{flex: "1 1 100%"}}>Foods</Typography>}
+                                {selectedFoods.length > 0 &&
+                                    <Tooltip title="Delete">
+                                        <IconButton onClick={handleOpenDialog}>
+                                            <DeleteIcon/>
+                                        </IconButton>
+                                    </Tooltip>}
+                            </Toolbar>
 
-                    <TableContainer component={Paper}>
-                        <Table size="medium" sx={{whiteSpace: "nowrap"}}>
+                            <TableContainer>
+                                <Table size="medium" sx={{whiteSpace: "nowrap"}}>
 
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell padding="checkbox">
-                                        <Checkbox color="primary"
-                                                  disabled={showLoading}
-                                                  indeterminate={selectedFoods.length > 0 && selectedFoods.length < filteredFoods.length}
-                                                  checked={filteredFoods.length > 0 && selectedFoods.length === filteredFoods.length}
-                                                  onChange={handleSelectAllClick}/>
-                                    </TableCell>
-                                    {foodTableHeader.map((tableHeader) => (
-                                        <TableCell key={tableHeader.id}
-                                                   sortDirection={orderBy === tableHeader.id ? orderType : false}>
-                                            <TableSortLabel active={orderBy === tableHeader.id}
-                                                            direction={orderBy === tableHeader.id ? orderType : OrderTypeEnum.ASC}
-                                                            onClick={handleRequestSort(tableHeader.id)}>
-                                                {tableHeader.label}
-                                            </TableSortLabel>
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            </TableHead>
-
-                            <TableBody>
-                                {filteredFoods
-                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                    // @ts-ignore
-                                    .sort(getComparator(orderType, orderBy))
-                                    .slice(getFirstDataInPage(), getLastDataInPage())
-                                    .map((food, _) => {
-                                        const isItemSelected = isDataSelected(food.id);
-                                        return (
-                                            <TableRow key={food.name} tabIndex={-1} hover={!showLoading}
-                                                      selected={isItemSelected}>
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox disabled={showLoading} checked={isItemSelected}
-                                                              onChange={() => handleSelectClick(food.id)}/>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell padding="checkbox">
+                                                <Checkbox color="primary"
+                                                          disabled={showLoading}
+                                                          indeterminate={selectedFoods.length > 0 && selectedFoods.length < filteredFoods.length}
+                                                          checked={filteredFoods.length > 0 && selectedFoods.length === filteredFoods.length}
+                                                          onChange={handleSelectAllClick}/>
+                                            </TableCell>
+                                            {foodTableHeader.map((tableHeader) => (
+                                                <TableCell key={tableHeader.id}
+                                                           sortDirection={orderBy === tableHeader.id ? orderType : false}>
+                                                    <TableSortLabel active={orderBy === tableHeader.id}
+                                                                    direction={orderBy === tableHeader.id ? orderType : OrderTypeEnum.ASC}
+                                                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                        // @ts-ignore
+                                                                    onClick={handleRequestSort(tableHeader.id)}>
+                                                        {tableHeader.label}
+                                                    </TableSortLabel>
                                                 </TableCell>
-                                                <TableCell width={100} sx={{paddingTop: 0, paddingBottom: 0}}>
-                                                    <Tooltip
-                                                        title={(food.active) ? "Set to Inactive" : "Set to Active"}>
-                                                        <Switch disabled={showLoading} checked={food.active}
-                                                                onChange={() => handleChangeActiveCateringFood(food.id)}/>
-                                                    </Tooltip>
-                                                </TableCell>
-                                                <TableCell>{food.name}</TableCell>
-                                                <TableCell>{convertToIDR(food.price)}</TableCell>
-                                                <TableCell width={180}>{food.category}</TableCell>
-                                                <TableCell
-                                                    width={150}>{(food.createdBy.fullname) ? food.createdBy.fullname : food.createdBy.username}</TableCell>
-                                                <TableCell
-                                                    width={150}>{(food.lastUpdatedBy.fullname) ? food.lastUpdatedBy.fullname : food.lastUpdatedBy.username}</TableCell>
-                                            </TableRow>
-                                        );
-                                    })}
-                                {((page > 0) ? Math.max(0, (1 + page) * dataPerPage - filteredFoods.length) : 0) > 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={6}/>
-                                    </TableRow>)}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                            ))}
+                                        </TableRow>
+                                    </TableHead>
 
-                    <TablePagination component="div" rowsPerPageOptions={[5, 10, 15, 20]}
-                                     count={filteredFoods.length} page={page} rowsPerPage={dataPerPage}
-                                     onPageChange={handleChangePage}
-                                     onRowsPerPageChange={handleChangeDataPerPage}/>
+                                    <TableBody>
+                                        {filteredFoods
+                                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                            // @ts-ignore
+                                            .sort(getComparator(orderType, orderBy))
+                                            .slice(getFirstDataInPage(), getLastDataInPage())
+                                            .map((food, _) => {
+                                                const isItemSelected = isDataSelected(food.id);
+                                                return (
+                                                    <TableRow key={food.name} tabIndex={-1} hover={!showLoading}
+                                                              selected={isItemSelected}>
+                                                        <TableCell padding="checkbox">
+                                                            <Checkbox disabled={showLoading} checked={isItemSelected}
+                                                                      onChange={() => handleSelectClick(food.id)}/>
+                                                        </TableCell>
+                                                        <TableCell width={100} sx={{paddingTop: 0, paddingBottom: 0}}>
+                                                            <Tooltip
+                                                                title={(food.active) ? "Set to Inactive" : "Set to Active"}>
+                                                                <Switch disabled={showLoading} checked={food.active}
+                                                                        onChange={() => handleChangeActiveCateringFood(food.id)}/>
+                                                            </Tooltip>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {food.name}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {convertToIDR(food.additionalPrice)}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {convertToIDR(food.reductionPrice)}
+                                                        </TableCell>
+                                                        <TableCell width={180}>
+                                                            {food.category}
+                                                        </TableCell>
+                                                        <TableCell width={150}>
+                                                            {(food.createdBy.fullname) ? food.createdBy.fullname : food.createdBy.username}
+                                                        </TableCell>
+                                                        <TableCell width={150}>
+                                                            {(food.lastUpdatedBy.fullname) ? food.lastUpdatedBy.fullname : food.lastUpdatedBy.username}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            })}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
 
-                </Paper>
+                            <TablePagination component="div" rowsPerPageOptions={[5, 10, 15, 20]}
+                                             count={filteredFoods.length} page={page} rowsPerPage={dataPerPage}
+                                             onPageChange={handleChangePage}
+                                             onRowsPerPageChange={handleChangeDataPerPage}/>
+
+                        </Paper>
+                    </>
+                ) : (
+                    <Alert variant="outlined" severity="info">
+                        There is no catering food data.
+                    </Alert>
+                )}
+
             </>
-
         </HomeLayout>
     );
 }

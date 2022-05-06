@@ -1,7 +1,5 @@
 import {ReactElement} from "react";
 
-import {CateringFood} from "types/cateringType";
-
 
 export interface LayoutProps {
     children: ReactElement,
@@ -9,7 +7,7 @@ export interface LayoutProps {
 }
 
 export interface TableHeadKey {
-    id: keyof CateringFood,
+    id: string,
     label: string
 }
 

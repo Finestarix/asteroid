@@ -18,16 +18,19 @@ export default function MainLayout(props: LayoutProps) {
         const handleCheckAuth = async () => {
             const authPath: string[] = ["/auth/login", "/auth/register"];
             const token = getSessionToken();
+            let checkAuthData;
 
-            const checkAuthFetch = await fetch("http://localhost:3000/api/auth/check", {
-                method: "POST",
-                headers: {
-                    "authorization": token
-                }
-            });
+            if(token) {
+                const checkAuthFetch = await fetch("http://localhost:3000/api/auth/check", {
+                    method: "POST",
+                    headers: {
+                        "authorization": token
+                    }
+                });
+                checkAuthData = await checkAuthFetch.json();
+            }
 
-            const checkAuthData = await checkAuthFetch.json();
-            if ((checkAuthData.message === "Token Invalid") ||
+            if ((checkAuthData && checkAuthData.message === "Token Invalid") ||
                 (!authPath.includes(router.pathname) && !token)) {
                 removeSessionToken();
                 router.push("/auth/login").then();

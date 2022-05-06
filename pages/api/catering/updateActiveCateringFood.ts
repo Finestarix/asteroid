@@ -32,6 +32,7 @@ export default async function updateActiveCateringFood(request: NextApiRequest, 
             },
         });
     } catch (_) {
+        data.error = "Failed to fetch catering food data.";
     }
 
     if (!foodData) {

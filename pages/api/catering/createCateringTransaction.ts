@@ -1,45 +1,47 @@
 import {NextApiRequest, NextApiResponse} from "next";
 
-import {CateringFoodCategory, InsertCateringFoodParameter} from "types/cateringType";
+import {InsertCateringTransactionParameter} from "types/cateringType";
 import {TokenData} from "types/userType";
 import {prisma} from "utils/database";
+import {convertDateGeneral} from "utils/date";
 import {getTokenData} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";
 
 
-export default async function createCateringFood(request: NextApiRequest, response: NextApiResponse) {
+export default async function createCateringTransaction(request: NextApiRequest, response: NextApiResponse) {
 
     const data = {data: {}, error: "", success: ""};
     let tokenData: TokenData;
-    let foodParameter: InsertCateringFoodParameter;
+    let transactionParameter: InsertCateringTransactionParameter;
+    let constraintDate: number;
+    let transactionDate: number;
 
     try {
         tokenData = getTokenData(request);
-        foodParameter = JSON.parse(request.body);
+        transactionParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, foodParameter.name, foodParameter.category, foodParameter.additionalPrice, foodParameter.reductionPrice))
+            checkMultipleUndefined(tokenData.username, transactionParameter.date, transactionParameter.basePrice))
             throw Error();
+        const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() + 2);
+        constraintDate = currentDate.getTime();
+        transactionDate = new Date(transactionParameter.date).getTime();
     } catch (_) {
         data.error = "Oops. Something went wrong.";
         return response.status(400).json(data);
     }
 
-    if (foodParameter.name.length === 0) {
-        data.error = "Name field cannot be empty.";
-    } else if (!Object.values(CateringFoodCategory).includes(foodParameter.category)) {
-        data.error = "Category option can only consists of " + Object.values(CateringFoodCategory).join(", ") + ".";
-    } else if (foodParameter.additionalPrice < 0) {
-        data.error = "Additional price value must be an positive number.";
-    } else if (foodParameter.reductionPrice < 0) {
-        data.error = "Reduction price value must be an positive number.";
-    } else {
+    if (transactionDate > constraintDate) {
+        data.error = "Transaction date must be before the day after tomorrow.";
+    } else if (transactionParameter.basePrice < 0) {
+        data.error = "Base price value must be an positive number.";
+    }  else {
         try {
-            data.data = await prisma.cateringFood.create({
+            data.data = await prisma.cateringHeader.create({
                 data: {
-                    name: foodParameter.name,
-                    category: foodParameter.category,
-                    additionalPrice: foodParameter.additionalPrice,
-                    reductionPrice: foodParameter.reductionPrice,
+                    date: transactionParameter.date,
+                    basePrice: transactionParameter.basePrice,
+                    deliveryPrice: 5000,
                     active: false,
                     createdBy: {
                         connect: {
@@ -67,9 +69,9 @@ export default async function createCateringFood(request: NextApiRequest, respon
                     }
                 }
             });
-            data.success = "Successfully created " + foodParameter.name + ".";
+            data.success = "Successfully created catering for " + convertDateGeneral(transactionParameter.date) + ".";
         } catch (_) {
-            data.error = "Failed to created " + foodParameter.name + ".";
+            data.error = "Failed to created catering for " + convertDateGeneral(transactionParameter.date) + ".";
         }
     }
 

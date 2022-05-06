@@ -16,8 +16,10 @@ model User {
   avatar        Avatar?
   debtLending   DebtHeader[]
   debtBorrowing DebtDetail[]
-  foodCreator   CateringFood[]   @relation(name: "createdUser")
-  foodUpdater   CateringFood[]   @relation(name: "updatedUser")
+  headerCreator CateringHeader[] @relation(name: "createdUserCateringHeader")
+  headerUpdater CateringHeader[] @relation(name: "updatedUserCateringHeader")
+  foodCreator   CateringFood[]   @relation(name: "createdUserCateringFood")
+  foodUpdater   CateringFood[]   @relation(name: "updatedUserCateringFood")
   foodBuyer     CateringDetail[]
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
@@ -42,13 +44,18 @@ model Avatar {
 }
 
 model CateringHeader {
-  id            Int              @id @default(autoincrement())
-  date          DateTime
-  basePrice     Int
-  deliveryPrice Int
-  details       CateringDetail[]
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+  id              Int              @id @default(autoincrement())
+  date            DateTime
+  basePrice       Int
+  deliveryPrice   Int
+  active          Boolean
+  createdBy       User             @relation(name: "createdUserCateringHeader", fields: [createdById], references: [id])
+  createdById     Int
+  lastUpdatedBy   User             @relation(name: "updatedUserCateringHeader", fields: [lastUpdatedById], references: [id])
+  lastUpdatedById Int
+  details         CateringDetail[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
 model CateringDetail {
@@ -58,9 +65,9 @@ model CateringDetail {
   participant        User                        @relation(fields: [participantId], references: [id])
   participantId      Int
   paymentType        PaymentType
+  foods              CateringParticipantDetail[]
   createdAt          DateTime                    @default(now())
   updatedAt          DateTime                    @updatedAt
-  participantDetails CateringParticipantDetail[]
 }
 
 model CateringParticipantDetail {
@@ -77,13 +84,14 @@ model CateringFood {
   id              Int                         @id @default(autoincrement())
   name            String
   category        CateringType
-  price           Int
+  additionalPrice Int
+  reductionPrice  Int
   active          Boolean
-  createdBy       User                        @relation(name: "createdUser", fields: [createdById], references: [id])
+  createdBy       User                        @relation(name: "createdUserCateringFood", fields: [createdById], references: [id])
   createdById     Int
-  lastUpdatedBy   User?                       @relation(name: "updatedUser", fields: [lastUpdatedById], references: [id])
-  lastUpdatedById Int?
-  buyer           CateringParticipantDetail[]
+  lastUpdatedBy   User                        @relation(name: "updatedUserCateringFood", fields: [lastUpdatedById], references: [id])
+  lastUpdatedById Int
+  participant     CateringParticipantDetail[]
   createdAt       DateTime                    @default(now())
   updatedAt       DateTime                    @updatedAt
 }
@@ -125,6 +133,7 @@ enum PaymentType {
 }
 
 enum CateringType {
+  Rice
   MainDish
   SideDish
   Vegetable

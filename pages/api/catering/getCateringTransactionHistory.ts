@@ -6,7 +6,7 @@ import {checkMultipleUndefined} from "utils/validate";
 import {getTokenData} from "utils/token";
 
 
-export default async function getActiveCateringTransaction(request: NextApiRequest, response: NextApiResponse) {
+export default async function getCateringTransactionHistory(request: NextApiRequest, response: NextApiResponse) {
 
     const data = {data: {}, error: ""};
     let tokenData: TokenData;
@@ -22,25 +22,27 @@ export default async function getActiveCateringTransaction(request: NextApiReque
     }
 
     try {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        data.data = await prisma.cateringHeader.findFirst({
+        data.data = await prisma.cateringDetail.findMany({
             where: {
-                active: true
+                participant: {
+                    username: tokenData.username
+                }
             },
             include: {
-                details: {
-                    where: {
-                        participant: {
-                            username: tokenData.username
-                        }
+                foods: {
+                    include: {
+                        food: true
                     }
-                }
+                },
+                header: true
+            },
+            orderBy: {
+                createdAt: "desc"
             }
         });
     } catch (_) {
         data.data = [];
-        data.error = "Failed to fetch catering transaction data.";
+        data.error = "Failed to fetch catering transaction history data.";
     }
 
     return response.status(200).json(data);

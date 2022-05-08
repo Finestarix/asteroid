@@ -1,10 +1,7 @@
-import {useRouter} from "next/router";
-import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import FoodBankIcon from "@mui/icons-material/FoodBank";
-import LocalDiningIcon from "@mui/icons-material/LocalDining";
 import Alert, {AlertColor} from "@mui/material/Alert";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
@@ -17,9 +14,7 @@ import FormGroup from "@mui/material/FormGroup";
 import Paper from "@mui/material/Paper";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
-import SpeedDial from "@mui/material/SpeedDial";
-import SpeedDialAction from "@mui/material/SpeedDialAction";
-import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+import Snackbar from "@mui/material/Snackbar";
 import Step from "@mui/material/Step";
 import Stepper from "@mui/material/Stepper";
 import StepContent from "@mui/material/StepContent";
@@ -37,18 +32,16 @@ import {
     CateringFood,
     CateringTransaction,
     ViewOrderCateringFoodData,
-    ViewActiveCateringTransactionData, ChangeCateringFoodData, InsertCateringTransactionDetailData
+    ViewActiveCateringTransactionData,
+    InsertCateringTransactionDetailData
 } from "types/cateringType";
+import {AlertTypeEnum} from "types/generalType";
 import {convertToIDR} from "utils/currency";
 import {convertDateGeneral} from "utils/date";
 import {getSessionToken} from "utils/storage";
-import {AlertTypeEnum} from "../../../types/generalType";
-import Snackbar from "@mui/material/Snackbar";
 
 
-export default function CateringPage() {
-
-    const router = useRouter();
+export default function CateringOrderPage() {
 
     const [transaction, setTransaction] = useState<CateringTransaction>();
     const [activeStep, setActiveStep] = useState<number>(-1);
@@ -104,11 +97,9 @@ export default function CateringPage() {
             setTransaction(cateringTransactionData.data);
             setShowLoading(false);
         };
+
         handleViewCateringTransaction().then(() => handleViewCateringFood().then());
     }, []);
-
-    const gotoManageCateringFood = () => router.push("/home/catering/manage/food");
-    const gotoManageCateringTransaction = () => router.push("/home/catering/manage/transaction");
 
     const handleCloseAlert = () => setShowAlert(false);
 
@@ -185,6 +176,7 @@ export default function CateringPage() {
 
         const createCateringOrderData: InsertCateringTransactionDetailData = await createCateringOrderFetch.json();
         if (createCateringOrderData.error) {
+            setActiveStep((prevActiveStep) => prevActiveStep - 1);
             setMessageAlert(createCateringOrderData.error);
             setTypeAlert(AlertTypeEnum.ERROR);
         } else {
@@ -196,7 +188,7 @@ export default function CateringPage() {
     };
 
     return (
-        <HomeLayout title="Catering">
+        <HomeLayout title="Catering Order">
             <>
 
                 <Backdrop open={showLoading}
@@ -219,19 +211,6 @@ export default function CateringPage() {
                     </Alert>
                 </Snackbar>
 
-                <Box sx={{position: "fixed", bottom: 2, right: 2}}>
-                    <SpeedDial ariaLabel="Catering Admin"
-                               icon={<SpeedDialIcon/>}
-                               sx={{position: "absolute", bottom: 16, right: 16}}>
-                        <SpeedDialAction key="Manage Catering Food" tooltipTitle="Manage Catering Food"
-                                         icon={<FoodBankIcon/>}
-                                         onClick={gotoManageCateringFood}/>
-                        <SpeedDialAction key="Manage Catering Transaction" tooltipTitle="Manage Catering Transaction"
-                                         icon={<LocalDiningIcon/>}
-                                         onClick={gotoManageCateringTransaction}/>
-                    </SpeedDial>
-                </Box>
-
                 <Paper sx={{padding: 2}}>
 
                     {(transaction) ? (
@@ -240,6 +219,13 @@ export default function CateringPage() {
                                         sx={{paddingBottom: 2}}>
                                 Catering for {convertDateGeneral(transaction.date)}
                             </Typography>
+
+                            {(transaction.details && transaction.details.length > 0) && (
+                                <Alert variant="outlined" severity="info"
+                                       sx={{maxWidth: "500px", marginBottom: 2}}>
+                                    You already have <b>{transaction.details.length} transaction</b> for this catering.
+                                </Alert>
+                            )}
 
                             <Stepper orientation="vertical"
                                      activeStep={activeStep}>
@@ -547,6 +533,11 @@ export default function CateringPage() {
                                     </StepLabel>
                                     <StepContent>
                                         <Box>
+                                            <Alert variant="outlined" severity="info"
+                                                   sx={{maxWidth: "500px", marginBottom: 2}}>
+                                                Once you press the <b>ORDER</b> button, the transaction cannot be
+                                                canceled.
+                                            </Alert>
                                             <ButtonGroup variant="outlined" size="small"
                                                          sx={{marginTop: 1}}>
                                                 <Button startIcon={<ArrowLeftIcon/>}

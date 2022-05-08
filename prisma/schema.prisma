@@ -127,9 +127,7 @@ enum Role {
 
 enum PaymentType {
   NotPaid
-  Cash
-  Transfer
-  Other
+  Paid
 }
 
 enum CateringType {

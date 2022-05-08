@@ -80,6 +80,11 @@ export interface DeleteCateringTransactionData {
     success: string
 }
 
+export interface ViewCateringTransactionHistoryData {
+    data: CateringTransactionDetail[],
+    error: string
+}
+
 export interface InsertCateringTransactionDetailParameter {
     header: number,
     foods: number[]
@@ -136,9 +141,7 @@ export interface DeleteCateringFoodData {
 
 export enum CateringPaymentType {
     NotPaid = "NotPaid",
-    Cash = "Cash",
-    Transfer = "Transfer",
-    Other = "Other"
+    Paid = "Paid"
 }
 
 export enum CateringFoodCategory {

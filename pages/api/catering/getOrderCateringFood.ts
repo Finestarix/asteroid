@@ -22,19 +22,25 @@ export default async function getOrderCateringFood(request: NextApiRequest, resp
         return response.status(400).json(data);
     }
 
+    for (const category of Object.keys(CateringFoodCategory)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        data.data[category] = [];
+    }
+
     try {
+        const activeFoods = await prisma.cateringFood.findMany({
+            where: {
+                active: true
+            }
+        });
+
         for (const category of Object.keys(CateringFoodCategory)) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            data.data[category] = await prisma.cateringFood.findMany({
-                where: {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    category: category,
-                    active: true
-                }
-            });
+            data.data[category] = activeFoods.filter((food) => food.category === category);
         }
+
     } catch (_) {
         data.error = "Failed to fetch catering food data.";
     }

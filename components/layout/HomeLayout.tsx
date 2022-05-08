@@ -1,7 +1,15 @@
 import {useRouter} from "next/router";
 import {useState} from "react";
 
-import FastfoodIcon from "@mui/icons-material/Fastfood";
+import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import MicrowaveOutlinedIcon from '@mui/icons-material/MicrowaveOutlined';
+import KitchenOutlinedIcon from '@mui/icons-material/KitchenOutlined';
+import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
+import DinnerDiningOutlinedIcon from '@mui/icons-material/DinnerDiningOutlined';
+import EggAltIcon from '@mui/icons-material/EggAlt';
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
+import FoodBankIcon from "@mui/icons-material/FoodBank";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
@@ -33,6 +41,9 @@ export default function HomeLayout(props: LayoutProps) {
     const router = useRouter();
     const gotoHome = async () => await router.push("/home");
     const gotoCatering = async () => await router.push("/home/catering");
+    const gotoCateringHistory = async () => await router.push("/home/catering/history");
+    const gotoManageCateringFood = () => router.push("/home/catering/manage/food");
+    const gotoManageCateringTransaction = () => router.push("/home/catering/manage/transaction");
     const gotoLogout = async () => {
         removeSessionToken();
         await router.push("/auth/login");
@@ -49,22 +60,44 @@ export default function HomeLayout(props: LayoutProps) {
             </Toolbar>
             <Divider/>
             <List>
-                <ListItem key="Catering"
-                          button={true}
+                <ListItem button={true}
                           onClick={gotoCatering}>
                     <ListItemIcon>
-                        <FastfoodIcon/>
+                        <RestaurantOutlinedIcon fontSize="medium"/>
                     </ListItemIcon>
-                    <ListItemText primary="Catering" secondary="View and Order Your Meals"/>
+                    <ListItemText primary="Catering Order"/>
+                </ListItem>
+                <ListItem button={true}
+                          onClick={gotoCateringHistory}>
+                    <ListItemIcon>
+                        <ReceiptLongOutlinedIcon fontSize="medium"/>
+                    </ListItemIcon>
+                    <ListItemText primary="Catering History"/>
                 </ListItem>
             </List>
             <Divider/>
             <List>
-                <ListItem key="Logout"
-                          button={true}
+                <ListItem button={true}
+                          onClick={gotoManageCateringTransaction}>
+                    <ListItemIcon>
+                        <MicrowaveOutlinedIcon fontSize="medium"/>
+                    </ListItemIcon>
+                    <ListItemText primary="Catering Transaction"/>
+                </ListItem>
+                <ListItem button={true}
+                          onClick={gotoManageCateringFood}>
+                    <ListItemIcon>
+                        <DinnerDiningOutlinedIcon fontSize="medium"/>
+                    </ListItemIcon>
+                    <ListItemText primary="Catering Food"/>
+                </ListItem>
+            </List>
+            <Divider/>
+            <List>
+                <ListItem button={true}
                           onClick={gotoLogout}>
                     <ListItemIcon>
-                        <LogoutIcon/>
+                        <LogoutIcon fontSize="medium"/>
                     </ListItemIcon>
                     <ListItemText primary="Logout"/>
                 </ListItem>

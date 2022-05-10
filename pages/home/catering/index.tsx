@@ -1,3 +1,4 @@
+import {useRouter} from "next/router";
 import {ChangeEvent, useEffect, useState} from "react";
 
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
@@ -43,6 +44,8 @@ import {getSessionToken} from "utils/storage";
 
 export default function CateringOrderPage() {
 
+    const router = useRouter();
+
     const [transaction, setTransaction] = useState<CateringTransaction>();
     const [activeStep, setActiveStep] = useState<number>(-1);
     const [rice, setRice] = useState<CateringFood[]>([]);
@@ -66,7 +69,7 @@ export default function CateringOrderPage() {
         const handleViewCateringFood = async () => {
             setShowLoading(true);
 
-            const cateringFoodFetch = await fetch("http://localhost:3000/api/catering/getOrderCateringFood", {
+            const cateringFoodFetch = await fetch(router.basePath + "/api/catering/getOrderCateringFood", {
                 method: "POST",
                 headers: {
                     "authorization": getSessionToken()
@@ -86,7 +89,7 @@ export default function CateringOrderPage() {
         const handleViewCateringTransaction = async () => {
             setShowLoading(true);
 
-            const cateringTransactionFetch = await fetch("http://localhost:3000/api/catering/getActiveCateringTransaction", {
+            const cateringTransactionFetch = await fetch(router.basePath + "/api/catering/getActiveCateringTransaction", {
                 method: "POST",
                 headers: {
                     "authorization": getSessionToken()
@@ -161,7 +164,7 @@ export default function CateringOrderPage() {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
         setShowLoading(true);
 
-        const createCateringOrderFetch = await fetch("http://localhost:3000/api/catering/createCateringTransactionDetail", {
+        const createCateringOrderFetch = await fetch(router.basePath + "/api/catering/createCateringTransactionDetail", {
             method: "POST",
             headers: {
                 authorization: getSessionToken()
@@ -436,7 +439,7 @@ export default function CateringOrderPage() {
                                         <Box>
                                             <TableContainer
                                                 sx={{maxWidth: "500px", marginBottom: 2, whiteSpace: "nowrap"}}>
-                                                <Table>
+                                                <Table size="small">
                                                     <TableHead>
                                                         <TableRow>
                                                             <TableCell colSpan={2}>Details</TableCell>

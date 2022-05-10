@@ -1,3 +1,4 @@
+import {useRouter} from "next/router";
 import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
 
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -50,6 +51,8 @@ import {getSessionToken} from "utils/storage";
 
 export default function ManageCateringTransactionPage() {
 
+    const router = useRouter();
+
     const transactionTableHeader: TableHeadKey[] = [
         {id: "active", label: "Active?"},
         {id: "date", label: "Transaction Date"},
@@ -80,7 +83,7 @@ export default function ManageCateringTransactionPage() {
         const handleViewCateringTransaction = async () => {
             setShowLoading(true);
 
-            const cateringTransactionFetch = await fetch("http://localhost:3000/api/catering/getCateringTransaction", {
+            const cateringTransactionFetch = await fetch(router.basePath + "/api/catering/getCateringTransaction", {
                 method: "POST",
                 headers: {
                     "authorization": getSessionToken()
@@ -159,7 +162,7 @@ export default function ManageCateringTransactionPage() {
     const handleCreateCateringTransaction = async () => {
         setShowLoadingForm(true);
 
-        const createCateringTransactionFetch = await fetch("http://localhost:3000/api/catering/createCateringTransaction", {
+        const createCateringTransactionFetch = await fetch(router.basePath + "/api/catering/createCateringTransaction", {
             method: "POST",
             headers: {
                 authorization: getSessionToken()
@@ -188,7 +191,7 @@ export default function ManageCateringTransactionPage() {
     const handleChangeActiveCateringTransaction = async (id: number) => {
         setShowLoading(true);
 
-        const updateActiveCateringTransactionFetch = await fetch("http://localhost:3000/api/catering/updateActiveCateringTransaction", {
+        const updateActiveCateringTransactionFetch = await fetch(router.basePath + "/api/catering/updateActiveCateringTransaction", {
             method: "POST",
             headers: {
                 authorization: getSessionToken()
@@ -216,7 +219,7 @@ export default function ManageCateringTransactionPage() {
         setShowLoading(true);
         setShowDialog(false);
 
-        const deleteCateringTransactionFetch = await fetch("http://localhost:3000/api/catering/deleteMultipleCateringTransaction", {
+        const deleteCateringTransactionFetch = await fetch(router.basePath + "/api/catering/deleteMultipleCateringTransaction", {
             method: "POST",
             headers: {
                 authorization: getSessionToken()
@@ -402,7 +405,7 @@ export default function ManageCateringTransactionPage() {
                                             // @ts-ignore
                                             .sort(getComparator(orderType, orderBy))
                                             .slice(getFirstDataInPage(), getLastDataInPage())
-                                            .map((transaction, _) => {
+                                            .map((transaction ) => {
                                                 const isItemSelected = isDataSelected(transaction.id);
                                                 return (
                                                     // TODO: Add Catering Transaction Detail

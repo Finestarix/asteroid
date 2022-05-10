@@ -40,7 +40,7 @@ export default function LoginPage() {
     const handleLogin = async () => {
         setShowLoading(true);
 
-        const loginFetch = await fetch("http://localhost:3000/api/auth/login", {
+        const loginFetch = await fetch(router.basePath + "/api/auth/login", {
             method: "POST",
             body: JSON.stringify({
                 username: username,

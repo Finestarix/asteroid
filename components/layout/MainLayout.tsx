@@ -21,7 +21,7 @@ export default function MainLayout(props: LayoutProps) {
             let checkAuthData;
 
             if(token) {
-                const checkAuthFetch = await fetch("http://localhost:3000/api/auth/check", {
+                const checkAuthFetch = await fetch(router.basePath + "api/auth/check", {
                     method: "POST",
                     headers: {
                         "authorization": token

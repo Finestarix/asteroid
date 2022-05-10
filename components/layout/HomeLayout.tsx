@@ -2,14 +2,9 @@ import {useRouter} from "next/router";
 import {useState} from "react";
 
 import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
-import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import MicrowaveOutlinedIcon from '@mui/icons-material/MicrowaveOutlined';
-import KitchenOutlinedIcon from '@mui/icons-material/KitchenOutlined';
-import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
 import DinnerDiningOutlinedIcon from '@mui/icons-material/DinnerDiningOutlined';
-import EggAltIcon from '@mui/icons-material/EggAlt';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
-import FoodBankIcon from "@mui/icons-material/FoodBank";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";

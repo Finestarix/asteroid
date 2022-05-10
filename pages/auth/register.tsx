@@ -43,7 +43,7 @@ export default function RegisterPage() {
     const handleRegister = async () => {
         setShowLoading(true);
 
-        const registerFetch = await fetch("http://localhost:3000/api/auth/register", {
+        const registerFetch = await fetch(router.basePath + "/api/auth/register", {
             method: "POST",
             body: JSON.stringify({
                 username: username,

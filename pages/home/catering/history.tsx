@@ -1,3 +1,4 @@
+import {useRouter} from "next/router";
 import {SyntheticEvent, useEffect, useState} from "react";
 
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -32,6 +33,8 @@ import Alert from "@mui/material/Alert";
 
 export default function CateringHistoryPage() {
 
+    const router = useRouter();
+
     const [transactions, setTransaction] = useState<CateringTransactionDetail[]>([]);
     const [subTotal, setSubTotal] = useState<number[]>([]);
     const [total, setTotal] = useState<number[]>([]);
@@ -43,7 +46,7 @@ export default function CateringHistoryPage() {
         const handleViewCateringTransactionHistory = async () => {
             setShowLoading(true);
 
-            const cateringTransactionHistoryFetch = await fetch("http://localhost:3000/api/catering/getCateringTransactionHistory", {
+            const cateringTransactionHistoryFetch = await fetch(router.basePath + "/api/catering/getCateringTransactionHistory", {
                 method: "POST",
                 headers: {
                     "authorization": getSessionToken()

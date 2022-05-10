@@ -1,3 +1,4 @@
+import {useRouter} from "next/router";
 import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
 
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -48,6 +49,8 @@ import {getSessionToken} from "utils/storage";
 
 export default function ManageCateringFoodPage() {
 
+    const router = useRouter();
+
     const foodTableHeader: TableHeadKey[] = [
         {id: "active", label: "Active?"},
         {id: "name", label: "Name"},
@@ -81,7 +84,7 @@ export default function ManageCateringFoodPage() {
         const handleViewCateringFood = async () => {
             setShowLoading(true);
 
-            const cateringFoodFetch = await fetch("http://localhost:3000/api/catering/getCateringFood", {
+            const cateringFoodFetch = await fetch(router.basePath + "/api/catering/getCateringFood", {
                 method: "POST",
                 headers: {
                     "authorization": getSessionToken()
@@ -164,7 +167,7 @@ export default function ManageCateringFoodPage() {
     const handleCreateCateringFood = async () => {
         setShowLoadingForm(true);
 
-        const createCateringFoodFetch = await fetch("http://localhost:3000/api/catering/createCateringFood", {
+        const createCateringFoodFetch = await fetch(router.basePath + "/api/catering/createCateringFood", {
             method: "POST",
             headers: {
                 authorization: getSessionToken()
@@ -197,7 +200,7 @@ export default function ManageCateringFoodPage() {
     const handleChangeActiveCateringFood = async (id: number) => {
         setShowLoading(true);
 
-        const updateActiveCateringFoodFetch = await fetch("http://localhost:3000/api/catering/updateActiveCateringFood", {
+        const updateActiveCateringFoodFetch = await fetch(router.basePath + "/api/catering/updateActiveCateringFood", {
             method: "POST",
             headers: {
                 authorization: getSessionToken()
@@ -225,7 +228,7 @@ export default function ManageCateringFoodPage() {
         setShowLoading(true);
         setShowDialog(false);
 
-        const deleteCateringFoodFetch = await fetch("http://localhost:3000/api/catering/deleteMultipleCateringFood", {
+        const deleteCateringFoodFetch = await fetch(router.basePath + "/api/catering/deleteMultipleCateringFood", {
             method: "POST",
             headers: {
                 authorization: getSessionToken()
@@ -423,7 +426,7 @@ export default function ManageCateringFoodPage() {
                                             // @ts-ignore
                                             .sort(getComparator(orderType, orderBy))
                                             .slice(getFirstDataInPage(), getLastDataInPage())
-                                            .map((food, _) => {
+                                            .map((food) => {
                                                 const isItemSelected = isDataSelected(food.id);
                                                 return (
                                                     <TableRow key={food.name} tabIndex={-1} hover={!showLoading}

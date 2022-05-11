@@ -28,7 +28,7 @@ export default function MainLayout(props: LayoutProps) {
             let role: UserRole | string;
 
             try {
-                if (encryptedToken === "" || encryptedRole === "")
+                if ((!authPath.includes(router.pathname)) && (encryptedToken === "" || encryptedRole === ""))
                     throw Error();
 
                 token = decryptData(encryptedToken);

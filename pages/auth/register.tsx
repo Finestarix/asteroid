@@ -43,7 +43,7 @@ export default function RegisterPage() {
     const handleRegister = async () => {
         setShowLoading(true);
 
-        const registerFetch = await fetch(router.basePath + "/api/auth/register", {
+        const registerFetch = await fetch("/api/auth/register", {
             method: "POST",
             body: JSON.stringify({
                 username: username,
@@ -75,7 +75,7 @@ export default function RegisterPage() {
             <Box height="100vh"
                  sx={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
 
-                <Snackbar open={showAlert} autoHideDuration={5000} anchorOrigin={{vertical: "top", horizontal: "right"}}
+                <Snackbar open={showAlert} autoHideDuration={5000} anchorOrigin={{vertical: "top", horizontal: "center"}}
                           onClose={handleCloseAlert}>
                     <Alert severity="error"
                            onClose={handleCloseAlert}>
@@ -89,7 +89,7 @@ export default function RegisterPage() {
                 </Typography>
 
                 <Box component="form"
-                     sx={{maxWidth: "430px"}}>
+                     sx={{maxWidth: "430px", marginLeft: 2, marginRight: 2}}>
 
                     <TextField type="text" label="Username" variant="outlined"
                                fullWidth={true} disabled={showLoading}

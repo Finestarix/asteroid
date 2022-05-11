@@ -40,7 +40,7 @@ export default function LoginPage() {
     const handleLogin = async () => {
         setShowLoading(true);
 
-        const loginFetch = await fetch(router.basePath + "/api/auth/login", {
+        const loginFetch = await fetch("/api/auth/login", {
             method: "POST",
             body: JSON.stringify({
                 username: username,
@@ -72,7 +72,7 @@ export default function LoginPage() {
             <Box height="100vh"
                  sx={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
 
-                <Snackbar open={showAlert} autoHideDuration={5000} anchorOrigin={{vertical: "top", horizontal: "right"}}
+                <Snackbar open={showAlert} autoHideDuration={5000} anchorOrigin={{vertical: "top", horizontal: "center"}}
                           onClose={handleCloseAlert}>
                     <Alert severity="error"
                            onClose={handleCloseAlert}>
@@ -86,9 +86,9 @@ export default function LoginPage() {
                 </Typography>
 
                 <Box component="form"
-                     sx={{maxWidth: "430px"}}>
+                     sx={{maxWidth: "430px", marginLeft: 2, marginRight: 2}}>
 
-                    <TextField type="text" label="Username" variant="outlined"
+                <TextField type="text" label="Username" variant="outlined"
                                fullWidth={true} disabled={showLoading}
                                sx={{marginBottom: 2}}
                                onChange={changeUsername} onKeyDown={handleEnter}

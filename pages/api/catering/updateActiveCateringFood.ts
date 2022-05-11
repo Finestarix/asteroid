@@ -62,7 +62,7 @@ export default async function updateActiveCateringFood(request: NextApiRequest, 
         } catch (_) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            data.success = "Failed to updated " + data.data.name + ".";
+            data.error = "Failed to updated " + data.data.name + ".";
         }
     }
 

@@ -71,7 +71,7 @@ export default async function updateActiveCateringTransaction(request: NextApiRe
         } catch (_) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            data.success = "Failed to updated catering for " + convertDateGeneral(data.data.date) + ".";
+            data.error = "Failed to updated catering for " + convertDateGeneral(data.data.date) + ".";
         }
     }
 

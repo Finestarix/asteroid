@@ -96,6 +96,12 @@ export interface InsertCateringTransactionDetailData {
     success: string
 }
 
+export interface ChangeCateringTransactionDetailData {
+    data: number,
+    error: string,
+    success: string
+}
+
 export interface ViewCateringFoodData {
     data: CateringFood[],
     error: string
@@ -141,6 +147,7 @@ export interface DeleteCateringFoodData {
 
 export enum CateringPaymentType {
     NotPaid = "NotPaid",
+    Pending = "Pending",
     Paid = "Paid"
 }
 

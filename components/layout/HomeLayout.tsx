@@ -37,8 +37,8 @@ export default function HomeLayout(props: LayoutProps) {
     const gotoHome = async () => await router.push("/home");
     const gotoCatering = async () => await router.push("/home/catering");
     const gotoCateringHistory = async () => await router.push("/home/catering/history");
-    const gotoManageCateringFood = () => router.push("/home/catering/manage/food");
-    const gotoManageCateringTransaction = () => router.push("/home/catering/manage/transaction");
+    const gotoCateringFood = () => router.push("/home/catering/manage/food");
+    const gotoCateringTransaction = () => router.push("/home/catering/manage/transaction");
     const gotoLogout = async () => {
         removeSessionToken();
         await router.push("/auth/login");
@@ -73,14 +73,14 @@ export default function HomeLayout(props: LayoutProps) {
             <Divider/>
             <List>
                 <ListItem button={true}
-                          onClick={gotoManageCateringTransaction}>
+                          onClick={gotoCateringTransaction}>
                     <ListItemIcon>
                         <MicrowaveOutlinedIcon fontSize="medium"/>
                     </ListItemIcon>
                     <ListItemText primary="Catering Transaction"/>
                 </ListItem>
                 <ListItem button={true}
-                          onClick={gotoManageCateringFood}>
+                          onClick={gotoCateringFood}>
                     <ListItemIcon>
                         <DinnerDiningOutlinedIcon fontSize="medium"/>
                     </ListItemIcon>

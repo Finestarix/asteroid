@@ -1,39 +1,46 @@
-import {useRouter} from "next/router";
 import {SyntheticEvent, useEffect, useState} from "react";
 
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import CancelIcon from "@mui/icons-material/Cancel";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Modal from "@mui/material/Modal";
+import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import {CopyToClipboard} from "react-copy-to-clipboard";
 
 import HomeLayout from "@components/layout/HomeLayout";
 import {
     CateringPaymentType,
     CateringTransactionDetail,
-    ViewCateringTransactionHistoryData,
+    ChangeCateringTransactionDetailData,
+    ViewCateringTransactionHistoryData
 } from "types/cateringType";
 import {convertToIDR} from "utils/currency";
 import {convertDateGeneral} from "utils/date";
 import {getSessionToken} from "utils/storage";
-import Alert from "@mui/material/Alert";
+import Alert, {AlertColor} from "@mui/material/Alert";
+import Image from "next/image";
+import Snackbar from "@mui/material/Snackbar";
+import {AlertTypeEnum} from "../../../types/generalType";
 
 
 export default function CateringHistoryPage() {
-
-    const router = useRouter();
 
     const [transactions, setTransaction] = useState<CateringTransactionDetail[]>([]);
     const [subTotal, setSubTotal] = useState<number[]>([]);
@@ -41,12 +48,16 @@ export default function CateringHistoryPage() {
     const [totalUnpaid, setTotalUnpaid] = useState<number>(0);
     const [expanded, setExpanded] = useState<string | false>(false);
     const [showLoading, setShowLoading] = useState<boolean>(false);
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const [typeAlert, setTypeAlert] = useState<AlertColor>("error");
+    const [messageAlert, setMessageAlert] = useState<string>("");
+    const [showAlert, setShowAlert] = useState<boolean>(false);
 
     useEffect(() => {
         const handleViewCateringTransactionHistory = async () => {
             setShowLoading(true);
 
-            const cateringTransactionHistoryFetch = await fetch(router.basePath + "/api/catering/getCateringTransactionHistory", {
+            const cateringTransactionHistoryFetch = await fetch("/api/catering/getCateringTransactionHistory", {
                 method: "POST",
                 headers: {
                     "authorization": getSessionToken()
@@ -81,8 +92,46 @@ export default function CateringHistoryPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
+    const handleOpenAlertClipboard = () => {
+        setTypeAlert("success");
+        setMessageAlert("Successfully copied to clipboard.");
+        setShowAlert(true);
+    };
+    const handleCloseAlert = () => setShowAlert(false);
+
     const handleAccordion = (panel: string) => (event: SyntheticEvent, isExpanded: boolean) =>
         setExpanded(isExpanded ? panel : false);
+
+    const handleChangeCateringTransactionDetail = async () => {
+        setShowLoading(true);
+        setShowModal(false);
+
+        const changeCateringTransactionDetailFetch = await fetch("/api/catering/updatePendingCateringTransactionDetail", {
+            method: "POST",
+            headers: {
+                authorization: getSessionToken()
+            }
+        });
+
+        const changeCateringTransactionDetailData: ChangeCateringTransactionDetailData = await changeCateringTransactionDetailFetch.json();
+        if (changeCateringTransactionDetailData.error) {
+            setMessageAlert(changeCateringTransactionDetailData.error);
+            setTypeAlert(AlertTypeEnum.ERROR);
+            setShowModal(true);
+        } else {
+            for (const transaction of transactions) {
+                if (transaction.paymentType === CateringPaymentType.NotPaid) {
+                    transaction.paymentType = CateringPaymentType.Pending;
+                }
+            }
+            setMessageAlert(changeCateringTransactionDetailData.success);
+            setTypeAlert(AlertTypeEnum.SUCCESS);
+        }
+        setShowAlert(true);
+        setShowLoading(false);
+    };
 
     return (
         <HomeLayout title="Catering History">
@@ -100,15 +149,79 @@ export default function CateringHistoryPage() {
                                       }}/>
                 </Backdrop>
 
+                <Snackbar open={showAlert} autoHideDuration={5000}
+                          anchorOrigin={{vertical: "top", horizontal: "center"}}
+                          onClose={handleCloseAlert}>
+                    <Alert severity={typeAlert}
+                           onClose={handleCloseAlert}>
+                        {messageAlert}
+                    </Alert>
+                </Snackbar>
+
+                <Modal open={showModal}
+                       onClose={handleCloseModal}>
+                    <Paper elevation={8}
+                           sx={{
+                               paddingTop: 2,
+                               paddingBottom: 2,
+                               width: "300px",
+                               display: "flex",
+                               flexDirection: "column",
+                               alignItems: "center",
+                               justifyContent: "center",
+                               position: "absolute",
+                               top: "50%",
+                               left: "50%",
+                               transform: "translate(-50%, -50%)"
+                           }}>
+                        <Typography sx={{marginBottom: 1}}>
+                            <b>RENALDY</b>
+                        </Typography>
+                        <Image src="/qr_code.png" alt="QR Code"
+                               width={250} height={250}/>
+                        <CopyToClipboard text="5271638231"
+                                         onCopy={handleOpenAlertClipboard}>
+                            <Box sx={{
+                                marginTop: 1,
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                cursor: "pointer"
+                            }}>
+                                <Typography>
+                                    <b>BCA - 5271638231</b>
+                                </Typography>
+                                <Typography variant="caption">
+                                    (click to copy)
+                                </Typography>
+                            </Box>
+                        </CopyToClipboard>
+                        <Alert variant="outlined" severity="info"
+                               sx={{margin: 1}}>
+                            Click on <b>Notify Payment</b> so your payment can be checked.
+                        </Alert>
+                        <Button variant="contained" size="small"
+                                onClick={handleChangeCateringTransactionDetail}>
+                            Notify Payment
+                        </Button>
+                    </Paper>
+                </Modal>
+
                 {(transactions.length > 0) ? (
                     <>
-                        <Box sx={{marginBottom: 2, display: "flex", justifyContent: "space-between", alignItems: "flex-end"}}>
+                        <Box sx={{
+                            marginBottom: 2,
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center"
+                        }}>
                             <Typography>
-                                Total Unpaid: {convertToIDR(totalUnpaid)}
+                                Unpaid: {convertToIDR(totalUnpaid)}
                             </Typography>
                             <Button size="small" variant="contained"
-                                    startIcon={<AttachMoneyIcon/>}>
-                                Payment
+                                    startIcon={<AttachMoneyIcon/>}
+                                    onClick={handleOpenModal}>
+                                Pay
                             </Button>
                         </Box>
                         {transactions.map((transaction, index) => (
@@ -116,16 +229,25 @@ export default function CateringHistoryPage() {
                                        onChange={handleAccordion("accordion" + index)}>
                                 <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                                     <Typography sx={{width: "100%", display: "flex", justifyContent: "space-between"}}>
-                                        Catering {convertDateGeneral(transaction.header.date)}
-                                        <Chip size="small"
-                                              color={(transaction.paymentType === CateringPaymentType.NotPaid) ? "primary" : "default"}
-                                              label={transaction.paymentType}
-                                              sx={{marginRight: 2}}/>
+                                        {convertDateGeneral(transaction.header.date)}
+                                        {(transaction.paymentType === CateringPaymentType.NotPaid) ?
+                                            <Tooltip title="Unpaid">
+                                                <CancelIcon fontSize="small" color="primary"
+                                                            sx={{marginRight: 2}}/>
+                                            </Tooltip> : (transaction.paymentType === CateringPaymentType.Paid) ?
+                                                <Tooltip title="Paid">
+                                                    <CheckCircleIcon fontSize="small" color="disabled"
+                                                                     sx={{marginRight: 2}}/>
+                                                </Tooltip> :
+                                                <Tooltip title="Pending">
+                                                    <RemoveCircleIcon fontSize="small" color="info"
+                                                                      sx={{marginRight: 2}}/>
+                                                </Tooltip>}
                                     </Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Box>
-                                        <TableContainer sx={{marginBottom: 2, whiteSpace: "nowrap"}}>
+                                        <TableContainer sx={{marginBottom: 1, whiteSpace: "nowrap"}}>
                                             <Table size="small">
                                                 <TableHead>
                                                     <TableRow>

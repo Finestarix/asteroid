@@ -1,4 +1,3 @@
-import {useRouter} from "next/router";
 import {ChangeEvent, useEffect, useState} from "react";
 
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
@@ -44,8 +43,6 @@ import {getSessionToken} from "utils/storage";
 
 export default function CateringOrderPage() {
 
-    const router = useRouter();
-
     const [transaction, setTransaction] = useState<CateringTransaction>();
     const [activeStep, setActiveStep] = useState<number>(-1);
     const [rice, setRice] = useState<CateringFood[]>([]);
@@ -69,7 +66,7 @@ export default function CateringOrderPage() {
         const handleViewCateringFood = async () => {
             setShowLoading(true);
 
-            const cateringFoodFetch = await fetch(router.basePath + "/api/catering/getOrderCateringFood", {
+            const cateringFoodFetch = await fetch("/api/catering/getOrderCateringFood", {
                 method: "POST",
                 headers: {
                     "authorization": getSessionToken()
@@ -89,7 +86,7 @@ export default function CateringOrderPage() {
         const handleViewCateringTransaction = async () => {
             setShowLoading(true);
 
-            const cateringTransactionFetch = await fetch(router.basePath + "/api/catering/getActiveCateringTransaction", {
+            const cateringTransactionFetch = await fetch("/api/catering/getActiveCateringTransaction", {
                 method: "POST",
                 headers: {
                     "authorization": getSessionToken()
@@ -102,6 +99,7 @@ export default function CateringOrderPage() {
         };
 
         handleViewCateringTransaction().then(() => handleViewCateringFood().then());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleCloseAlert = () => setShowAlert(false);
@@ -164,7 +162,7 @@ export default function CateringOrderPage() {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
         setShowLoading(true);
 
-        const createCateringOrderFetch = await fetch(router.basePath + "/api/catering/createCateringTransactionDetail", {
+        const createCateringOrderFetch = await fetch("/api/catering/createCateringTransactionDetail", {
             method: "POST",
             headers: {
                 authorization: getSessionToken()
@@ -206,7 +204,7 @@ export default function CateringOrderPage() {
                                       }}/>
                 </Backdrop>
 
-                <Snackbar open={showAlert} autoHideDuration={5000} anchorOrigin={{vertical: "top", horizontal: "right"}}
+                <Snackbar open={showAlert} autoHideDuration={5000} anchorOrigin={{vertical: "top", horizontal: "center"}}
                           onClose={handleCloseAlert}>
                     <Alert severity={typeAlert}
                            onClose={handleCloseAlert}>

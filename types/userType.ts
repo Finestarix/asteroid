@@ -16,6 +16,7 @@ export interface LoginParameter {
 }
 
 export interface LoginData {
+    role: string,
     token: string,
     error: string
 }
@@ -37,6 +38,7 @@ export interface TokenData {
 
 export enum UserRole {
     User = "User",
-    Admin = "Admin",
+    CateringAdmin = "CateringAdmin",
+    DebtAdmin = "DebtAdmin",
     Owner = "Owner"
 }

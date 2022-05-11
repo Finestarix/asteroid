@@ -43,8 +43,9 @@ import {
 } from "types/cateringType";
 import {AlertTypeEnum, OrderTypeEnum, TableHeadKey} from "types/generalType";
 import {getComparator} from "utils/comparator";
-import {convertDateGeneral} from "utils/date";
 import {convertToIDR} from "utils/currency";
+import {convertDateGeneral} from "utils/date";
+import {decryptData} from "utils/encryption";
 import {getSessionToken} from "utils/storage";
 
 
@@ -83,7 +84,7 @@ export default function ManageCateringTransactionPage() {
             const cateringTransactionFetch = await fetch("/api/catering/getCateringTransaction", {
                 method: "POST",
                 headers: {
-                    "authorization": getSessionToken()
+                    "authorization": decryptData(getSessionToken())
                 }
             });
 
@@ -163,7 +164,7 @@ export default function ManageCateringTransactionPage() {
         const createCateringTransactionFetch = await fetch("/api/catering/createCateringTransaction", {
             method: "POST",
             headers: {
-                authorization: getSessionToken()
+                authorization: decryptData(getSessionToken())
             },
             body: JSON.stringify({
                 date: date,
@@ -192,7 +193,7 @@ export default function ManageCateringTransactionPage() {
         const updateActiveCateringTransactionFetch = await fetch("/api/catering/updateActiveCateringTransaction", {
             method: "POST",
             headers: {
-                authorization: getSessionToken()
+                authorization: decryptData(getSessionToken())
             },
             body: JSON.stringify({
                 id: id
@@ -220,7 +221,7 @@ export default function ManageCateringTransactionPage() {
         const deleteCateringTransactionFetch = await fetch("/api/catering/deleteMultipleCateringTransaction", {
             method: "POST",
             headers: {
-                authorization: getSessionToken()
+                authorization: decryptData(getSessionToken())
             },
             body: JSON.stringify({
                 ids: selectedTransactions

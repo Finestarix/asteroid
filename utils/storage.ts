@@ -8,5 +8,12 @@ export const getSessionToken = () => {
 };
 export const removeSessionToken = () => sessionStorage.removeItem(tokenKey);
 
+export const setSessionData = (key: string, data: string) => sessionStorage.setItem(key, data);
+export const getSessionData = (key: string) => {
+    const sessionToken = sessionStorage.getItem(key);
+    return (sessionToken) ? sessionToken : "";
+};
+export const removeSessionData = (key: string) => sessionStorage.removeItem(key);
+
 export const setLocalMode = (newMode: boolean) => localStorage.setItem(modeKey, String(newMode));
 export const getLocalMode = () => localStorage.getItem(modeKey);

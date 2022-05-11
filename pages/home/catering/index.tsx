@@ -38,6 +38,7 @@ import {
 import {AlertTypeEnum} from "types/generalType";
 import {convertToIDR} from "utils/currency";
 import {convertDateGeneral} from "utils/date";
+import {decryptData} from "utils/encryption";
 import {getSessionToken} from "utils/storage";
 
 
@@ -69,7 +70,7 @@ export default function CateringOrderPage() {
             const cateringFoodFetch = await fetch("/api/catering/getOrderCateringFood", {
                 method: "POST",
                 headers: {
-                    "authorization": getSessionToken()
+                    "authorization": decryptData(getSessionToken())
                 }
             });
 
@@ -89,7 +90,7 @@ export default function CateringOrderPage() {
             const cateringTransactionFetch = await fetch("/api/catering/getActiveCateringTransaction", {
                 method: "POST",
                 headers: {
-                    "authorization": getSessionToken()
+                    "authorization": decryptData(getSessionToken())
                 }
             });
 
@@ -165,7 +166,7 @@ export default function CateringOrderPage() {
         const createCateringOrderFetch = await fetch("/api/catering/createCateringTransactionDetail", {
             method: "POST",
             headers: {
-                authorization: getSessionToken()
+                authorization: decryptData(getSessionToken())
             },
             body: JSON.stringify({
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

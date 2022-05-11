@@ -43,6 +43,7 @@ import {
 import {AlertTypeEnum, OrderTypeEnum, TableHeadKey} from "types/generalType";
 import {getComparator} from "utils/comparator";
 import {convertToIDR} from "utils/currency";
+import {decryptData} from "utils/encryption";
 import {getSessionToken} from "utils/storage";
 
 
@@ -84,7 +85,7 @@ export default function ManageCateringFoodPage() {
             const cateringFoodFetch = await fetch("/api/catering/getCateringFood", {
                 method: "POST",
                 headers: {
-                    "authorization": getSessionToken()
+                    "authorization": decryptData(getSessionToken())
                 }
             });
 
@@ -168,7 +169,7 @@ export default function ManageCateringFoodPage() {
         const createCateringFoodFetch = await fetch("/api/catering/createCateringFood", {
             method: "POST",
             headers: {
-                authorization: getSessionToken()
+                authorization: decryptData(getSessionToken())
             },
             body: JSON.stringify({
                 name: name,
@@ -201,7 +202,7 @@ export default function ManageCateringFoodPage() {
         const updateActiveCateringFoodFetch = await fetch("/api/catering/updateActiveCateringFood", {
             method: "POST",
             headers: {
-                authorization: getSessionToken()
+                authorization: decryptData(getSessionToken())
             },
             body: JSON.stringify({
                 id: id
@@ -229,7 +230,7 @@ export default function ManageCateringFoodPage() {
         const deleteCateringFoodFetch = await fetch("/api/catering/deleteMultipleCateringFood", {
             method: "POST",
             headers: {
-                authorization: getSessionToken()
+                authorization: decryptData(getSessionToken())
             },
             body: JSON.stringify({
                 ids: selectedFoods

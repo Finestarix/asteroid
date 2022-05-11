@@ -122,7 +122,8 @@ model DebtDetail {
 
 enum Role {
   User
-  Admin
+  CateringAdmin
+  DebtAdmin
   Owner
 }
 

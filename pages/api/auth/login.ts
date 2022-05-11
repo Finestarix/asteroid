@@ -2,14 +2,14 @@ import {NextApiRequest, NextApiResponse} from "next";
 
 import {LoginParameter, TokenData} from "types/userType";
 import {prisma} from "utils/database";
-import {compareHashString} from "utils/encryption";
+import {compareHashString} from "utils/hash";
 import {generateToken} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";
 
 
 export default async function authLogin(request: NextApiRequest, response: NextApiResponse) {
 
-    const data = {token: "", error: ""};
+    const data = {role: "", token: "", error: ""};
     let userParameter: LoginParameter;
 
     try {
@@ -52,6 +52,7 @@ export default async function authLogin(request: NextApiRequest, response: NextA
                     role: userData.role,
                 };
                 data.token = generateToken(tokenData);
+                data.role = userData.role;
             }
         }
     }

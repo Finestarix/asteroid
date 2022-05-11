@@ -23,7 +23,9 @@ import MainLayout from "@components/layout/MainLayout";
 import ThemeButton from "@components/themes/ThemeButton";
 import ThemeImage from "@components/themes/ThemeImage";
 import {LayoutProps} from "types/generalType";
-import {removeSessionToken} from "utils/storage";
+import {getSessionData, removeSessionData, removeSessionToken} from "utils/storage";
+import {UserRole} from "../../types/userType";
+import {decryptData} from "../../utils/encryption";
 
 
 export default function HomeLayout(props: LayoutProps) {
@@ -33,6 +35,10 @@ export default function HomeLayout(props: LayoutProps) {
     const [drawerMobileOpen, setDrawerMobileOpen] = useState<boolean>(false);
     const toggleDrawerMobile = () => setDrawerMobileOpen(!drawerMobileOpen);
 
+    // const role = decryptData(getSessionData("role"));
+    const cateringAdminRole: string[] = [UserRole.CateringAdmin, UserRole.Owner];
+    const debtAdminRole: string[] = [UserRole.DebtAdmin, UserRole.Owner];
+
     const router = useRouter();
     const gotoHome = async () => await router.push("/home");
     const gotoCatering = async () => await router.push("/home/catering");
@@ -41,6 +47,7 @@ export default function HomeLayout(props: LayoutProps) {
     const gotoCateringTransaction = () => router.push("/home/catering/manage/transaction");
     const gotoLogout = async () => {
         removeSessionToken();
+        removeSessionData("role");
         await router.push("/auth/login");
     };
 
@@ -71,23 +78,26 @@ export default function HomeLayout(props: LayoutProps) {
                 </ListItem>
             </List>
             <Divider/>
-            <List>
-                <ListItem button={true}
-                          onClick={gotoCateringTransaction}>
-                    <ListItemIcon>
-                        <MicrowaveOutlinedIcon fontSize="medium"/>
-                    </ListItemIcon>
-                    <ListItemText primary="Catering Transaction"/>
-                </ListItem>
-                <ListItem button={true}
-                          onClick={gotoCateringFood}>
-                    <ListItemIcon>
-                        <DinnerDiningOutlinedIcon fontSize="medium"/>
-                    </ListItemIcon>
-                    <ListItemText primary="Catering Food"/>
-                </ListItem>
-            </List>
-            <Divider/>
+            {/*{(cateringAdminRole.includes(role)) &&*/}
+            {/*    <>*/}
+                    <List>
+                        <ListItem button={true}
+                                  onClick={gotoCateringTransaction}>
+                            <ListItemIcon>
+                                <MicrowaveOutlinedIcon fontSize="medium"/>
+                            </ListItemIcon>
+                            <ListItemText primary="Catering Transaction"/>
+                        </ListItem>
+                        <ListItem button={true}
+                                  onClick={gotoCateringFood}>
+                            <ListItemIcon>
+                                <DinnerDiningOutlinedIcon fontSize="medium"/>
+                            </ListItemIcon>
+                            <ListItemText primary="Catering Food"/>
+                        </ListItem>
+                    </List>
+                    <Divider/>
+                {/*</>}*/}
             <List>
                 <ListItem button={true}
                           onClick={gotoLogout}>

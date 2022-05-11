@@ -1,7 +1,7 @@
-import {hash, compare} from "bcrypt";
+import CryptoJS from "crypto-js";
 
 
-const saltRounds = 10;
+const key = "5uP3rS3cR37";
 
-export const hashString = async (plain: string) => await hash(plain, saltRounds);
-export const compareHashString = async (plain: string, hash: string) => await compare(plain, hash);
+export const encryptData = (data: string) => CryptoJS.AES.encrypt(data, key).toString();
+export const decryptData = (data: string) => CryptoJS.AES.decrypt(data, key).toString(CryptoJS.enc.Utf8);

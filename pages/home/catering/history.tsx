@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {SyntheticEvent, useEffect, useState} from "react";
 
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
@@ -8,12 +9,14 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
+import Alert, {AlertColor} from "@mui/material/Alert";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Modal from "@mui/material/Modal";
 import Paper from "@mui/material/Paper";
+import Snackbar from "@mui/material/Snackbar";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -31,13 +34,11 @@ import {
     ChangeCateringTransactionDetailData,
     ViewCateringTransactionHistoryData
 } from "types/cateringType";
+import {AlertTypeEnum} from "types/generalType";
 import {convertToIDR} from "utils/currency";
 import {convertDateGeneral} from "utils/date";
+import {decryptData} from "utils/encryption";
 import {getSessionToken} from "utils/storage";
-import Alert, {AlertColor} from "@mui/material/Alert";
-import Image from "next/image";
-import Snackbar from "@mui/material/Snackbar";
-import {AlertTypeEnum} from "../../../types/generalType";
 
 
 export default function CateringHistoryPage() {
@@ -60,7 +61,7 @@ export default function CateringHistoryPage() {
             const cateringTransactionHistoryFetch = await fetch("/api/catering/getCateringTransactionHistory", {
                 method: "POST",
                 headers: {
-                    "authorization": getSessionToken()
+                    "authorization": decryptData(getSessionToken())
                 }
             });
 
@@ -111,7 +112,7 @@ export default function CateringHistoryPage() {
         const changeCateringTransactionDetailFetch = await fetch("/api/catering/updatePendingCateringTransactionDetail", {
             method: "POST",
             headers: {
-                authorization: getSessionToken()
+                authorization: decryptData(getSessionToken())
             }
         });
 
@@ -128,6 +129,7 @@ export default function CateringHistoryPage() {
             }
             setMessageAlert(changeCateringTransactionDetailData.success);
             setTypeAlert(AlertTypeEnum.SUCCESS);
+            setTotalUnpaid(0);
         }
         setShowAlert(true);
         setShowLoading(false);
@@ -218,11 +220,12 @@ export default function CateringHistoryPage() {
                             <Typography>
                                 Unpaid: {convertToIDR(totalUnpaid)}
                             </Typography>
-                            <Button size="small" variant="contained"
-                                    startIcon={<AttachMoneyIcon/>}
-                                    onClick={handleOpenModal}>
-                                Pay
-                            </Button>
+                            {(totalUnpaid !== 0) && (
+                                <Button size="small" variant="contained"
+                                        startIcon={<AttachMoneyIcon/>}
+                                        onClick={handleOpenModal}>
+                                    Pay
+                                </Button>)}
                         </Box>
                         {transactions.map((transaction, index) => (
                             <Accordion key={transaction.id} expanded={expanded === "accordion" + index}

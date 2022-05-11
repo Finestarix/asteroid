@@ -19,7 +19,8 @@ import Typography from "@mui/material/Typography";
 import MainLayout from "@components/layout/MainLayout";
 import ThemeButton from "@components/themes/ThemeButton";
 import {LoginData} from "types/userType";
-import {setSessionToken} from "utils/storage";
+import {encryptData} from "utils/encryption";
+import {setSessionData, setSessionToken} from "utils/storage";
 
 
 export default function LoginPage() {
@@ -53,7 +54,8 @@ export default function LoginPage() {
             setMessageAlert(loginData.error);
             setShowAlert(true);
         } else {
-            setSessionToken(loginData.token);
+            setSessionToken(encryptData(loginData.token));
+            setSessionData("role", encryptData(loginData.role));
             await router.push("/home");
         }
         setShowLoading(false);

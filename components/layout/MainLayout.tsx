@@ -6,7 +6,9 @@ import {useTheme} from "@mui/material/styles";
 import NextNProgress from "nextjs-progressbar";
 
 import {LayoutProps} from "types/generalType";
-import {getSessionToken, removeSessionToken} from "utils/storage";
+import {UserRole} from "types/userType";
+import {getSessionData, getSessionToken, removeSessionData, removeSessionToken} from "utils/storage";
+import {decryptData} from "utils/encryption";
 
 
 export default function MainLayout(props: LayoutProps) {
@@ -17,25 +19,30 @@ export default function MainLayout(props: LayoutProps) {
     useEffect(() => {
         const handleCheckAuth = async () => {
             const authPath: string[] = ["/auth/login", "/auth/register"];
-            const token = getSessionToken();
-            let checkAuthData;
+            const cateringAdminPath: string[] = ["/home/catering/manage/food", "/home/catering/manage/transaction"];
+            const cateringAdminRole: string[] = [UserRole.CateringAdmin, UserRole.Owner];
 
-            if(token) {
-                const checkAuthFetch = await fetch("/api/auth/check", {
-                    method: "POST",
-                    headers: {
-                        "authorization": token
-                    }
-                });
-                checkAuthData = await checkAuthFetch.json();
-            }
+            const encryptedToken = getSessionToken();
+            const encryptedRole = getSessionData("role");
+            let token: string;
+            let role: UserRole | string;
 
-            if ((checkAuthData && checkAuthData.message === "Token Invalid") ||
-                (!authPath.includes(router.pathname) && !token)) {
+            try {
+                if (encryptedToken === "" || encryptedRole === "")
+                    throw Error();
+
+                token = decryptData(encryptedToken);
+                role = decryptData(encryptedRole);
+
+                if ((!authPath.includes(router.pathname)) && (!token))
+                    throw Error();
+                else if ((cateringAdminPath.includes(router.pathname) && (!cateringAdminRole.includes(role))) ||
+                    (authPath.includes(router.pathname) && token))
+                    router.push("/home").then();
+            } catch (_) {
                 removeSessionToken();
+                removeSessionData("role");
                 router.push("/auth/login").then();
-            } else if (authPath.includes(router.pathname) && token) {
-                router.push("/home").then();
             }
         };
         handleCheckAuth().then();

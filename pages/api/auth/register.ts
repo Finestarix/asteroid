@@ -5,7 +5,7 @@ import {passwordStrength} from "check-password-strength";
 import * as AvatarType from "types/avatarType";
 import {RegisterParameter} from "types/userType";
 import {prisma} from "utils/database";
-import {hashString} from "utils/encryption";
+import {hashString} from "utils/hash";
 import {randomEnum} from "utils/random";
 import {checkMultipleUndefined} from "utils/validate";
 

@@ -1,5 +1,5 @@
 import {useRouter} from "next/router";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
 import MicrowaveOutlinedIcon from '@mui/icons-material/MicrowaveOutlined';
@@ -33,9 +33,14 @@ export default function HomeLayout(props: LayoutProps) {
     const drawerWidth = 300;
 
     const [drawerMobileOpen, setDrawerMobileOpen] = useState<boolean>(false);
+    const [role, setRole] = useState<UserRole | string>("");
+
+    useEffect(() => {
+        setRole(decryptData(getSessionData("role")));
+    }, []);
+
     const toggleDrawerMobile = () => setDrawerMobileOpen(!drawerMobileOpen);
 
-    // const role = decryptData(getSessionData("role"));
     const cateringAdminRole: string[] = [UserRole.CateringAdmin, UserRole.Owner];
     const debtAdminRole: string[] = [UserRole.DebtAdmin, UserRole.Owner];
 
@@ -78,8 +83,8 @@ export default function HomeLayout(props: LayoutProps) {
                 </ListItem>
             </List>
             <Divider/>
-            {/*{(cateringAdminRole.includes(role)) &&*/}
-            {/*    <>*/}
+            {(cateringAdminRole.includes(role)) &&
+                <>
                     <List>
                         <ListItem button={true}
                                   onClick={gotoCateringTransaction}>
@@ -97,7 +102,7 @@ export default function HomeLayout(props: LayoutProps) {
                         </ListItem>
                     </List>
                     <Divider/>
-                {/*</>}*/}
+                </>}
             <List>
                 <ListItem button={true}
                           onClick={gotoLogout}>

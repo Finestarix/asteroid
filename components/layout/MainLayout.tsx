@@ -17,35 +17,32 @@ export default function MainLayout(props: LayoutProps) {
 
     const router = useRouter();
     useEffect(() => {
-        const handleCheckAuth = async () => {
-            const authPath: string[] = ["/auth/login", "/auth/register"];
-            const cateringAdminPath: string[] = ["/home/catering/manage/food", "/home/catering/manage/transaction"];
-            const cateringAdminRole: string[] = [UserRole.CateringAdmin, UserRole.Owner];
+        const authPath: string[] = ["/auth/login", "/auth/register"];
+        const cateringAdminPath: string[] = ["/home/catering/manage/food", "/home/catering/manage/transaction"];
+        const cateringAdminRole: string[] = [UserRole.CateringAdmin, UserRole.Owner];
 
-            const encryptedToken = getSessionToken();
-            const encryptedRole = getSessionData("role");
-            let token: string;
-            let role: UserRole | string;
+        const encryptedToken = getSessionToken();
+        const encryptedRole = getSessionData("role");
+        let token: string;
+        let role: UserRole | string;
 
-            try {
-                if ((!authPath.includes(router.pathname)) && (encryptedToken === "" || encryptedRole === ""))
-                    throw Error();
+        try {
+            if ((!authPath.includes(router.pathname)) && (encryptedToken === "" || encryptedRole === ""))
+                throw Error();
 
-                token = decryptData(encryptedToken);
-                role = decryptData(encryptedRole);
+            token = decryptData(encryptedToken);
+            role = decryptData(encryptedRole);
 
-                if ((!authPath.includes(router.pathname)) && (!token))
-                    throw Error();
-                else if ((cateringAdminPath.includes(router.pathname) && (!cateringAdminRole.includes(role))) ||
-                    (authPath.includes(router.pathname) && token))
-                    router.push("/home").then();
-            } catch (_) {
-                removeSessionToken();
-                removeSessionData("role");
-                router.push("/auth/login").then();
-            }
-        };
-        handleCheckAuth().then();
+            if ((!authPath.includes(router.pathname)) && (!token))
+                throw Error();
+            else if ((cateringAdminPath.includes(router.pathname) && (!cateringAdminRole.includes(role))) ||
+                (authPath.includes(router.pathname) && token))
+                router.push("/home").then();
+        } catch (_) {
+            removeSessionToken();
+            removeSessionData("role");
+            router.push("/auth/login").then();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

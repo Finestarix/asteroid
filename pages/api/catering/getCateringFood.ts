@@ -17,6 +17,7 @@ export default async function getCateringFood(request: NextApiRequest, response:
             checkMultipleUndefined(tokenData.username))
             throw Error();
     } catch (_) {
+        data.data = [];
         data.error = "Oops. Something went wrong.";
         return response.status(400).json(data);
     }

@@ -55,6 +55,16 @@ export interface ViewCateringTransactionData {
     error: string
 }
 
+export interface ViewTotalCateringTransactionParameter {
+    id: number
+}
+
+export interface ViewTotalCateringTransactionData {
+    data: number,
+    error: string,
+    success: string
+}
+
 export interface InsertCateringTransactionParameter {
     date: Date,
     basePrice: number,
@@ -87,6 +97,8 @@ export interface ViewCateringTransactionHistoryData {
 
 export interface InsertCateringTransactionDetailParameter {
     header: number,
+    note: string,
+    onlyAdditional: boolean,
     foods: number[]
 }
 

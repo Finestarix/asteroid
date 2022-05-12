@@ -17,7 +17,8 @@ export default async function createCateringTransaction(request: NextApiRequest,
         tokenData = getTokenData(request);
         transactionDetailParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, transactionDetailParameter.header, transactionDetailParameter.foods))
+            checkMultipleUndefined(tokenData.username, transactionDetailParameter.header, transactionDetailParameter.foods,
+                transactionDetailParameter.note, transactionDetailParameter.onlyAdditional))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";
@@ -37,6 +38,8 @@ export default async function createCateringTransaction(request: NextApiRequest,
                         username: tokenData.username
                     }
                 },
+                note: transactionDetailParameter.note,
+                onlyAdditional: transactionDetailParameter.onlyAdditional,
                 paymentType: "NotPaid",
                 foods: {
                     create: transactionDetailParameter.foods.map((food) => {

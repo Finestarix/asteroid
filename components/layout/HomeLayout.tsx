@@ -23,9 +23,9 @@ import MainLayout from "@components/layout/MainLayout";
 import ThemeButton from "@components/themes/ThemeButton";
 import ThemeImage from "@components/themes/ThemeImage";
 import {LayoutProps} from "types/generalType";
+import {UserRole} from "types/userType";
+import {decryptData} from "utils/encryption";
 import {getSessionData, removeSessionData, removeSessionToken} from "utils/storage";
-import {UserRole} from "../../types/userType";
-import {decryptData} from "../../utils/encryption";
 
 
 export default function HomeLayout(props: LayoutProps) {
@@ -37,6 +37,7 @@ export default function HomeLayout(props: LayoutProps) {
 
     useEffect(() => {
         setRole(decryptData(getSessionData("role")));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const toggleDrawerMobile = () => setDrawerMobileOpen(!drawerMobileOpen);
@@ -130,7 +131,7 @@ export default function HomeLayout(props: LayoutProps) {
                         </IconButton>
                         <Box sx={{width: "100%"}}>
                             <Typography component="div" variant="h6">
-                                {props.title} Page
+                                {props.title}
                             </Typography>
                         </Box>
                         <ThemeButton/>

@@ -8,7 +8,7 @@ import {getTokenData} from "utils/token";
 
 export default async function getActiveCateringTransaction(request: NextApiRequest, response: NextApiResponse) {
 
-    const data = {data: {}, error: ""};
+    const data = {data: null, error: ""};
     let tokenData: TokenData;
 
     try {
@@ -17,7 +17,7 @@ export default async function getActiveCateringTransaction(request: NextApiReque
             checkMultipleUndefined(tokenData.username))
             throw Error();
     } catch (_) {
-        data.data = [];
+        data.data = null;
         data.error = "Oops. Something went wrong.";
         return response.status(400).json(data);
     }
@@ -40,7 +40,7 @@ export default async function getActiveCateringTransaction(request: NextApiReque
             }
         });
     } catch (_) {
-        data.data = [];
+        data.data = null;
         data.error = "Failed to fetch catering transaction data.";
     }
 

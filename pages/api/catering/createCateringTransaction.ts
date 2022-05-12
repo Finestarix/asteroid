@@ -23,7 +23,7 @@ export default async function createCateringTransaction(request: NextApiRequest,
             checkMultipleUndefined(tokenData.username, transactionParameter.date, transactionParameter.basePrice))
             throw Error();
         const currentDate = new Date();
-        currentDate.setDate(currentDate.getDate() + 2);
+        currentDate.setDate(currentDate.getDate() + 6);
         constraintDate = currentDate.getTime();
         transactionDate = new Date(transactionParameter.date).getTime();
     } catch (_) {

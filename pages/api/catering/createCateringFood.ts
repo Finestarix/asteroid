@@ -17,7 +17,8 @@ export default async function createCateringFood(request: NextApiRequest, respon
         tokenData = getTokenData(request);
         foodParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, foodParameter.name, foodParameter.category, foodParameter.additionalPrice, foodParameter.reductionPrice))
+            checkMultipleUndefined(tokenData.username, foodParameter.name, foodParameter.category,
+                foodParameter.additionalPrice, foodParameter.reductionPrice))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";

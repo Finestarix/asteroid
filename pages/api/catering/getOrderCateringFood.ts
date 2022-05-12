@@ -32,6 +32,9 @@ export default async function getOrderCateringFood(request: NextApiRequest, resp
         const activeFoods = await prisma.cateringFood.findMany({
             where: {
                 active: true
+            },
+            orderBy: {
+                id: "asc"
             }
         });
 

@@ -8,7 +8,7 @@ import {getTokenData} from "utils/token";
 
 export default async function getCateringFood(request: NextApiRequest, response: NextApiResponse) {
 
-    const data = {data: {}, error: ""};
+    const data = {data: [], error: ""};
     let tokenData: TokenData;
 
     try {
@@ -17,12 +17,13 @@ export default async function getCateringFood(request: NextApiRequest, response:
             checkMultipleUndefined(tokenData.username))
             throw Error();
     } catch (_) {
-        data.data = [];
         data.error = "Oops. Something went wrong.";
         return response.status(400).json(data);
     }
 
     try {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         data.data = await prisma.cateringFood.findMany({
             include: {
                 createdBy: {
@@ -40,7 +41,6 @@ export default async function getCateringFood(request: NextApiRequest, response:
             }
         });
     } catch (_) {
-        data.data = [];
         data.error = "Failed to fetch catering food data.";
     }
 

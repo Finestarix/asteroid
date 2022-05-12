@@ -56,16 +56,19 @@ export default function ManageCateringTransactionPage() {
         {id: "date", label: "Transaction Date"},
         {id: "basePrice", label: "Base Price"},
         {id: "deliveryPrice", label: "Delivery Price"},
-        {id: "createdBy", label: "Created By"},
-        {id: "lastUpdatedBy", label: "Last Updated By"}
+        {id: "createdById", label: "Created By"},
+        {id: "lastUpdatedById", label: "Last Updated By"}
     ];
 
     const [transactions, setTransactions] = useState<CateringTransaction[]>([]);
+    const [transactionDetails, setTransactionDetails] = useState<CateringTransaction[]>([]);
     const [selectedTransactions, setSelectedTransactions] = useState<number[]>([]);
     const [filter, setFilter] = useState<string>("");
     const [filteredTransactions, setFilteredTransactions] = useState<CateringTransaction[]>([]);
     const [date, setDate] = useState<Date | null>(new Date());
-    const [basePrice, setBasePrice] = useState<number>(20000);
+    const [minDate, setMinDate] = useState<Date>(new Date());
+    const [maxDate, setMaxDate] = useState<Date>(new Date());
+    const [basePrice, setBasePrice] = useState<number>(17000);
     const [typeAlert, setTypeAlert] = useState<AlertColor>("error");
     const [messageAlert, setMessageAlert] = useState<string>("");
     const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -78,6 +81,13 @@ export default function ManageCateringTransactionPage() {
     const [dataPerPage, setDataPerPage] = useState<number>(10);
 
     useEffect(() => {
+        const minDateTemp = new Date();
+        setMinDate(minDateTemp);
+
+        const maxDateTemp = new Date();
+        maxDateTemp.setDate(maxDateTemp.getDate() + 6);
+        setMaxDate(maxDateTemp);
+
         const handleViewCateringTransaction = async () => {
             setShowLoading(true);
 
@@ -179,7 +189,7 @@ export default function ManageCateringTransactionPage() {
         } else {
             transactions.push(createCateringTransactionData.data);
             setDate(new Date());
-            setBasePrice(20000);
+            setBasePrice(17000);
             setMessageAlert(createCateringTransactionData.success);
             setTypeAlert(AlertTypeEnum.SUCCESS);
         }
@@ -245,6 +255,10 @@ export default function ManageCateringTransactionPage() {
         setShowLoading(false);
     };
 
+    const handleViewCateringTransactionDetail = (headerId: number) => {
+        console.log(headerId);
+    };
+
     return (
         <HomeLayout title="Manage Catering Transaction">
             <>
@@ -261,7 +275,8 @@ export default function ManageCateringTransactionPage() {
                                       }}/>
                 </Backdrop>
 
-                <Snackbar open={showAlert} autoHideDuration={5000} anchorOrigin={{vertical: "top", horizontal: "center"}}
+                <Snackbar open={showAlert} autoHideDuration={5000}
+                          anchorOrigin={{vertical: "top", horizontal: "center"}}
                           onClose={handleCloseAlert}>
                     <Alert severity={typeAlert}
                            onClose={handleCloseAlert}>
@@ -293,7 +308,7 @@ export default function ManageCateringTransactionPage() {
 
                 <Paper sx={{padding: 2, paddingBottom: 3, marginBottom: 2}}>
 
-                    <Typography variant="h6">
+                    <Typography variant="body1">
                         Create Catering Transaction
                     </Typography>
 
@@ -303,7 +318,7 @@ export default function ManageCateringTransactionPage() {
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
                             <DatePicker label="Date" inputFormat="eeee, MMMM d" mask=""
                                         value={date} disabled={showLoadingForm} disableOpenPicker={showLoadingForm}
-                                        minDate={new Date()}
+                                        minDate={minDate} maxDate={maxDate}
                                         onChange={changeDate}
                                         renderInput={(params) =>
                                             <TextField variant="outlined" size="medium"
@@ -351,7 +366,7 @@ export default function ManageCateringTransactionPage() {
                                    sx={{marginBottom: 2}}
                                    onChange={handleFilterCateringTransaction}/>
 
-                        <Paper>
+                        <Paper sx={{marginBottom: 2}}>
 
                             <Toolbar variant="dense"
                                      sx={{
@@ -361,7 +376,8 @@ export default function ManageCateringTransactionPage() {
                                          })
                                      }}>
                                 {selectedTransactions.length > 0 ?
-                                    <Typography sx={{flex: "1 1 100%"}}>{selectedTransactions.length} selected</Typography> :
+                                    <Typography
+                                        sx={{flex: "1 1 100%"}}>{selectedTransactions.length} selected</Typography> :
                                     <Typography sx={{flex: "1 1 100%"}}>Transactions</Typography>}
                                 {selectedTransactions.length > 0 &&
                                     <Tooltip title="Delete">
@@ -404,12 +420,12 @@ export default function ManageCateringTransactionPage() {
                                             // @ts-ignore
                                             .sort(getComparator(orderType, orderBy))
                                             .slice(getFirstDataInPage(), getLastDataInPage())
-                                            .map((transaction ) => {
+                                            .map((transaction) => {
                                                 const isItemSelected = isDataSelected(transaction.id);
                                                 return (
-                                                    // TODO: Add Catering Transaction Detail
                                                     <TableRow key={transaction.id} tabIndex={-1} hover={!showLoading}
-                                                              selected={isItemSelected}>
+                                                              selected={isItemSelected}
+                                                              onClick={() => handleViewCateringTransactionDetail(transaction.id)}>
                                                         <TableCell padding="checkbox">
                                                             <Checkbox disabled={showLoading} checked={isItemSelected}
                                                                       onChange={() => handleSelectClick(transaction.id)}/>
@@ -417,7 +433,8 @@ export default function ManageCateringTransactionPage() {
                                                         <TableCell width={100} sx={{paddingTop: 0, paddingBottom: 0}}>
                                                             <Tooltip
                                                                 title={(transaction.active) ? "Set to Inactive" : "Set to Active"}>
-                                                                <Switch disabled={showLoading} checked={transaction.active}
+                                                                <Switch disabled={showLoading}
+                                                                        checked={transaction.active}
                                                                         onChange={() => handleChangeActiveCateringTransaction(transaction.id)}/>
                                                             </Tooltip>
                                                         </TableCell>
@@ -439,10 +456,6 @@ export default function ManageCateringTransactionPage() {
                                                     </TableRow>
                                                 );
                                             })}
-                                        {((page > 0) ? Math.max(0, (1 + page) * dataPerPage - filteredTransactions.length) : 0) > 0 && (
-                                            <TableRow>
-                                                <TableCell colSpan={6}/>
-                                            </TableRow>)}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
@@ -453,12 +466,23 @@ export default function ManageCateringTransactionPage() {
                                              onRowsPerPageChange={handleChangeDataPerPage}/>
 
                         </Paper>
+
+                        {(transactionDetails.length !== 0) ? (
+                            <></>
+                        ) : (
+                            <Alert variant="outlined" severity="info">
+                                Click on the table row to view transaction details.
+                            </Alert>
+                        )}
                     </>
                 ) : (
                     <Alert variant="outlined" severity="info">
                         There is no catering transaction data.
                     </Alert>
                 )}
+
+
+
 
             </>
         </HomeLayout>

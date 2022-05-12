@@ -74,7 +74,8 @@ export default function LoginPage() {
             <Box height="100vh"
                  sx={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
 
-                <Snackbar open={showAlert} autoHideDuration={5000} anchorOrigin={{vertical: "top", horizontal: "center"}}
+                <Snackbar open={showAlert} autoHideDuration={5000}
+                          anchorOrigin={{vertical: "top", horizontal: "center"}}
                           onClose={handleCloseAlert}>
                     <Alert severity="error"
                            onClose={handleCloseAlert}>
@@ -90,7 +91,7 @@ export default function LoginPage() {
                 <Box component="form"
                      sx={{maxWidth: "430px", marginLeft: 2, marginRight: 2}}>
 
-                <TextField type="text" label="Username" variant="outlined"
+                    <TextField type="text" label="Username" variant="outlined"
                                fullWidth={true} disabled={showLoading}
                                sx={{marginBottom: 2}}
                                onChange={changeUsername} onKeyDown={handleEnter}

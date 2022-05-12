@@ -55,8 +55,8 @@ export default function ManageCateringFoodPage() {
         {id: "additionalPrice", label: "Additional Price"},
         {id: "reductionPrice", label: "Reduction Price"},
         {id: "category", label: "Category"},
-        {id: "createdBy", label: "Created By"},
-        {id: "lastUpdatedBy", label: "Last Updated By"}
+        {id: "createdById", label: "Created By"},
+        {id: "lastUpdatedById", label: "Last Updated By"}
     ];
 
     const [foods, setFoods] = useState<CateringFood[]>([]);
@@ -270,7 +270,8 @@ export default function ManageCateringFoodPage() {
                                       }}/>
                 </Backdrop>
 
-                <Snackbar open={showAlert} autoHideDuration={5000} anchorOrigin={{vertical: "top", horizontal: "center"}}
+                <Snackbar open={showAlert} autoHideDuration={5000}
+                          anchorOrigin={{vertical: "top", horizontal: "center"}}
                           onClose={handleCloseAlert}>
                     <Alert severity={typeAlert}
                            onClose={handleCloseAlert}>
@@ -302,7 +303,7 @@ export default function ManageCateringFoodPage() {
 
                 <Paper sx={{padding: 2, paddingBottom: 3, marginBottom: 2}}>
 
-                    <Typography variant="h6">
+                    <Typography variant="body1">
                         Create Catering Food
                     </Typography>
 
@@ -428,7 +429,7 @@ export default function ManageCateringFoodPage() {
                                             .map((food) => {
                                                 const isItemSelected = isDataSelected(food.id);
                                                 return (
-                                                    <TableRow key={food.name} tabIndex={-1} hover={!showLoading}
+                                                    <TableRow key={food.id} tabIndex={-1} hover={!showLoading}
                                                               selected={isItemSelected}>
                                                         <TableCell padding="checkbox">
                                                             <Checkbox disabled={showLoading} checked={isItemSelected}

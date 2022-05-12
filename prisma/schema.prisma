@@ -64,9 +64,12 @@ model CateringDetail {
   headerId           Int
   participant        User                        @relation(fields: [participantId], references: [id])
   participantId      Int
+  note               String?
   paymentType        PaymentType
+  onlyAdditional     Boolean
   foods              CateringParticipantDetail[]
   payTime            DateTime?
+  approveTime        DateTime?
   createdAt          DateTime                    @default(now())
   updatedAt          DateTime                    @updatedAt
 }

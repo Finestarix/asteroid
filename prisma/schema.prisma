@@ -142,6 +142,7 @@ enum CateringType {
   SideDish
   Vegetable
   Additional
+  OnlyAdditional
 }
 
 enum TopType {

@@ -35,10 +35,10 @@ import HomeLayout from "@components/layout/HomeLayout";
 import {
     CateringFood,
     CateringTransaction,
+    InsertCateringTransactionDetailData,
     ViewActiveCateringTransactionData,
     ViewOrderCateringFoodData,
     ViewTotalCateringTransactionData,
-    InsertCateringTransactionDetailData,
 } from "types/cateringType";
 import {AlertTypeEnum} from "types/generalType";
 import {calculateDeliveryPrice} from "utils/calculator";
@@ -58,13 +58,14 @@ export default function CateringOrderPage() {
     const [sideDish, setSideDish] = useState<CateringFood[]>([]);
     const [vegetable, setVegetable] = useState<CateringFood[]>([]);
     const [additional, setAdditional] = useState<CateringFood[]>([]);
+    const [onlyAdditional, setOnlyAdditional] = useState<CateringFood[]>([]);
     const [selectedRice, setSelectedRice] = useState<number>(0);
     const [selectedMainDish, setSelectedMainDish] = useState<number>(0);
     const [selectedSideDish, setSelectedSideDish] = useState<number>(0);
     const [selectedVegetable, setSelectedVegetable] = useState<number>(0);
     const [selectedAdditional, setSelectedAdditional] = useState<number[]>([]);
     const [note, setNote] = useState<string>("");
-    const [onlyAdditional, setOnlyAdditional] = useState<boolean>(false);
+    const [isOnlyAdditional, setIsOnlyAdditional] = useState<boolean>(false);
     const [subTotal, setSubTotal] = useState<number>(0);
     const [total, setTotal] = useState<number>(0);
     const [showLoading, setShowLoading] = useState<boolean>(false);
@@ -110,6 +111,7 @@ export default function CateringOrderPage() {
                 setSideDish(cateringFoodData.data.SideDish);
                 setVegetable(cateringFoodData.data.Vegetable);
                 setAdditional(cateringFoodData.data.Additional);
+                setOnlyAdditional(cateringFoodData.data.OnlyAdditional);
                 setTotalTransaction(totalCateringTransactionData.data);
                 setActiveStep(0);
             }
@@ -147,21 +149,19 @@ export default function CateringOrderPage() {
     const handleNote = (event: ChangeEvent<HTMLInputElement>) => setNote(event.target.value);
 
     const handleFullSet = () => {
-        setOnlyAdditional(false);
+        setIsOnlyAdditional(false);
         setActiveStep(1);
     };
     const handleOnlyAdditional = () => {
-        setOnlyAdditional(true);
+        setIsOnlyAdditional(true);
         setActiveStep(5);
     };
-    const handleBack = () => setActiveStep((prevActiveStep) => {
-        return (onlyAdditional && prevActiveStep === 5) ? 0 : prevActiveStep - 1;
-    });
+
+    const handleBack = () => setActiveStep((prevActiveStep) => (isOnlyAdditional && prevActiveStep === 5) ? 0 : prevActiveStep - 1);
     const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1);
     const handleFinalNext = () => {
-
         let subTotalTemp = 0;
-        if (!onlyAdditional) {
+        if (!isOnlyAdditional) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             subTotalTemp = transaction.basePrice;
@@ -183,7 +183,7 @@ export default function CateringOrderPage() {
             }
         }
 
-        for (const food of (!onlyAdditional ? additional : [...rice, ...additional])
+        for (const food of (!isOnlyAdditional ? additional : [...onlyAdditional, ...additional])
             .filter((food) => selectedAdditional.includes(food.id))) {
             if (food.additionalPrice) subTotalTemp += food.additionalPrice;
             if (food.reductionPrice) subTotalTemp -= food.reductionPrice;
@@ -208,9 +208,12 @@ export default function CateringOrderPage() {
                 // @ts-ignore
                 header: transaction.id,
                 note: note,
-                onlyAdditional: onlyAdditional,
-                foods: [selectedRice, selectedMainDish, selectedSideDish, selectedVegetable,
-                    ...(!onlyAdditional ? additional : [...rice, ...additional])
+                onlyAdditional: isOnlyAdditional,
+                foods: [(!isOnlyAdditional) && selectedRice,
+                    (!isOnlyAdditional) && selectedMainDish,
+                    (!isOnlyAdditional) && selectedSideDish,
+                    (!isOnlyAdditional) && selectedVegetable,
+                    ...(!isOnlyAdditional ? additional : [...onlyAdditional, ...additional])
                         .filter((food) => selectedAdditional.includes(food.id))
                         .map((food) => food.id)]
                     .filter((food) => food != 0 && food != -1)
@@ -297,13 +300,6 @@ export default function CateringOrderPage() {
                                     <Box>
                                         <RadioGroup sx={{marginBottom: 2}}
                                                     onChange={handleSelectedRice}>
-                                            <Box width="fit-content"
-                                                 sx={{display: "flex", flexDirection: "column"}}>
-                                                <FormControlLabel
-                                                    label="Without Rice"
-                                                    value={-1}
-                                                    control={<Radio color="error" checked={selectedRice === -1}/>}/>
-                                            </Box>
                                             {rice.map((food) => (
                                                 <Box width="fit-content"
                                                      key={food.id}
@@ -324,7 +320,8 @@ export default function CateringOrderPage() {
                                                     onClick={handleBack}>
                                                 Back
                                             </Button>
-                                            <Button disabled={selectedRice === 0} endIcon={<ArrowRightIcon/>}
+                                            <Button disabled={selectedRice === 0}
+                                                    endIcon={<ArrowRightIcon/>}
                                                     onClick={handleNext}>
                                                 Next
                                             </Button>
@@ -339,13 +336,6 @@ export default function CateringOrderPage() {
                                     <Box>
                                         <RadioGroup sx={{marginBottom: 2}}
                                                     onChange={handleSelectedMainDish}>
-                                            <Box width="fit-content"
-                                                 sx={{display: "flex", flexDirection: "column"}}>
-                                                <FormControlLabel
-                                                    label="Without Main Dish"
-                                                    value={-1}
-                                                    control={<Radio color="error" checked={selectedMainDish === -1}/>}/>
-                                            </Box>
                                             {mainDish.map((food) => (
                                                 <Box width="fit-content"
                                                      key={food.id}
@@ -468,7 +458,7 @@ export default function CateringOrderPage() {
                                 <StepContent>
                                     <Box>
                                         <FormGroup sx={{marginBottom: 2}}>
-                                            {(!onlyAdditional ? additional : [...rice, ...additional]).map((food) => (
+                                            {(!isOnlyAdditional ? additional : [...onlyAdditional, ...additional]).map((food) => (
                                                 <Box width="fit-content"
                                                      key={food.id}
                                                      sx={{display: "flex", flexDirection: "column"}}>
@@ -547,7 +537,7 @@ export default function CateringOrderPage() {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {(!onlyAdditional) && (
+                                                    {(!isOnlyAdditional) && (
                                                         <>
                                                             <TableRow>
                                                                 <TableCell colSpan={2}>Catering</TableCell>
@@ -591,7 +581,7 @@ export default function CateringOrderPage() {
                                                                 </TableRow>))}
                                                         </>
                                                     )}
-                                                    {(!onlyAdditional ? additional : [...rice, ...additional])
+                                                    {(!isOnlyAdditional ? additional : [...onlyAdditional, ...additional])
                                                         .filter((food) => selectedAdditional.includes(food.id)).map((food) => (
                                                             <TableRow key={food.id}>
                                                                 <TableCell colSpan={2}>{food.name}</TableCell>
@@ -657,7 +647,8 @@ export default function CateringOrderPage() {
                                                     onClick={handleBack}>
                                                 Back
                                             </Button>
-                                            <Button variant="contained" endIcon={<ArrowRightIcon/>}
+                                            <Button variant="contained"
+                                                    endIcon={<ArrowRightIcon/>}
                                                     onClick={handleCreateCateringOrder}>
                                                 Order
                                             </Button>
@@ -673,8 +664,9 @@ export default function CateringOrderPage() {
                                 <StepContent>
                                     <Box>
                                         <Alert variant="outlined" severity="info"
-                                               sx={{maxWidth: "500px", marginBottom: 2}}>
-                                            Please wait. Do not <b>close</b> or <b>refresh</b> your browser. This might take several minutes.
+                                               sx={{maxWidth: "500px"}}>
+                                            Please wait. Do not <b>close</b> or <b>refresh</b> your browser. This might
+                                            take a few seconds.
                                         </Alert>
                                     </Box>
                                 </StepContent>
@@ -688,7 +680,8 @@ export default function CateringOrderPage() {
                                     <Box>
                                         <Alert variant="outlined" severity="info"
                                                sx={{maxWidth: "500px", marginBottom: 2}}>
-                                            Payment is made when you have received the catering. It is recommended to pay per week to simplify the checking process.
+                                            Payment is made when you have received the catering. It is recommended to
+                                            pay per week to simplify the checking process.
                                         </Alert>
                                         <ButtonGroup variant="outlined" size="small">
                                             <Button onClick={gotoCateringHistory}>

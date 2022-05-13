@@ -72,7 +72,12 @@ export default function CateringHistoryPage() {
             const subTotalTemp = [];
             const totalTemp = [];
             for (const transaction of cateringTransactionHistoryData.data) {
-                let priceTemp = transaction.header.basePrice;
+                let priceTemp = 0;
+
+                if (!transaction.onlyAdditional) {
+                    priceTemp = transaction.header.basePrice;
+                }
+
                 for (const food of transaction.foods) {
                     if (food.food.additionalPrice) priceTemp += food.food.additionalPrice;
                     if (food.food.reductionPrice) priceTemp -= food.food.reductionPrice;
@@ -259,10 +264,11 @@ export default function CateringHistoryPage() {
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    <TableRow>
-                                                        <TableCell colSpan={2}>Catering</TableCell>
-                                                        <TableCell>{convertToIDR(transaction.header.basePrice)}</TableCell>
-                                                    </TableRow>
+                                                    {(!transaction.onlyAdditional) && (
+                                                        <TableRow>
+                                                            <TableCell colSpan={2}>Catering</TableCell>
+                                                            <TableCell>{convertToIDR(transaction.header.basePrice)}</TableCell>
+                                                        </TableRow>)}
                                                     {transaction.foods.map((food) => (
                                                         <TableRow key={food.id}>
                                                             <TableCell colSpan={2}>{food.food.name}</TableCell>

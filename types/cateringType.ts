@@ -21,6 +21,9 @@ export interface CateringTransactionDetail {
     participant: User,
     participantId: number,
     paymentType: CateringPaymentType,
+    onlyAdditional: boolean,
+    payTime: Date,
+    approveTime: Date,
     foods: CateringTransactionParticipant[]
 }
 
@@ -126,6 +129,7 @@ export interface ViewOrderCateringFoodData {
         SideDish: CateringFood[],
         Vegetable: CateringFood[],
         Additional: CateringFood[],
+        OnlyAdditional: CateringFood[]
     },
     error: string
 }
@@ -168,5 +172,6 @@ export enum CateringFoodCategory {
     MainDish = "MainDish",
     SideDish = "SideDish",
     Vegetable = "Vegetable",
-    Additional = "Additional"
+    Additional = "Additional",
+    OnlyAdditional = "OnlyAdditional"
 }

@@ -68,7 +68,7 @@ export default function ManageCateringTransactionPage() {
     const [date, setDate] = useState<Date | null>(new Date());
     const [minDate, setMinDate] = useState<Date>(new Date());
     const [maxDate, setMaxDate] = useState<Date>(new Date());
-    const [basePrice, setBasePrice] = useState<number>(17000);
+    const [basePrice, setBasePrice] = useState<number>(20000);
     const [typeAlert, setTypeAlert] = useState<AlertColor>("error");
     const [messageAlert, setMessageAlert] = useState<string>("");
     const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -189,7 +189,7 @@ export default function ManageCateringTransactionPage() {
         } else {
             transactions.push(createCateringTransactionData.data);
             setDate(new Date());
-            setBasePrice(17000);
+            setBasePrice(20000);
             setMessageAlert(createCateringTransactionData.success);
             setTypeAlert(AlertTypeEnum.SUCCESS);
         }

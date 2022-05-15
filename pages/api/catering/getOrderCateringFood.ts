@@ -3,8 +3,8 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {CateringFoodCategory} from "types/cateringType";
 import {TokenData} from "types/userType";
 import {prisma} from "utils/database";
-import {checkMultipleUndefined} from "utils/validate";
 import {getTokenData} from "utils/token";
+import {checkMultipleUndefined} from "utils/validate";
 
 
 export default async function getOrderCateringFood(request: NextApiRequest, response: NextApiResponse) {
@@ -31,7 +31,8 @@ export default async function getOrderCateringFood(request: NextApiRequest, resp
     try {
         const activeFoods = await prisma.cateringFood.findMany({
             where: {
-                active: true
+                active: true,
+                deleted: false
             },
             orderBy: {
                 id: "asc"

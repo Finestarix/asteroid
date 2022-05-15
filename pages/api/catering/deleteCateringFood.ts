@@ -7,7 +7,7 @@ import {getTokenData} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";
 
 
-export default async function updateActiveCateringFood(request: NextApiRequest, response: NextApiResponse) {
+export default async function deleteCateringFood(request: NextApiRequest, response: NextApiResponse) {
 
     const data = {data: {}, error: "", success: ""};
     let tokenData: TokenData;
@@ -45,25 +45,21 @@ export default async function updateActiveCateringFood(request: NextApiRequest, 
                     id: foodParameter.id
                 },
                 data: {
-                    active: !foodData.active,
+                    deleted: true,
                     lastUpdatedBy: {
                         connect: {
                             username: tokenData.username
                         }
                     }
-                },
-                include: {
-                    createdBy: true,
-                    lastUpdatedBy: true
                 }
             });
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            data.success = "Successfully updated " + data.data.name + " status to " + ((data.data.active) ? "active" : "inactive") + ".";
+            data.success = "Successfully deleted " + data.data.name + ".";
         } catch (_) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            data.error = "Failed to updated " + data.data.name + ".";
+            data.error = "Failed to deleted " + data.data.name + ".";
         }
     }
 

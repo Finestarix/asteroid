@@ -31,8 +31,8 @@ import HomeLayout from "@components/layout/HomeLayout";
 import {
     CateringPaymentType,
     CateringTransactionDetail,
-    ChangeCateringTransactionDetailData,
-    ViewCateringTransactionHistoryData
+    ChangeMultipleCateringTransactionDetailData,
+    ViewCateringTransactionDetailData
 } from "types/cateringType";
 import {AlertTypeEnum} from "types/generalType";
 import {convertToIDR} from "utils/currency";
@@ -65,7 +65,7 @@ export default function CateringHistoryPage() {
                 }
             });
 
-            const cateringTransactionHistoryData: ViewCateringTransactionHistoryData = await cateringTransactionHistoryFetch.json();
+            const cateringTransactionHistoryData: ViewCateringTransactionDetailData = await cateringTransactionHistoryFetch.json();
             setTransaction(cateringTransactionHistoryData.data);
 
             let totalUnpaidTemp = 0;
@@ -121,7 +121,7 @@ export default function CateringHistoryPage() {
             }
         });
 
-        const changeCateringTransactionDetailData: ChangeCateringTransactionDetailData = await changeCateringTransactionDetailFetch.json();
+        const changeCateringTransactionDetailData: ChangeMultipleCateringTransactionDetailData = await changeCateringTransactionDetailFetch.json();
         if (changeCateringTransactionDetailData.error) {
             setMessageAlert(changeCateringTransactionDetailData.error);
             setTypeAlert(AlertTypeEnum.ERROR);
@@ -240,15 +240,15 @@ export default function CateringHistoryPage() {
                                         {convertDateGeneral(transaction.header.date)}
                                         {(transaction.paymentType === CateringPaymentType.NotPaid) ?
                                             <Tooltip title="Unpaid">
-                                                <CancelIcon fontSize="small" color="primary"
+                                                <CancelIcon color="info"
                                                             sx={{marginRight: 2}}/>
                                             </Tooltip> : (transaction.paymentType === CateringPaymentType.Paid) ?
                                                 <Tooltip title="Paid">
-                                                    <CheckCircleIcon fontSize="small" color="disabled"
+                                                    <CheckCircleIcon color="disabled"
                                                                      sx={{marginRight: 2}}/>
                                                 </Tooltip> :
                                                 <Tooltip title="Pending">
-                                                    <RemoveCircleIcon fontSize="small" color="info"
+                                                    <RemoveCircleIcon color="primary"
                                                                       sx={{marginRight: 2}}/>
                                                 </Tooltip>}
                                     </Typography>

@@ -2,11 +2,9 @@ import {NextApiRequest, NextApiResponse} from "next";
 
 import {passwordStrength} from "check-password-strength";
 
-import * as AvatarType from "types/avatarType";
 import {RegisterParameter} from "types/userType";
 import {prisma} from "utils/database";
 import {hashString} from "utils/hash";
-import {randomEnum} from "utils/random";
 import {checkMultipleUndefined} from "utils/validate";
 
 
@@ -25,8 +23,8 @@ export default async function authRegister(request: NextApiRequest, response: Ne
         return response.status(400).json(data);
     }
 
-    if (userParameter.username.length < 4 || userParameter.username.length > 64) {
-        data.error = "Username length must be between 4 and 64.";
+    if (userParameter.username.length < 2 || userParameter.username.length > 64) {
+        data.error = "Username length must be between 2 and 64.";
     } else if (passwordStrength(userParameter.password).id <= 0) {
         data.error = "Password is too weak. Password must use at least 6 character and " +
             "contains one upper case letter, one lower case letter, and one numeric character.";
@@ -52,22 +50,7 @@ export default async function authRegister(request: NextApiRequest, response: Ne
                 data.data = await prisma.user.create({
                     data: {
                         username: userParameter.username,
-                        password: userParameter.password,
-                        avatar: {
-                            create: {
-                                topType: randomEnum(AvatarType.TopType),
-                                accessoriesType: randomEnum(AvatarType.AccessoriesType),
-                                hairColor: randomEnum(AvatarType.HairColor),
-                                facialHairType: randomEnum(AvatarType.FacialHairType),
-                                facialHairColor: randomEnum(AvatarType.FacialHairColor),
-                                clotheType: randomEnum(AvatarType.ClotheType),
-                                clotheColor: randomEnum(AvatarType.ClotheColor),
-                                eyeType: randomEnum(AvatarType.EyeType),
-                                eyebrowType: randomEnum(AvatarType.EyebrowType),
-                                mouthType: randomEnum(AvatarType.MouthType),
-                                skinColor: randomEnum(AvatarType.SkinColor)
-                            }
-                        }
+                        password: userParameter.password
                     }
                 });
             } catch (_) {

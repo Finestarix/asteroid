@@ -1,13 +1,12 @@
-import {Avatar} from "types/avatarType";
-
-
 export interface User {
     id: number,
     fullname: string,
     username: string,
     password: string,
     role: UserRole,
-    avatar: Avatar
+    createdAt: Date,
+    deletedAt: Date,
+    deleted: boolean
 }
 
 export interface LoginParameter {

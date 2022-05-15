@@ -13,7 +13,6 @@ model User {
   username      String           @unique
   password      String
   role          Role             @default(User)
-  avatar        Avatar?
   debtLending   DebtHeader[]
   debtBorrowing DebtDetail[]
   headerCreator CateringHeader[] @relation(name: "createdUserCateringHeader")
@@ -23,55 +22,41 @@ model User {
   foodBuyer     CateringDetail[]
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
-}
-
-model Avatar {
-  user            User            @relation(fields: [userId], references: [id])
-  userId          Int             @id
-  topType         TopType
-  accessoriesType AccessoriesType
-  hairColor       HairColor
-  facialHairType  FacialHairType
-  facialHairColor FacialHairColor
-  clotheType      ClotheType
-  clotheColor     ClotheColor
-  eyeType         EyeType
-  eyebrowType     EyebrowType
-  mouthType       MouthType
-  skinColor       SkinColor
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  deleted       Boolean          @default(false)
 }
 
 model CateringHeader {
-  id              Int              @id @default(autoincrement())
-  date            DateTime
-  basePrice       Int
-  deliveryPrice   Int
-  active          Boolean
-  createdBy       User             @relation(name: "createdUserCateringHeader", fields: [createdById], references: [id])
-  createdById     Int
-  lastUpdatedBy   User             @relation(name: "updatedUserCateringHeader", fields: [lastUpdatedById], references: [id])
-  lastUpdatedById Int
-  details         CateringDetail[]
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id                Int              @id @default(autoincrement())
+  date              DateTime
+  basePrice         Int
+  deliveryPrice     Int?
+  realDeliveryPrice Int?
+  active            Boolean
+  createdBy         User             @relation(name: "createdUserCateringHeader", fields: [createdById], references: [id])
+  createdById       Int
+  lastUpdatedBy     User             @relation(name: "updatedUserCateringHeader", fields: [lastUpdatedById], references: [id])
+  lastUpdatedById   Int
+  details           CateringDetail[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  deleted           Boolean          @default(false)
 }
 
 model CateringDetail {
-  id                 Int                         @id @default(autoincrement())
-  header             CateringHeader              @relation(fields: [headerId], references: [id])
-  headerId           Int
-  participant        User                        @relation(fields: [participantId], references: [id])
-  participantId      Int
-  note               String?
-  paymentType        PaymentType
-  onlyAdditional     Boolean
-  foods              CateringParticipantDetail[]
-  payTime            DateTime?
-  approveTime        DateTime?
-  createdAt          DateTime                    @default(now())
-  updatedAt          DateTime                    @updatedAt
+  id             Int                         @id @default(autoincrement())
+  header         CateringHeader              @relation(fields: [headerId], references: [id])
+  headerId       Int
+  participant    User                        @relation(fields: [participantId], references: [id])
+  participantId  Int
+  paymentType    PaymentType
+  note           String?
+  onlyAdditional Boolean
+  payTime        DateTime?
+  approveTime    DateTime?
+  foods          CateringParticipantDetail[]
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+  deleted        Boolean                     @default(false)
 }
 
 model CateringParticipantDetail {
@@ -82,6 +67,7 @@ model CateringParticipantDetail {
   foodId    Int
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
+  deleted   Boolean        @default(false)
 }
 
 model CateringFood {
@@ -98,6 +84,7 @@ model CateringFood {
   participant     CateringParticipantDetail[]
   createdAt       DateTime                    @default(now())
   updatedAt       DateTime                    @updatedAt
+  deleted         Boolean                     @default(false)
 }
 
 model DebtHeader {
@@ -109,6 +96,7 @@ model DebtHeader {
   details     DebtDetail[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  deleted     Boolean      @default(false)
 }
 
 model DebtDetail {
@@ -121,6 +109,7 @@ model DebtDetail {
   payTime    DateTime?
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
+  deleted    Boolean    @default(false)
 }
 
 enum Role {
@@ -143,171 +132,4 @@ enum CateringType {
   Vegetable
   Additional
   OnlyAdditional
-}
-
-enum TopType {
-  NoHair
-  Eyepatch
-  Hat
-  Hijab
-  Turban
-  WinterHat1
-  WinterHat2
-  WinterHat3
-  WinterHat4
-  LongHairBigHair
-  LongHairBob
-  LongHairBun
-  LongHairCurly
-  LongHairCurvy
-  LongHairDreads
-  LongHairFrida
-  LongHairFro
-  LongHairFroBand
-  LongHairNotTooLong
-  LongHairShavedSides
-  LongHairMiaWallace
-  LongHairStraight
-  LongHairStraight2
-  LongHairStraightStrand
-  ShortHairDreads01
-  ShortHairDreads02
-  ShortHairFrizzle
-  ShortHairShaggyMullet
-  ShortHairShortCurly
-  ShortHairShortFlat
-  ShortHairShortRound
-  ShortHairShortWaved
-  ShortHairSides
-  ShortHairTheCaesar
-  ShortHairTheCaesarSidePart
-}
-
-enum AccessoriesType {
-  Blank
-  Kurt
-  Prescription01
-  Prescription02
-  Round
-  Sunglasses
-  Wayfarers
-}
-
-enum HairColor {
-  Auburn
-  Black
-  Blonde
-  BlondeGolden
-  Brown
-  BrownDark
-  PastelPink
-  Blue
-  Platinum
-  Red
-  SilverGray
-}
-
-enum FacialHairType {
-  Blank
-  BeardMedium
-  BeardLight
-  BeardMajestic
-  MoustacheFancy
-  MoustacheMagnum
-}
-
-enum FacialHairColor {
-  Auburn
-  Black
-  Blonde
-  BlondeGolden
-  Brown
-  BrownDark
-  Platinum
-  Red
-}
-
-enum ClotheType {
-  BlazerShirt
-  BlazerSweater
-  CollarSweater
-  GraphicShirt
-  Hoodie
-  Overall
-  ShirtCrewNeck
-  ShirtScoopNeck
-  ShirtVNeck
-}
-
-enum ClotheColor {
-  Black
-  Blue01
-  Blue02
-  Blue03
-  Gray01
-  Gray02
-  Heather
-  PastelBlue
-  PastelGreen
-  PastelOrange
-  PastelRed
-  PastelYellow
-  Pink
-  Red
-  White
-}
-
-enum EyeType {
-  Close
-  Cry
-  Default
-  Dizzy
-  EyeRoll
-  Happy
-  Hearts
-  Side
-  Squint
-  Surprised
-  Wink
-  WinkWacky
-}
-
-enum EyebrowType {
-  Angry
-  AngryNatural
-  Default
-  DefaultNatural
-  FlatNatural
-  RaisedExcited
-  RaisedExcitedNatural
-  SadConcerned
-  SadConcernedNatural
-  UnibrowNatural
-  UpDown
-  UpDownNatural
-}
-
-enum MouthType {
-  Concerned
-  Default
-  Disbelief
-  Eating
-  Grimace
-  Sad
-  ScreamOpen
-  Serious
-  Smile
-  Tongue
-  Twinkle
-  Vomit
-}
-
-enum SkinColor {
-  Tanned
-  Yellow
-  Pale
-  Light
-  Brown
-  DarkBrown
-  Black
 }

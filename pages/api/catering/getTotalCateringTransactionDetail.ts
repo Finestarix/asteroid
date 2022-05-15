@@ -3,8 +3,8 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {ViewTotalCateringTransactionParameter} from "types/cateringType";
 import {TokenData} from "types/userType";
 import {prisma} from "utils/database";
-import {checkMultipleUndefined} from "utils/validate";
 import {getTokenData} from "utils/token";
+import {checkMultipleUndefined} from "utils/validate";
 
 
 export default async function getTotalCateringTransactionDetail(request: NextApiRequest, response: NextApiResponse) {
@@ -28,7 +28,8 @@ export default async function getTotalCateringTransactionDetail(request: NextApi
         const totalData = await prisma.cateringDetail.aggregate({
             _count: true,
             where: {
-                headerId: totalCateringTransactionParameter.id
+                headerId: totalCateringTransactionParameter.id,
+                deleted: false
             }
         });
         data.data = totalData._count + 1;

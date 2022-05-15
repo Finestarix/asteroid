@@ -8,13 +8,12 @@ import {getTokenData} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";
 
 
-export default async function updateActiveCateringTransaction(request: NextApiRequest, response: NextApiResponse) {
+export default async function deleteCateringTransaction(request: NextApiRequest, response: NextApiResponse) {
 
     const data = {data: {}, error: "", success: ""};
     let tokenData: TokenData;
     let transactionParameter: UpdateDeleteCateringTransactionParameter;
     let transactionData;
-    let activeTransactionData;
 
     try {
         tokenData = getTokenData(request);
@@ -34,20 +33,12 @@ export default async function updateActiveCateringTransaction(request: NextApiRe
                 deleted: false
             },
         });
-        activeTransactionData = await prisma.cateringHeader.findFirst({
-            where: {
-                active: true,
-                deleted: false
-            },
-        });
     } catch (_) {
         data.error = "Failed to fetch catering transaction data.";
     }
 
     if (!transactionData) {
         data.error = "Invalid catering transaction id.";
-    } else if (activeTransactionData && transactionData.active === false) {
-        data.error = "Only one catering transaction data can be active.";
     } else {
         try {
             data.data = await prisma.cateringHeader.update({
@@ -55,7 +46,8 @@ export default async function updateActiveCateringTransaction(request: NextApiRe
                     id: transactionParameter.id
                 },
                 data: {
-                    active: !transactionData.active,
+                    active: false,
+                    deleted: true,
                     lastUpdatedBy: {
                         connect: {
                             username: tokenData.username
@@ -65,11 +57,11 @@ export default async function updateActiveCateringTransaction(request: NextApiRe
             });
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            data.success = "Successfully updated catering for " + convertDateGeneral(data.data.date) + " status to " + ((data.data.active) ? "active" : "inactive") + ".";
+            data.success = "Successfully deleted catering for " + convertDateGeneral(data.data.date) + ".";
         } catch (_) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            data.error = "Failed to updated catering for " + convertDateGeneral(data.data.date) + ".";
+            data.error = "Failed to deleted catering for " + convertDateGeneral(data.data.date) + ".";
         }
     }
 

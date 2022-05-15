@@ -32,7 +32,7 @@ export default async function createCateringTransaction(request: NextApiRequest,
     }
 
     if (transactionDate > constraintDate) {
-        data.error = "Transaction date must be before the day after tomorrow.";
+        data.error = "Transaction date must be between today and the next one week.";
     } else if (transactionParameter.basePrice < 0) {
         data.error = "Base price value must be an positive number.";
     }  else {
@@ -41,7 +41,8 @@ export default async function createCateringTransaction(request: NextApiRequest,
                 data: {
                     date: transactionParameter.date,
                     basePrice: transactionParameter.basePrice,
-                    deliveryPrice: 5000,
+                    deliveryPrice: 0,
+                    realDeliveryPrice: 0,
                     active: false,
                     createdBy: {
                         connect: {
@@ -55,6 +56,21 @@ export default async function createCateringTransaction(request: NextApiRequest,
                     }
                 },
                 include: {
+                    details: {
+                        select: {
+                            foods: {
+                                include: {
+                                    food: true
+                                }
+                            },
+                            participant: {
+                                select: {
+                                    fullname: true,
+                                    username: true
+                                }
+                            }
+                        }
+                    },
                     createdBy: {
                         select: {
                             fullname: true,

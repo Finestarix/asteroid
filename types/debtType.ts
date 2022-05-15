@@ -7,7 +7,10 @@ export interface DebtHeader {
     lenderId: number
     title: string
     lendingTime: Date,
-    details: DebtDetail[]
+    details: DebtDetail[],
+    createdAt: Date,
+    deletedAt: Date,
+    deleted: boolean
 }
 
 export interface DebtDetail {
@@ -17,7 +20,10 @@ export interface DebtDetail {
     borrower: User,
     borrowerId: number,
     amount: number,
-    payTime: Date
+    payTime: Date,
+    createdAt: Date,
+    deletedAt: Date,
+    deleted: boolean
 }
 
 export interface InsertDebtHeaderParameter {

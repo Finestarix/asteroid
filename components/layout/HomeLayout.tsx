@@ -30,7 +30,7 @@ import {getSessionData, removeSessionData, removeSessionToken} from "utils/stora
 
 export default function HomeLayout(props: LayoutProps) {
 
-    const drawerWidth = 300;
+    const drawerWidth = 270;
 
     const [drawerMobileOpen, setDrawerMobileOpen] = useState<boolean>(false);
     const [role, setRole] = useState<UserRole | string>("");
@@ -122,10 +122,10 @@ export default function HomeLayout(props: LayoutProps) {
             <Box sx={{display: "flex"}}>
 
                 <AppBar position="fixed"
-                        sx={{width: {sm: `calc(100% - ${drawerWidth}px)`}, marginLeft: {sm: `${drawerWidth}px`}}}>
+                        sx={{width: {md: `calc(100% - ${drawerWidth}px)`}, marginLeft: {md: `${drawerWidth}px`}}}>
                     <Toolbar>
                         <IconButton edge="start" color="inherit"
-                                    sx={{marginRight: 2, display: {sm: "none"}}}
+                                    sx={{marginRight: 2, display: {md: "none"}}}
                                     onClick={toggleDrawerMobile}>
                             <MenuIcon/>
                         </IconButton>
@@ -139,12 +139,12 @@ export default function HomeLayout(props: LayoutProps) {
                 </AppBar>
 
                 <Box component="nav"
-                     sx={{width: {sm: drawerWidth}, flexShrink: {sm: 0}}}>
+                     sx={{width: {md: drawerWidth}, flexShrink: {md: 0}}}>
                     <Drawer variant="temporary"
                             open={drawerMobileOpen}
                             ModalProps={{keepMounted: true}}
                             sx={{
-                                display: {xs: "block", sm: "none"},
+                                display: {xs: "block", md: "none"},
                                 "& .MuiDrawer-paper": {boxSizing: "border-box", width: drawerWidth}
                             }}
                             onClose={toggleDrawerMobile}>
@@ -153,7 +153,7 @@ export default function HomeLayout(props: LayoutProps) {
                     <Drawer variant="permanent"
                             open={true}
                             sx={{
-                                display: {xs: "none", sm: "block"},
+                                display: {xs: "none", md: "block"},
                                 "& .MuiDrawer-paper": {boxSizing: "border-box", width: drawerWidth}
                             }}>
                         {drawerMenu}
@@ -161,7 +161,7 @@ export default function HomeLayout(props: LayoutProps) {
                 </Box>
 
                 <Box component="main"
-                     sx={{padding: 3, width: {sm: `calc(100% - ${drawerWidth}px)`}, flexGrow: 1, overflowX: "auto"}}>
+                     sx={{padding: 3, width: {md: `calc(100% - ${drawerWidth}px)`}, flexGrow: 1, overflowX: "auto"}}>
                     <Toolbar/>
                     {props.children}
                 </Box>

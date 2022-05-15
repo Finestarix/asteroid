@@ -7,7 +7,7 @@ import {checkMultipleUndefined} from "utils/validate";
 
 export default async function updatePendingCateringTransactionDetail(request: NextApiRequest, response: NextApiResponse) {
 
-    const data = {data: {}, error: "", success: ""};
+    const data = {error: "", success: ""};
     let tokenData: TokenData;
 
     try {
@@ -21,7 +21,7 @@ export default async function updatePendingCateringTransactionDetail(request: Ne
     }
 
     try {
-        data.data = await prisma.cateringDetail.updateMany({
+        await prisma.cateringDetail.updateMany({
             where: {
                 AND: [
                     {

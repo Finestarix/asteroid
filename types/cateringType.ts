@@ -6,12 +6,16 @@ export interface CateringTransaction {
     date: Date,
     basePrice: number,
     deliveryPrice: number,
+    realDeliveryPrice: number,
     active: boolean,
     createdBy: User,
     createdById: number,
     lastUpdatedBy: User,
     lastUpdatedById: number,
-    details: CateringTransactionDetail[]
+    details: CateringTransactionDetail[],
+    createdAt: Date,
+    deletedAt: Date,
+    deleted: boolean
 }
 
 export interface CateringTransactionDetail {
@@ -21,10 +25,25 @@ export interface CateringTransactionDetail {
     participant: User,
     participantId: number,
     paymentType: CateringPaymentType,
+    note: string,
     onlyAdditional: boolean,
     payTime: Date,
     approveTime: Date,
-    foods: CateringTransactionParticipant[]
+    foods: CateringTransactionParticipant[],
+    createdAt: Date,
+    deletedAt: Date,
+    deleted: boolean
+}
+
+export interface CateringTransactionParticipant {
+    id: number,
+    detail: CateringTransactionDetail,
+    detailId: number,
+    food: CateringFood,
+    foodId: number,
+    createdAt: Date,
+    deletedAt: Date,
+    deleted: boolean
 }
 
 export interface CateringFood {
@@ -37,15 +56,10 @@ export interface CateringFood {
     createdBy: User,
     createdById: number,
     lastUpdatedBy: User,
-    lastUpdatedById: number
-}
-
-export interface CateringTransactionParticipant {
-    id: number,
-    detail: CateringTransactionDetail,
-    detailId: number,
-    food: CateringFood,
-    foodId: number,
+    lastUpdatedById: number,
+    createdAt: Date,
+    deletedAt: Date,
+    deleted: boolean
 }
 
 export interface ViewActiveCateringTransactionData {
@@ -73,7 +87,7 @@ export interface InsertCateringTransactionParameter {
     basePrice: number,
 }
 
-export interface UpdateCateringTransactionParameter {
+export interface UpdateDeleteCateringTransactionParameter {
     id: number
 }
 
@@ -83,17 +97,11 @@ export interface ChangeCateringTransactionData {
     success: string
 }
 
-export interface DeleteCateringTransactionParameter {
-    ids: number[]
+export interface ViewCateringTransactionDetailParameter {
+    id: number
 }
 
-export interface DeleteCateringTransactionData {
-    data: number,
-    error: string,
-    success: string
-}
-
-export interface ViewCateringTransactionHistoryData {
+export interface ViewCateringTransactionDetailData {
     data: CateringTransactionDetail[],
     error: string
 }
@@ -105,13 +113,13 @@ export interface InsertCateringTransactionDetailParameter {
     foods: number[]
 }
 
-export interface InsertCateringTransactionDetailData {
+export interface ChangeCateringTransactionDetailData {
     data: CateringTransactionDetail,
     error: string,
     success: string
 }
 
-export interface ChangeCateringTransactionDetailData {
+export interface ChangeMultipleCateringTransactionDetailData {
     data: number,
     error: string,
     success: string
@@ -141,22 +149,12 @@ export interface InsertCateringFoodParameter {
     reductionPrice: number
 }
 
-export interface UpdateCateringFoodParameter {
+export interface UpdateDeleteCateringFoodParameter {
     id: number
 }
 
 export interface ChangeCateringFoodData {
     data: CateringFood,
-    error: string,
-    success: string
-}
-
-export interface DeleteCateringFoodParameter {
-    ids: number[]
-}
-
-export interface DeleteCateringFoodData {
-    data: number,
     error: string,
     success: string
 }

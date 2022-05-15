@@ -2,8 +2,8 @@ import {NextApiRequest, NextApiResponse} from "next";
 
 import {TokenData} from "types/userType";
 import {prisma} from "utils/database";
-import {checkMultipleUndefined} from "utils/validate";
 import {getTokenData} from "utils/token";
+import {checkMultipleUndefined} from "utils/validate";
 
 
 export default async function getCateringTransaction(request: NextApiRequest, response: NextApiResponse) {
@@ -25,7 +25,34 @@ export default async function getCateringTransaction(request: NextApiRequest, re
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         data.data = await prisma.cateringHeader.findMany({
+            where: {
+                deleted: false
+            },
             include: {
+                details: {
+                    select: {
+                        id: true,
+                        foods: {
+                            include: {
+                                food: true
+                            },
+                            orderBy: {
+                                id: "desc"
+                            }
+                        },
+                        participant: {
+                            select: {
+                                fullname: true,
+                                username: true
+                            }
+                        },
+                        note: true,
+                        onlyAdditional: true
+                    },
+                    orderBy: {
+                        id: "asc"
+                    }
+                },
                 createdBy: {
                     select: {
                         fullname: true,

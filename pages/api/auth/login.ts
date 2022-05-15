@@ -40,6 +40,8 @@ export default async function authLogin(request: NextApiRequest, response: NextA
 
         if (!userData) {
             data.error = "Invalid user credential.";
+        } else if (userData.deleted) {
+            data.error = "Your account has been disabled.";
         } else {
             const compareResult = await compareHashString(userParameter.password, userData.password);
             if (!compareResult) {
@@ -52,6 +54,8 @@ export default async function authLogin(request: NextApiRequest, response: NextA
                     role: userData.role,
                 };
                 data.token = generateToken(tokenData);
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
                 data.role = userData.role;
             }
         }

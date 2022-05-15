@@ -1,13 +1,24 @@
 import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
 
+import CancelIcon from "@mui/icons-material/Cancel";
+import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import SellIcon from "@mui/icons-material/Sell";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
 import Alert, {AlertColor} from "@mui/material/Alert";
-import {alpha} from "@mui/material/styles";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
-import Checkbox from "@mui/material/Checkbox";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -15,34 +26,26 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
 import Snackbar from "@mui/material/Snackbar";
-import Switch from "@mui/material/Switch";
-import Table from "@mui/material/Table";
-import TableCell from "@mui/material/TableCell";
-import TableBody from "@mui/material/TableBody";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
-import TableRow from "@mui/material/TableRow";
-import TableSortLabel from "@mui/material/TableSortLabel";
 import TextField from "@mui/material/TextField";
-import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import {DatePicker} from "@mui/x-date-pickers/DatePicker";
+import {CopyToClipboard} from "react-copy-to-clipboard";
 
 import HomeLayout from "@components/layout/HomeLayout";
 import {
     CateringTransaction,
     ViewCateringTransactionData,
-    ChangeCateringTransactionData,
-    DeleteCateringTransactionData
+    ChangeCateringTransactionData
 } from "types/cateringType";
-import {AlertTypeEnum, OrderTypeEnum, TableHeadKey} from "types/generalType";
-import {getComparator} from "utils/comparator";
+import {AlertTypeEnum} from "types/generalType";
 import {convertToIDR} from "utils/currency";
 import {convertDateGeneral} from "utils/date";
 import {decryptData} from "utils/encryption";
@@ -51,18 +54,9 @@ import {getSessionToken} from "utils/storage";
 
 export default function ManageCateringTransactionPage() {
 
-    const transactionTableHeader: TableHeadKey[] = [
-        {id: "active", label: "Active?"},
-        {id: "date", label: "Transaction Date"},
-        {id: "basePrice", label: "Base Price"},
-        {id: "deliveryPrice", label: "Delivery Price"},
-        {id: "createdById", label: "Created By"},
-        {id: "lastUpdatedById", label: "Last Updated By"}
-    ];
-
     const [transactions, setTransactions] = useState<CateringTransaction[]>([]);
-    const [transactionDetails, setTransactionDetails] = useState<CateringTransaction[]>([]);
-    const [selectedTransactions, setSelectedTransactions] = useState<number[]>([]);
+    const [transactionCopy, setTransactionCopy] = useState<string>("");
+    const [selectedDeleteTransaction, setSelectedDeleteTransaction] = useState<number>(-1);
     const [filter, setFilter] = useState<string>("");
     const [filteredTransactions, setFilteredTransactions] = useState<CateringTransaction[]>([]);
     const [date, setDate] = useState<Date | null>(new Date());
@@ -75,10 +69,7 @@ export default function ManageCateringTransactionPage() {
     const [showDialog, setShowDialog] = useState<boolean>(false);
     const [showLoading, setShowLoading] = useState<boolean>(false);
     const [showLoadingForm, setShowLoadingForm] = useState<boolean>(false);
-    const [orderType, setOrderType] = useState<OrderTypeEnum>(OrderTypeEnum.ASC);
-    const [orderBy, setOrderBy] = useState<keyof CateringTransaction>("id");
-    const [page, setPage] = useState<number>(0);
-    const [dataPerPage, setDataPerPage] = useState<number>(10);
+    const [expanded, setExpanded] = useState<string | false>(false);
 
     useEffect(() => {
         const minDateTemp = new Date();
@@ -111,19 +102,19 @@ export default function ManageCateringTransactionPage() {
     const changeBasePrice = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setBasePrice(parseInt(event.target.value));
 
     const handleFilterCateringTransaction = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        let filteredTransactions = transactions;
+        let filteredTransactionsTemp = transactions;
         if (event.target.value.length > 0) {
-            filteredTransactions = transactions.filter((transaction) =>
-                convertDateGeneral(transaction.date).toLowerCase().indexOf(event.target.value) !== -1 ||
-                transaction.basePrice.toString().indexOf(event.target.value) !== -1);
+            filteredTransactionsTemp = transactions.filter((transaction) =>
+                convertDateGeneral(transaction.date).toLowerCase().indexOf(event.target.value) !== -1);
         }
-
-        setPage(0);
         setFilter(event.target.value);
-        setFilteredTransactions(filteredTransactions);
+        setFilteredTransactions(filteredTransactionsTemp);
     };
 
-    const handleOpenDialog = () => setShowDialog(true);
+    const handleOpenDialog = (id: number) => {
+        setSelectedDeleteTransaction(id);
+        setShowDialog(true);
+    };
     const handleCloseDialog = () => setShowDialog(false);
     const handleCloseAlert = () => setShowAlert(false);
     const handleEnter = async (event?: SyntheticEvent | Event) => {
@@ -131,42 +122,8 @@ export default function ManageCateringTransactionPage() {
         // @ts-ignore
         if (event.code === "Enter") await handleCreateCateringTransaction();
     };
-
-    const isDataSelected = (id: number) => selectedTransactions.indexOf(id) !== -1;
-    const getFirstDataInPage = () => page * dataPerPage;
-    const getLastDataInPage = () => getFirstDataInPage() + dataPerPage;
-    const handleChangePage = (event: unknown, newPage: number) => setPage(newPage);
-    const handleChangeDataPerPage = (event: ChangeEvent<HTMLInputElement>) => {
-        setDataPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
-
-    const handleRequestSort = (property: keyof CateringTransaction) => () => {
-        const isAscending = (orderBy === property && orderType === OrderTypeEnum.ASC);
-        setOrderType(isAscending ? OrderTypeEnum.DESC : OrderTypeEnum.ASC);
-        setOrderBy(property);
-    };
-
-    const handleSelectClick = (id: number) => {
-        const selectedIndex = selectedTransactions.indexOf(id);
-        let newSelected: number[] = [];
-
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selectedTransactions, id);
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selectedTransactions.slice(1));
-        } else if (selectedIndex === selectedTransactions.length - 1) {
-            newSelected = newSelected.concat(selectedTransactions.slice(0, -1));
-        } else if (selectedIndex > 0) {
-            newSelected = newSelected.concat(selectedTransactions.slice(0, selectedIndex), selectedTransactions.slice(selectedIndex + 1));
-        }
-        setSelectedTransactions(newSelected);
-    };
-
-    const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) =>
-        (event.target.checked) ?
-            setSelectedTransactions(transactions.map((transaction) => transaction.id)) :
-            setSelectedTransactions([]);
+    const handleAccordion = (panel: string) => (event: SyntheticEvent, isExpanded: boolean) =>
+        setExpanded(isExpanded ? panel : false);
 
     const handleCreateCateringTransaction = async () => {
         setShowLoadingForm(true);
@@ -224,39 +181,75 @@ export default function ManageCateringTransactionPage() {
         setShowLoading(false);
     };
 
-    const handleDeleteCateringTransaction = async () => {
+    const handleChangeDeliveryCateringTransaction = async (id: number) => {
         setShowLoading(true);
-        setShowDialog(false);
 
-        const deleteCateringTransactionFetch = await fetch("/api/catering/deleteMultipleCateringTransaction", {
+        const updateDeliveryCateringTransactionFetch = await fetch("/api/catering/updateDeliveryCateringTransaction", {
             method: "POST",
             headers: {
                 authorization: decryptData(getSessionToken())
             },
             body: JSON.stringify({
-                ids: selectedTransactions
+                id: id
             }),
         });
 
-        const deleteCateringTransactionData: DeleteCateringTransactionData = await deleteCateringTransactionFetch.json();
-        if (deleteCateringTransactionData.error) {
-            setMessageAlert(deleteCateringTransactionData.error);
+        const updateDeliveryCateringTransactionData: ChangeCateringTransactionData = await updateDeliveryCateringTransactionFetch.json();
+        if (updateDeliveryCateringTransactionData.error) {
+            setMessageAlert(updateDeliveryCateringTransactionData.error);
             setTypeAlert(AlertTypeEnum.ERROR);
         } else {
-            selectedTransactions.forEach((data) => {
-                const deleteIndex = transactions.findIndex((transaction) => transaction.id === data);
-                transactions.splice(deleteIndex, 1);
-            });
-            setMessageAlert(deleteCateringTransactionData.success);
+            const updatedIndex = transactions.findIndex((transaction) => transaction.id === id);
+            transactions[updatedIndex].deliveryPrice = updateDeliveryCateringTransactionData.data.deliveryPrice;
+            setMessageAlert(updateDeliveryCateringTransactionData.success);
             setTypeAlert(AlertTypeEnum.SUCCESS);
-            setSelectedTransactions([]);
         }
         setShowAlert(true);
         setShowLoading(false);
     };
 
-    const handleViewCateringTransactionDetail = (headerId: number) => {
-        console.log(headerId);
+    const handleDeleteCateringTransaction = async () => {
+        setShowLoading(true);
+        setShowDialog(false);
+
+        const deleteCateringTransactionFetch = await fetch("/api/catering/deleteCateringTransaction", {
+            method: "POST",
+            headers: {
+                authorization: decryptData(getSessionToken())
+            },
+            body: JSON.stringify({
+                id: selectedDeleteTransaction
+            }),
+        });
+
+        const deleteCateringTransactionData: ChangeCateringTransactionData = await deleteCateringTransactionFetch.json();
+        if (deleteCateringTransactionData.error) {
+            setMessageAlert(deleteCateringTransactionData.error);
+            setTypeAlert(AlertTypeEnum.ERROR);
+        } else {
+            const deleteIndex = transactions.findIndex((transaction) => transaction.id === selectedDeleteTransaction);
+            transactions.splice(deleteIndex, 1);
+            setMessageAlert(deleteCateringTransactionData.success);
+            setTypeAlert(AlertTypeEnum.SUCCESS);
+            setSelectedDeleteTransaction(-1);
+        }
+        setShowAlert(true);
+        setShowLoading(false);
+    };
+
+    const handleCopyClipboard = (transaction: CateringTransaction) => {
+        let copyTemp = "Catering " + convertDateGeneral(transaction.date) + "\n\n";
+
+        transaction.details.forEach((detail, index) => {
+            copyTemp += (index + 1) + ". " + detail.participant.username +
+                ((detail.onlyAdditional) ? " (HANYA TAMBAHAN)" : "") + "\n";
+            detail.foods.forEach((food) => {
+                copyTemp += "- " + food.food.name + "\n";
+            });
+            if (detail.note) copyTemp += "Catatan: " + detail.note + "\n";
+            copyTemp += "\n";
+        });
+        setTransactionCopy(copyTemp);
     };
 
     return (
@@ -287,11 +280,11 @@ export default function ManageCateringTransactionPage() {
                 <Dialog open={showDialog}
                         onClose={handleCloseDialog}>
                     <DialogTitle>
-                        Delete Transaction(s) Confirmation
+                        Delete Transaction Confirmation
                     </DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            You are about to delete catering transaction(s) permanently from database. Are you sure?
+                            You are about to delete catering transaction permanently from database. Are you sure?
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -365,125 +358,148 @@ export default function ManageCateringTransactionPage() {
                                    fullWidth={true} value={filter}
                                    sx={{marginBottom: 2}}
                                    onChange={handleFilterCateringTransaction}/>
-
-                        <Paper sx={{marginBottom: 2}}>
-
-                            <Toolbar variant="dense"
-                                     sx={{
-                                         paddingLeft: {sm: 2}, paddingRight: {xs: 1, sm: 1},
-                                         ...(selectedTransactions.length > 0 && {
-                                             bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity)
-                                         })
-                                     }}>
-                                {selectedTransactions.length > 0 ?
-                                    <Typography
-                                        sx={{flex: "1 1 100%"}}>{selectedTransactions.length} selected</Typography> :
-                                    <Typography sx={{flex: "1 1 100%"}}>Transactions</Typography>}
-                                {selectedTransactions.length > 0 &&
-                                    <Tooltip title="Delete">
-                                        <IconButton onClick={handleOpenDialog}>
-                                            <DeleteIcon/>
-                                        </IconButton>
-                                    </Tooltip>}
-                            </Toolbar>
-
-                            <TableContainer>
-                                <Table size="medium" sx={{whiteSpace: "nowrap"}}>
-
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell padding="checkbox">
-                                                <Checkbox color="primary"
-                                                          disabled={showLoading}
-                                                          indeterminate={selectedTransactions.length > 0 && selectedTransactions.length < filteredTransactions.length}
-                                                          checked={filteredTransactions.length > 0 && selectedTransactions.length === filteredTransactions.length}
-                                                          onChange={handleSelectAllClick}/>
-                                            </TableCell>
-                                            {transactionTableHeader.map((tableHeader) => (
-                                                <TableCell key={tableHeader.id}
-                                                           sortDirection={orderBy === tableHeader.id ? orderType : false}>
-                                                    <TableSortLabel active={orderBy === tableHeader.id}
-                                                                    direction={orderBy === tableHeader.id ? orderType : OrderTypeEnum.ASC}
-                                                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                                        // @ts-ignore
-                                                                    onClick={handleRequestSort(tableHeader.id)}>
-                                                        {tableHeader.label}
-                                                    </TableSortLabel>
-                                                </TableCell>
-                                            ))}
-                                        </TableRow>
-                                    </TableHead>
-
-                                    <TableBody>
-                                        {filteredTransactions
-                                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                            // @ts-ignore
-                                            .sort(getComparator(orderType, orderBy))
-                                            .slice(getFirstDataInPage(), getLastDataInPage())
-                                            .map((transaction) => {
-                                                const isItemSelected = isDataSelected(transaction.id);
-                                                return (
-                                                    <TableRow key={transaction.id} tabIndex={-1} hover={!showLoading}
-                                                              selected={isItemSelected}
-                                                              onClick={() => handleViewCateringTransactionDetail(transaction.id)}>
-                                                        <TableCell padding="checkbox">
-                                                            <Checkbox disabled={showLoading} checked={isItemSelected}
-                                                                      onChange={() => handleSelectClick(transaction.id)}/>
-                                                        </TableCell>
-                                                        <TableCell width={100} sx={{paddingTop: 0, paddingBottom: 0}}>
-                                                            <Tooltip
-                                                                title={(transaction.active) ? "Set to Inactive" : "Set to Active"}>
-                                                                <Switch disabled={showLoading}
-                                                                        checked={transaction.active}
-                                                                        onChange={() => handleChangeActiveCateringTransaction(transaction.id)}/>
-                                                            </Tooltip>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {convertDateGeneral(transaction.date)}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {convertToIDR(transaction.basePrice)}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {convertToIDR(transaction.deliveryPrice)}
-                                                        </TableCell>
-                                                        <TableCell width={150}>
-                                                            {(transaction.createdBy.fullname) ? transaction.createdBy.fullname : transaction.createdBy.username}
-                                                        </TableCell>
-                                                        <TableCell width={150}>
-                                                            {(transaction.lastUpdatedBy.fullname) ? transaction.lastUpdatedBy.fullname : transaction.lastUpdatedBy.username}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                );
-                                            })}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-
-                            <TablePagination component="div" rowsPerPageOptions={[5, 10, 15, 20]}
-                                             count={filteredTransactions.length} page={page} rowsPerPage={dataPerPage}
-                                             onPageChange={handleChangePage}
-                                             onRowsPerPageChange={handleChangeDataPerPage}/>
-
-                        </Paper>
-
-                        {(transactionDetails.length !== 0) ? (
-                            <></>
-                        ) : (
-                            <Alert variant="outlined" severity="info">
-                                Click on the table row to view transaction details.
-                            </Alert>
-                        )}
+                        {filteredTransactions
+                            .map((transaction, index) => (
+                                <Accordion key={transaction.id} expanded={expanded === "accordion" + index}
+                                           onChange={handleAccordion("accordion" + index)}>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
+                                        <Typography
+                                            sx={{width: "100%", display: "flex", justifyContent: "space-between"}}>
+                                            {convertDateGeneral(transaction.date)}
+                                        </Typography>
+                                        <Box sx={{display: "flex"}}>
+                                            <Chip variant="filled" size="small"
+                                                  label={transaction.details.length + " pax"}
+                                                  sx={{marginRight: 0.5}}/>
+                                            {(transaction.active) ?
+                                                <Tooltip title="Active">
+                                                    <CheckCircleIcon color="info"
+                                                                     sx={{marginRight: 2}}/>
+                                                </Tooltip> :
+                                                <Tooltip title="Inactive">
+                                                    <CancelIcon color="primary"
+                                                                sx={{marginRight: 2}}/>
+                                                </Tooltip>}
+                                        </Box>
+                                    </AccordionSummary>
+                                    <AccordionDetails sx={{display: "flex", justifyContent: "space-between"}}>
+                                        <Box sx={{display: "flex", flexDirection: "column"}}>
+                                            <Box sx={{display: "flex"}}>
+                                                <SellIcon sx={{marginRight: 1}}/>
+                                                <Typography variant="body1"
+                                                            sx={{marginBottom: 1}}>
+                                                    {convertToIDR(transaction.basePrice)}
+                                                </Typography>
+                                            </Box>
+                                            <Box sx={{display: "flex"}}>
+                                                <DeliveryDiningIcon sx={{marginRight: 1}}/>
+                                                <Typography variant="body1"
+                                                            sx={{marginBottom: 1}}>
+                                                    {convertToIDR(transaction.deliveryPrice)}/pax
+                                                    ({convertToIDR(transaction.realDeliveryPrice)})
+                                                </Typography>
+                                            </Box>
+                                            <Typography variant="caption">
+                                                Created by <b>{transaction.createdBy.username}</b>
+                                            </Typography>
+                                            <Typography variant="caption">
+                                                Last Updated by <b>{transaction.lastUpdatedBy.username}</b>
+                                            </Typography>
+                                            <List dense={true}>
+                                                {transaction.details.map((detail) => (
+                                                    <ListItem key={detail.id} disableGutters={true}
+                                                              sx={{
+                                                                  width: "100%",
+                                                                  display: "flex",
+                                                                  flexDirection: "column",
+                                                                  alignItems: "flex-start"
+                                                              }}>
+                                                        <ListItemText
+                                                            primary={
+                                                                <Box>
+                                                                    <Typography variant="overline"
+                                                                                sx={{marginRight: 0.5}}>
+                                                                        {detail.participant.username}&nbsp;
+                                                                    </Typography>
+                                                                    {(detail.onlyAdditional) ?
+                                                                        <Chip variant="outlined" size="small"
+                                                                              label="Full Set"/> :
+                                                                        <Chip variant="outlined" size="small"
+                                                                              label="Only Additional"/>}
+                                                                </Box>}/>
+                                                        <ListItemText
+                                                            primary={
+                                                                <Box>
+                                                                    <Box sx={{
+                                                                        width: "100%",
+                                                                        display: "flex",
+                                                                        flexDirection: "row"
+                                                                    }}>
+                                                                        <Box>
+                                                                            {detail.foods.map((food) => (
+                                                                                <Chip variant="filled" size="small"
+                                                                                      key={food.id}
+                                                                                      label={food.food.name}
+                                                                                      sx={{
+                                                                                          marginRight: 1,
+                                                                                          marginBottom: 1
+                                                                                      }}/>
+                                                                            ))}
+                                                                        </Box>
+                                                                    </Box>
+                                                                    {(detail.note) && (
+                                                                        <Typography variant="caption">
+                                                                            Notes: {detail.note}
+                                                                        </Typography>
+                                                                    )}
+                                                                </Box>}/>
+                                                    </ListItem>
+                                                ))}
+                                            </List>
+                                        </Box>
+                                        <Box sx={{display: "flex", flexDirection: "column"}}>
+                                            <ButtonGroup orientation="vertical">
+                                                <CopyToClipboard text={transactionCopy}
+                                                                 onCopy={() => handleCopyClipboard(transaction)}>
+                                                    <Tooltip title="Copy Catering" placement="left">
+                                                        <IconButton color="primary"
+                                                                    disabled={showLoading}>
+                                                            <ContentPasteIcon/>
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </CopyToClipboard>
+                                                <Tooltip title="Change Status" placement="left">
+                                                    <IconButton color="primary"
+                                                                disabled={showLoading}
+                                                                onClick={() => handleChangeActiveCateringTransaction(transaction.id)}>
+                                                        <ChangeCircleIcon/>
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Update Delivery Price" placement="left">
+                                                    <IconButton color="primary"
+                                                                disabled={showLoading}
+                                                                onClick={() => handleChangeDeliveryCateringTransaction(transaction.id)}>
+                                                        <LocalOfferIcon/>
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Delete Transaction" placement="left">
+                                                    <IconButton color="error"
+                                                                disabled={showLoading}
+                                                                onClick={() => handleOpenDialog(transaction.id)}>
+                                                        <DeleteIcon/>
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </ButtonGroup>
+                                        </Box>
+                                    </AccordionDetails>
+                                </Accordion>
+                            ))}
                     </>
                 ) : (
                     <Alert variant="outlined" severity="info">
                         There is no catering transaction data.
                     </Alert>
                 )}
-
-
-
-
             </>
         </HomeLayout>
     );

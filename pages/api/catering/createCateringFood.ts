@@ -65,7 +65,7 @@ export default async function createCateringFood(request: NextApiRequest, respon
                             fullname: true,
                             username: true
                         }
-                    }
+                    },
                 }
             });
             data.success = "Successfully created " + foodParameter.name + ".";

@@ -2,8 +2,8 @@ import {NextApiRequest, NextApiResponse} from "next";
 
 import {TokenData} from "types/userType";
 import {prisma} from "utils/database";
-import {checkMultipleUndefined} from "utils/validate";
 import {getTokenData} from "utils/token";
+import {checkMultipleUndefined} from "utils/validate";
 
 
 export default async function getCateringTransactionHistory(request: NextApiRequest, response: NextApiResponse) {
@@ -28,12 +28,16 @@ export default async function getCateringTransactionHistory(request: NextApiRequ
             where: {
                 participant: {
                     username: tokenData.username
-                }
+                },
+                deleted: false
             },
             include: {
                 foods: {
                     include: {
                         food: true
+                    },
+                    orderBy: {
+                        id: "desc"
                     }
                 },
                 header: true

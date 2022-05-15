@@ -35,10 +35,10 @@ import HomeLayout from "@components/layout/HomeLayout";
 import {
     CateringFood,
     CateringTransaction,
-    InsertCateringTransactionDetailData,
     ViewActiveCateringTransactionData,
     ViewOrderCateringFoodData,
     ViewTotalCateringTransactionData,
+    ChangeCateringTransactionDetailData
 } from "types/cateringType";
 import {AlertTypeEnum} from "types/generalType";
 import {calculateDeliveryPrice} from "utils/calculator";
@@ -220,7 +220,7 @@ export default function CateringOrderPage() {
             }),
         });
 
-        const createCateringOrderData: InsertCateringTransactionDetailData = await createCateringOrderFetch.json();
+        const createCateringOrderData: ChangeCateringTransactionDetailData = await createCateringOrderFetch.json();
         if (createCateringOrderData.error) {
             setActiveStep((prevActiveStep) => prevActiveStep - 1);
             setMessageAlert(createCateringOrderData.error);
@@ -613,6 +613,18 @@ export default function CateringOrderPage() {
                                                 </TableBody>
                                             </Table>
                                         </TableContainer>
+                                        <Box>
+                                            <TextField label="Note"
+                                                       disabled={true} multiline={true} rows={3} value={note}
+                                                       sx={{width: "500px", marginTop: 1, marginBottom: 2}}
+                                                       InputProps={{
+                                                           startAdornment: (
+                                                               <InputAdornment position="start">
+                                                                   <StickyNote2Icon/>
+                                                               </InputAdornment>
+                                                           ),
+                                                       }}/>
+                                        </Box>
                                         <Alert variant="outlined" severity="info"
                                                sx={{maxWidth: "500px", marginBottom: 2}}>
                                             Delivery price may change according to the number of order.

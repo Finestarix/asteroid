@@ -2,8 +2,8 @@ import {NextApiRequest, NextApiResponse} from "next";
 
 import {TokenData} from "types/userType";
 import {prisma} from "utils/database";
-import {checkMultipleUndefined} from "utils/validate";
 import {getTokenData} from "utils/token";
+import {checkMultipleUndefined} from "utils/validate";
 
 
 export default async function getActiveCateringTransaction(request: NextApiRequest, response: NextApiResponse) {
@@ -17,7 +17,6 @@ export default async function getActiveCateringTransaction(request: NextApiReque
             checkMultipleUndefined(tokenData.username))
             throw Error();
     } catch (_) {
-        data.data = null;
         data.error = "Oops. Something went wrong.";
         return response.status(400).json(data);
     }
@@ -27,7 +26,8 @@ export default async function getActiveCateringTransaction(request: NextApiReque
         // @ts-ignore
         data.data = await prisma.cateringHeader.findFirst({
             where: {
-                active: true
+                active: true,
+                deleted: false
             },
             include: {
                 details: {
@@ -37,10 +37,9 @@ export default async function getActiveCateringTransaction(request: NextApiReque
                         }
                     }
                 }
-            }
+            },
         });
     } catch (_) {
-        data.data = null;
         data.error = "Failed to fetch catering transaction data.";
     }
 

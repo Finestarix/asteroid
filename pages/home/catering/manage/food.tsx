@@ -1,11 +1,13 @@
 import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
 
+import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Alert, {AlertColor} from "@mui/material/Alert";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
+import Chip from "@mui/material/Chip";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -40,8 +42,6 @@ import {getComparator} from "utils/comparator";
 import {convertToIDR} from "utils/currency";
 import {decryptData} from "utils/encryption";
 import {getSessionToken} from "utils/storage";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import Chip from "@mui/material/Chip";
 
 
 export default function ManageCateringFoodPage() {
@@ -395,7 +395,7 @@ export default function ManageCateringFoodPage() {
                                                                 <IconButton color="primary"
                                                                             disabled={showLoading}
                                                                             onClick={() => handleChangeActiveCateringFood(food.id)}>
-                                                                    <LocalOfferIcon/>
+                                                                    <ChangeCircleIcon/>
                                                                 </IconButton>
                                                             </Tooltip>
                                                             <Tooltip title="Delete Transaction">

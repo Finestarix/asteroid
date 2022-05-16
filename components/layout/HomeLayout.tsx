@@ -1,10 +1,11 @@
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
 
-import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
-import MicrowaveOutlinedIcon from '@mui/icons-material/MicrowaveOutlined';
-import DinnerDiningOutlinedIcon from '@mui/icons-material/DinnerDiningOutlined';
-import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
+import RestaurantOutlinedIcon from "@mui/icons-material/RestaurantOutlined";
+import MicrowaveOutlinedIcon from "@mui/icons-material/MicrowaveOutlined";
+import DinnerDiningOutlinedIcon from "@mui/icons-material/DinnerDiningOutlined";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
@@ -51,6 +52,7 @@ export default function HomeLayout(props: LayoutProps) {
     const gotoCateringHistory = async () => await router.push("/home/catering/history");
     const gotoCateringFood = () => router.push("/home/catering/manage/food");
     const gotoCateringTransaction = () => router.push("/home/catering/manage/transaction");
+    const gotoCateringPayment = () => router.push("/home/catering/manage/payment");
     const gotoLogout = async () => {
         removeSessionToken();
         removeSessionData("role");
@@ -100,6 +102,13 @@ export default function HomeLayout(props: LayoutProps) {
                                 <DinnerDiningOutlinedIcon fontSize="medium"/>
                             </ListItemIcon>
                             <ListItemText primary="Catering Food"/>
+                        </ListItem>
+                        <ListItem button={true}
+                                  onClick={gotoCateringPayment}>
+                            <ListItemIcon>
+                                <PointOfSaleIcon fontSize="medium"/>
+                            </ListItemIcon>
+                            <ListItemText primary="Catering Payment"/>
                         </ListItem>
                     </List>
                     <Divider/>

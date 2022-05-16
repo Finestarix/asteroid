@@ -9,6 +9,7 @@ import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import SellIcon from "@mui/icons-material/Sell";
+import SendIcon from "@mui/icons-material/Send";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -63,6 +64,7 @@ export default function ManageCateringTransactionPage() {
     const [minDate, setMinDate] = useState<Date>(new Date());
     const [maxDate, setMaxDate] = useState<Date>(new Date());
     const [basePrice, setBasePrice] = useState<number>(20000);
+    const [deliveryPrice, setDeliveryPrice] = useState<number>(0);
     const [typeAlert, setTypeAlert] = useState<AlertColor>("error");
     const [messageAlert, setMessageAlert] = useState<string>("");
     const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -100,6 +102,7 @@ export default function ManageCateringTransactionPage() {
 
     const changeDate = (date: Date | null) => setDate(date);
     const changeBasePrice = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setBasePrice(parseInt(event.target.value));
+    const changeDeliveryPrice = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setDeliveryPrice(parseInt(event.target.value));
 
     const handleFilterCateringTransaction = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         let filteredTransactionsTemp = transactions;
@@ -117,10 +120,15 @@ export default function ManageCateringTransactionPage() {
     };
     const handleCloseDialog = () => setShowDialog(false);
     const handleCloseAlert = () => setShowAlert(false);
-    const handleEnter = async (event?: SyntheticEvent | Event) => {
+    const handleEnterCreateCatering = async (event?: SyntheticEvent | Event) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         if (event.code === "Enter") await handleCreateCateringTransaction();
+    };
+    const handleEnterChangeDelivery = async (event: SyntheticEvent | Event, id: number) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        if (event.code === "Enter") await handleChangeRealDeliveryCateringTransaction(id);
     };
     const handleAccordion = (panel: string) => (event: SyntheticEvent, isExpanded: boolean) =>
         setExpanded(isExpanded ? panel : false);
@@ -208,6 +216,35 @@ export default function ManageCateringTransactionPage() {
         setShowLoading(false);
     };
 
+    const handleChangeRealDeliveryCateringTransaction = async (id: number) => {
+        setShowLoading(true);
+
+        const updateRealDeliveryCateringTransactionFetch = await fetch("/api/catering/updateRealDeliveryCateringTransaction", {
+            method: "POST",
+            headers: {
+                authorization: decryptData(getSessionToken())
+            },
+            body: JSON.stringify({
+                id: id,
+                deliveryPrice: deliveryPrice
+            }),
+        });
+
+        const updateRealDeliveryCateringTransactionData: ChangeCateringTransactionData = await updateRealDeliveryCateringTransactionFetch.json();
+        if (updateRealDeliveryCateringTransactionData.error) {
+            setMessageAlert(updateRealDeliveryCateringTransactionData.error);
+            setTypeAlert(AlertTypeEnum.ERROR);
+        } else {
+            const updatedIndex = transactions.findIndex((transaction) => transaction.id === id);
+            transactions[updatedIndex].realDeliveryPrice = updateRealDeliveryCateringTransactionData.data.realDeliveryPrice;
+            setMessageAlert(updateRealDeliveryCateringTransactionData.success);
+            setTypeAlert(AlertTypeEnum.SUCCESS);
+            setDeliveryPrice(0);
+        }
+        setShowAlert(true);
+        setShowLoading(false);
+    };
+
     const handleDeleteCateringTransaction = async () => {
         setShowLoading(true);
         setShowDialog(false);
@@ -250,6 +287,9 @@ export default function ManageCateringTransactionPage() {
             copyTemp += "\n";
         });
         setTransactionCopy(copyTemp);
+        setTypeAlert("success");
+        setMessageAlert("Successfully copied to clipboard.");
+        setShowAlert(true);
     };
 
     return (
@@ -324,7 +364,7 @@ export default function ManageCateringTransactionPage() {
                         <TextField type="number" label="Base Price" variant="outlined" size="medium"
                                    fullWidth={true} disabled={showLoadingForm} value={basePrice}
                                    sx={{marginBottom: 2}}
-                                   onChange={changeBasePrice} onKeyDown={handleEnter}
+                                   onChange={changeBasePrice} onKeyDown={handleEnterCreateCatering}
                                    InputProps={{
                                        startAdornment: (
                                            <InputAdornment position="start">Rp.</InputAdornment>
@@ -391,13 +431,34 @@ export default function ManageCateringTransactionPage() {
                                                     {convertToIDR(transaction.basePrice)}
                                                 </Typography>
                                             </Box>
-                                            <Box sx={{display: "flex"}}>
+                                            <Box sx={{display: "flex", alignItems: "center"}}>
                                                 <DeliveryDiningIcon sx={{marginRight: 1}}/>
-                                                <Typography variant="body1"
-                                                            sx={{marginBottom: 1}}>
+                                                <Typography variant="body1">
                                                     {convertToIDR(transaction.deliveryPrice)}/pax
                                                     ({convertToIDR(transaction.realDeliveryPrice)})
                                                 </Typography>
+                                            </Box>
+                                            <Box sx={{
+                                                marginTop: 2,
+                                                marginBottom: 2,
+                                                display: "flex",
+                                                alignItems: "center",
+                                            }}>
+                                                <TextField type="number" label="Real Delivery Price" size="small"
+                                                           disabled={showLoading} value={deliveryPrice}
+                                                           sx={{maxWidth: "180px"}}
+                                                           onChange={changeDeliveryPrice}
+                                                           onKeyDown={(event) => handleEnterChangeDelivery(event, transaction.id)}
+                                                           InputProps={{
+                                                               endAdornment: (
+                                                                   <IconButton color="primary" size="small"
+                                                                               disabled={showLoading}
+                                                                               onClick={() => handleChangeRealDeliveryCateringTransaction(transaction.id)}>
+                                                                       <SendIcon/>
+                                                                   </IconButton>
+                                                               )
+                                                           }}/>
+
                                             </Box>
                                             <Typography variant="caption">
                                                 Created by <b>{transaction.createdBy.username}</b>
@@ -405,7 +466,8 @@ export default function ManageCateringTransactionPage() {
                                             <Typography variant="caption">
                                                 Last Updated by <b>{transaction.lastUpdatedBy.username}</b>
                                             </Typography>
-                                            <List dense={true}>
+                                            <List dense={true}
+                                                  sx={{marginTop: 1}}>
                                                 {transaction.details.map((detail) => (
                                                     <ListItem key={detail.id} disableGutters={true}
                                                               sx={{
@@ -426,7 +488,8 @@ export default function ManageCateringTransactionPage() {
                                                                               label="Full Set"/> :
                                                                         <Chip variant="outlined" size="small"
                                                                               label="Only Additional"/>}
-                                                                </Box>}/>
+                                                                </Box>}
+                                                            sx={{marginBottom: 0}}/>
                                                         <ListItemText
                                                             primary={
                                                                 <Box>

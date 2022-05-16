@@ -411,8 +411,8 @@ export default function ManageCateringFoodPage() {
                                                         </TableCell>
                                                         <TableCell width={100}>
                                                             {(food.active) ?
-                                                                <Chip color="primary" label="Active"/> :
-                                                                <Chip label="Inactive"/>}
+                                                                <Chip size="small" color="primary" label="Active"/> :
+                                                                <Chip size="small" label="Inactive"/>}
                                                         </TableCell>
                                                         <TableCell width={180}>
                                                             {food.category}

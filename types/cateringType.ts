@@ -91,14 +91,15 @@ export interface UpdateDeleteCateringTransactionParameter {
     id: number
 }
 
+export interface UpdateDeliveryCateringTransactionParameter {
+    id: number,
+    deliveryPrice: number
+}
+
 export interface ChangeCateringTransactionData {
     data: CateringTransaction,
     error: string,
     success: string
-}
-
-export interface ViewCateringTransactionDetailParameter {
-    id: number
 }
 
 export interface ViewCateringTransactionDetailData {

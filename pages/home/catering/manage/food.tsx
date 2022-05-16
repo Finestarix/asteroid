@@ -2,12 +2,10 @@ import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import Alert, {AlertColor} from "@mui/material/Alert";
-import {alpha} from "@mui/material/styles";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
-import Checkbox from "@mui/material/Checkbox";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -18,7 +16,6 @@ import InputAdornment from "@mui/material/InputAdornment";
 import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
 import Snackbar from "@mui/material/Snackbar";
-import Switch from "@mui/material/Switch";
 import Table from "@mui/material/Table";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
@@ -28,7 +25,6 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import TextField from "@mui/material/TextField";
-import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 
@@ -38,28 +34,29 @@ import {
     CateringFoodCategory,
     ViewCateringFoodData,
     ChangeCateringFoodData,
-    DeleteCateringFoodData
 } from "types/cateringType";
-import {AlertTypeEnum, OrderTypeEnum, TableHeadKey} from "types/generalType";
+import {TableHeadKey, AlertTypeEnum, OrderTypeEnum} from "types/generalType";
 import {getComparator} from "utils/comparator";
 import {convertToIDR} from "utils/currency";
 import {decryptData} from "utils/encryption";
 import {getSessionToken} from "utils/storage";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import Chip from "@mui/material/Chip";
 
 
 export default function ManageCateringFoodPage() {
 
     const foodTableHeader: TableHeadKey[] = [
-        {id: "active", label: "Active?"},
+        {id: "", label: "Action"},
         {id: "name", label: "Name"},
-        {id: "additionalPrice", label: "Additional Price"},
-        {id: "reductionPrice", label: "Reduction Price"},
+        {id: "active", label: "Status"},
         {id: "category", label: "Category"},
-        {id: "createdById", label: "Created By"},
-        {id: "lastUpdatedById", label: "Last Updated By"}
+        {id: "", label: "Price"},
+        {id: "", label: ""},
     ];
 
     const [foods, setFoods] = useState<CateringFood[]>([]);
+    const [selectedDeleteFood, setSelectedDeleteFood] = useState<number>(-1);
     const [selectedFoods, setSelectedFoods] = useState<number[]>([]);
     const [filter, setFilter] = useState<string>("");
     const [filteredFoods, setFilteredFoods] = useState<CateringFood[]>([]);
@@ -118,7 +115,10 @@ export default function ManageCateringFoodPage() {
         setFilteredFoods(filteredFoods);
     };
 
-    const handleOpenDialog = () => setShowDialog(true);
+    const handleOpenDialog = (id: number) => {
+        setSelectedDeleteFood(id);
+        setShowDialog(true);
+    };
     const handleCloseDialog = () => setShowDialog(false);
     const handleCloseAlert = () => setShowAlert(false);
     const handleEnter = async (event?: SyntheticEvent | Event) => {
@@ -141,27 +141,6 @@ export default function ManageCateringFoodPage() {
         setOrderType(isAscending ? OrderTypeEnum.DESC : OrderTypeEnum.ASC);
         setOrderBy(property);
     };
-
-    const handleSelectClick = (id: number) => {
-        const selectedIndex = selectedFoods.indexOf(id);
-        let newSelected: number[] = [];
-
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selectedFoods, id);
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selectedFoods.slice(1));
-        } else if (selectedIndex === selectedFoods.length - 1) {
-            newSelected = newSelected.concat(selectedFoods.slice(0, -1));
-        } else if (selectedIndex > 0) {
-            newSelected = newSelected.concat(selectedFoods.slice(0, selectedIndex), selectedFoods.slice(selectedIndex + 1));
-        }
-        setSelectedFoods(newSelected);
-    };
-
-    const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) =>
-        (event.target.checked) ?
-            setSelectedFoods(foods.map((food) => food.id)) :
-            setSelectedFoods([]);
 
     const handleCreateCateringFood = async () => {
         setShowLoadingForm(true);
@@ -227,29 +206,28 @@ export default function ManageCateringFoodPage() {
         setShowLoading(true);
         setShowDialog(false);
 
-        const deleteCateringFoodFetch = await fetch("/api/catering/deleteMultipleCateringFood", {
+        const deleteCateringFoodFetch = await fetch("/api/catering/deleteCateringFood", {
             method: "POST",
             headers: {
                 authorization: decryptData(getSessionToken())
             },
             body: JSON.stringify({
-                ids: selectedFoods
+                id: selectedDeleteFood
             }),
         });
 
-        const deleteCateringFoodData: DeleteCateringFoodData = await deleteCateringFoodFetch.json();
+        const deleteCateringFoodData: ChangeCateringFoodData = await deleteCateringFoodFetch.json();
         if (deleteCateringFoodData.error) {
             setMessageAlert(deleteCateringFoodData.error);
             setTypeAlert(AlertTypeEnum.ERROR);
         } else {
-            selectedFoods.forEach((data) => {
-                const deleteIndex = foods.findIndex((food) => food.id === data);
-                foods.splice(deleteIndex, 1);
-            });
+            const deleteIndex = foods.findIndex((food) => food.id === selectedDeleteFood);
+            foods.splice(deleteIndex, 1);
             setMessageAlert(deleteCateringFoodData.success);
             setTypeAlert(AlertTypeEnum.SUCCESS);
             setSelectedFoods([]);
         }
+        setSelectedDeleteFood(-1);
         setShowAlert(true);
         setShowLoading(false);
     };
@@ -282,11 +260,11 @@ export default function ManageCateringFoodPage() {
                 <Dialog open={showDialog}
                         onClose={handleCloseDialog}>
                     <DialogTitle>
-                        Delete Food(s) Confirmation
+                        Delete Food Confirmation
                     </DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            You are about to delete catering food(s) permanently from database. Are you sure?
+                            You are about to delete catering food permanently from database. Are you sure?
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -375,47 +353,28 @@ export default function ManageCateringFoodPage() {
 
                         <Paper>
 
-                            <Toolbar variant="dense"
-                                     sx={{
-                                         paddingLeft: {sm: 2}, paddingRight: {xs: 1, sm: 1},
-                                         ...(selectedFoods.length > 0 && {
-                                             bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity)
-                                         })
-                                     }}>
-                                {selectedFoods.length > 0 ?
-                                    <Typography sx={{flex: "1 1 100%"}}>{selectedFoods.length} selected</Typography> :
-                                    <Typography sx={{flex: "1 1 100%"}}>Foods</Typography>}
-                                {selectedFoods.length > 0 &&
-                                    <Tooltip title="Delete">
-                                        <IconButton onClick={handleOpenDialog}>
-                                            <DeleteIcon/>
-                                        </IconButton>
-                                    </Tooltip>}
-                            </Toolbar>
-
                             <TableContainer>
-                                <Table size="medium" sx={{whiteSpace: "nowrap"}}>
+                                <Table size="small" sx={{whiteSpace: "nowrap"}}>
 
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell padding="checkbox">
-                                                <Checkbox color="primary"
-                                                          disabled={showLoading}
-                                                          indeterminate={selectedFoods.length > 0 && selectedFoods.length < filteredFoods.length}
-                                                          checked={filteredFoods.length > 0 && selectedFoods.length === filteredFoods.length}
-                                                          onChange={handleSelectAllClick}/>
-                                            </TableCell>
                                             {foodTableHeader.map((tableHeader) => (
-                                                <TableCell key={tableHeader.id}
-                                                           sortDirection={orderBy === tableHeader.id ? orderType : false}>
-                                                    <TableSortLabel active={orderBy === tableHeader.id}
-                                                                    direction={orderBy === tableHeader.id ? orderType : OrderTypeEnum.ASC}
-                                                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                                        // @ts-ignore
-                                                                    onClick={handleRequestSort(tableHeader.id)}>
+                                                (tableHeader.id !== "") ? (
+                                                    <TableCell key={tableHeader.id}
+                                                               sortDirection={orderBy === tableHeader.id ? orderType : false}>
+                                                        <TableSortLabel active={orderBy === tableHeader.id}
+                                                                        direction={orderBy === tableHeader.id ? orderType : OrderTypeEnum.ASC}
+                                                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                            // @ts-ignore
+                                                                        onClick={handleRequestSort(tableHeader.id)}>
+                                                            {tableHeader.label}
+                                                        </TableSortLabel>
+                                                    </TableCell>
+                                                ) : (
+                                                    <TableCell>
                                                         {tableHeader.label}
-                                                    </TableSortLabel>
-                                                </TableCell>
+                                                    </TableCell>
+                                                )
                                             ))}
                                         </TableRow>
                                     </TableHead>
@@ -431,34 +390,49 @@ export default function ManageCateringFoodPage() {
                                                 return (
                                                     <TableRow key={food.id} tabIndex={-1} hover={!showLoading}
                                                               selected={isItemSelected}>
-                                                        <TableCell padding="checkbox">
-                                                            <Checkbox disabled={showLoading} checked={isItemSelected}
-                                                                      onChange={() => handleSelectClick(food.id)}/>
-                                                        </TableCell>
-                                                        <TableCell width={100} sx={{paddingTop: 0, paddingBottom: 0}}>
-                                                            <Tooltip
-                                                                title={(food.active) ? "Set to Inactive" : "Set to Active"}>
-                                                                <Switch disabled={showLoading} checked={food.active}
-                                                                        onChange={() => handleChangeActiveCateringFood(food.id)}/>
+                                                        <TableCell width={120} sx={{paddingTop: 0, paddingBottom: 0}}>
+                                                            <Tooltip title={(food.active) ? "Change to Inactive" : "Change to Active"}>
+                                                                <IconButton color="primary"
+                                                                            disabled={showLoading}
+                                                                            onClick={() => handleChangeActiveCateringFood(food.id)}>
+                                                                    <LocalOfferIcon/>
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                            <Tooltip title="Delete Transaction">
+                                                                <IconButton color="error"
+                                                                            disabled={showLoading}
+                                                                            onClick={() => handleOpenDialog(food.id)}>
+                                                                    <DeleteIcon/>
+                                                                </IconButton>
                                                             </Tooltip>
                                                         </TableCell>
-                                                        <TableCell>
+                                                        <TableCell width={200}>
                                                             {food.name}
                                                         </TableCell>
-                                                        <TableCell>
-                                                            {convertToIDR(food.additionalPrice)}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {convertToIDR(food.reductionPrice)}
+                                                        <TableCell width={100}>
+                                                            {(food.active) ?
+                                                                <Chip color="primary" label="Active"/> :
+                                                                <Chip label="Inactive"/>}
                                                         </TableCell>
                                                         <TableCell width={180}>
                                                             {food.category}
                                                         </TableCell>
                                                         <TableCell width={150}>
-                                                            {(food.createdBy.fullname) ? food.createdBy.fullname : food.createdBy.username}
+                                                            {(food.additionalPrice) ?
+                                                                "+ " + convertToIDR(food.additionalPrice) :
+                                                                (food.reductionPrice) ?
+                                                                    "- " + convertToIDR(food.reductionPrice) :
+                                                                    convertToIDR(0)}
                                                         </TableCell>
-                                                        <TableCell width={150}>
-                                                            {(food.lastUpdatedBy.fullname) ? food.lastUpdatedBy.fullname : food.lastUpdatedBy.username}
+                                                        <TableCell >
+                                                            <Box sx={{display: "flex", flexDirection: "column"}}>
+                                                                <Typography variant="caption">
+                                                                    Created by <b>{food.createdBy.username}</b>
+                                                                </Typography>
+                                                                <Typography variant="caption">
+                                                                    Last Updated by <b>{food.lastUpdatedBy.username}</b>
+                                                                </Typography>
+                                                            </Box>
                                                         </TableCell>
                                                     </TableRow>
                                                 );

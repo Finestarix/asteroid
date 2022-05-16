@@ -6,6 +6,11 @@ export interface LayoutProps {
     title: string
 }
 
+export interface TableHeadKey {
+    id: string,
+    label: string
+}
+
 export enum AlertTypeEnum {
     ERROR = "error",
     SUCCESS = "success"

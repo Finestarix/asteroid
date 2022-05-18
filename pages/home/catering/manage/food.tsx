@@ -47,17 +47,16 @@ import {getSessionToken} from "utils/storage";
 export default function ManageCateringFoodPage() {
 
     const foodTableHeader: TableHeadKey[] = [
-        {id: "", label: "Action"},
-        {id: "name", label: "Name"},
-        {id: "active", label: "Status"},
-        {id: "category", label: "Category"},
-        {id: "", label: "Price"},
-        {id: "", label: ""},
+        {id: "action", label: "Action", sort: false},
+        {id: "name", label: "Name", sort: true},
+        {id: "active", label: "Status", sort: true},
+        {id: "category", label: "Category", sort: true},
+        {id: "price", label: "Price", sort: false},
+        {id: "user", label: "", sort: false},
     ];
 
     const [foods, setFoods] = useState<CateringFood[]>([]);
     const [selectedDeleteFood, setSelectedDeleteFood] = useState<number>(-1);
-    const [selectedFoods, setSelectedFoods] = useState<number[]>([]);
     const [filter, setFilter] = useState<string>("");
     const [filteredFoods, setFilteredFoods] = useState<CateringFood[]>([]);
     const [name, setName] = useState<string>("");
@@ -125,7 +124,6 @@ export default function ManageCateringFoodPage() {
         if (event.code === "Enter") await handleCreateCateringFood();
     };
 
-    const isDataSelected = (id: number) => selectedFoods.indexOf(id) !== -1;
     const getFirstDataInPage = () => page * dataPerPage;
     const getLastDataInPage = () => getFirstDataInPage() + dataPerPage;
     const handleChangePage = (event: unknown, newPage: number) => setPage(newPage);
@@ -223,7 +221,6 @@ export default function ManageCateringFoodPage() {
             foods.splice(deleteIndex, 1);
             setMessageAlert(deleteCateringFoodData.success);
             setTypeAlert(AlertTypeEnum.SUCCESS);
-            setSelectedFoods([]);
         }
         setSelectedDeleteFood(-1);
         setShowAlert(true);
@@ -357,7 +354,7 @@ export default function ManageCateringFoodPage() {
                                     <TableHead>
                                         <TableRow>
                                             {foodTableHeader.map((tableHeader) => (
-                                                (tableHeader.id !== "") ? (
+                                                (tableHeader.sort) ? (
                                                     <TableCell key={tableHeader.id}
                                                                sortDirection={orderBy === tableHeader.id ? orderType : false}>
                                                         <TableSortLabel active={orderBy === tableHeader.id}
@@ -365,11 +362,13 @@ export default function ManageCateringFoodPage() {
                                                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                                             // @ts-ignore
                                                                         onClick={handleRequestSort(tableHeader.id)}>
+                                                            {tableHeader.id}
                                                             {tableHeader.label}
                                                         </TableSortLabel>
                                                     </TableCell>
                                                 ) : (
-                                                    <TableCell>
+                                                    <TableCell key={tableHeader.id}>
+                                                        {tableHeader.id}
                                                         {tableHeader.label}
                                                     </TableCell>
                                                 )
@@ -384,10 +383,8 @@ export default function ManageCateringFoodPage() {
                                             .sort(getComparator(orderType, orderBy))
                                             .slice(getFirstDataInPage(), getLastDataInPage())
                                             .map((food) => {
-                                                const isItemSelected = isDataSelected(food.id);
                                                 return (
-                                                    <TableRow key={food.id} tabIndex={-1} hover={!showLoading}
-                                                              selected={isItemSelected}>
+                                                    <TableRow key={food.id} tabIndex={-1} hover={!showLoading}>
                                                         <TableCell width={120} sx={{paddingTop: 0, paddingBottom: 0}}>
                                                             <Tooltip title={(food.active) ? "Change to Inactive" : "Change to Active"}>
                                                                 <IconButton color="primary"

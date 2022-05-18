@@ -8,7 +8,8 @@ export interface LayoutProps {
 
 export interface TableHeadKey {
     id: string,
-    label: string
+    label: string,
+    sort: boolean
 }
 
 export enum AlertTypeEnum {

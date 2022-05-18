@@ -1,9 +1,10 @@
 export interface User {
     id: number,
-    fullname: string,
+    alias: string,
     username: string,
     password: string,
     role: UserRole,
+    status: UserStatus,
     createdAt: Date,
     deletedAt: Date,
     deleted: boolean
@@ -33,6 +34,36 @@ export interface RegisterData {
 export interface TokenData {
     username: string,
     role: UserRole
+}
+
+export interface ViewUserData {
+    data: User[],
+    error: string
+}
+
+export interface UpdateAliasUserParameter {
+    id: number,
+    alias: string
+}
+
+export interface UpdateRoleUserParameter {
+    id: number,
+    role: UserRole
+}
+
+export interface UpdateStatusUserParameter {
+    id: number,
+    status: UserStatus
+}
+
+export interface UpdateDeleteUserParameter {
+    id: number
+}
+
+export interface UpdateDeleteUserData {
+    data: User,
+    error: string,
+    success: string
 }
 
 export enum UserRole {

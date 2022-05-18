@@ -270,7 +270,7 @@ export default function CateringOrderPage() {
                         {(transaction.details && transaction.details.length > 0) && (
                             <Alert variant="outlined" severity="info"
                                    sx={{maxWidth: "530px", marginBottom: 2}}>
-                                You already have <b>{transaction.details.length} transaction</b> for this catering.
+                                You already have <b>{transaction.details.length} transaction(s)</b> for this catering.
                             </Alert>
                         )}
 

@@ -31,14 +31,14 @@ export default async function getCateringFood(request: NextApiRequest, response:
             include: {
                 createdBy: {
                     select: {
-                        fullname: true,
-                        username: true
+                        username: true,
+                        alias: true
                     }
                 },
                 lastUpdatedBy: {
                     select: {
-                        fullname: true,
-                        username: true
+                        username: true,
+                        alias: true
                     }
                 }
             }

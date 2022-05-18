@@ -3,7 +3,6 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {UpdateDeliveryCateringTransactionParameter} from "types/cateringType";
 import {TokenData} from "types/userType";
 import {prisma} from "utils/database";
-import {calculateDeliveryPrice} from "utils/calculator";
 import {convertDateGeneral} from "utils/date";
 import {getTokenData} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";

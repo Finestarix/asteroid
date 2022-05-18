@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 
-import {passwordStrength} from "check-password-strength";
+import owasp from "owasp-password-strength-test";
 
 import {RegisterParameter} from "types/userType";
 import {prisma} from "utils/database";
@@ -23,11 +23,12 @@ export default async function authRegister(request: NextApiRequest, response: Ne
         return response.status(400).json(data);
     }
 
+    const passwordCheck = owasp.test(userParameter.password);
+
     if (userParameter.username.length < 2 || userParameter.username.length > 64) {
         data.error = "Username length must be between 2 and 64.";
-    } else if (passwordStrength(userParameter.password).id <= 0) {
-        data.error = "Password is too weak. Password must use at least 6 character and " +
-            "contains one upper case letter, one lower case letter, and one numeric character.";
+    } else if (passwordCheck.requiredTestErrors.length > 0) {
+        data.error = "Password is too weak. " + passwordCheck.requiredTestErrors[0];
     } else if (userParameter.password !== userParameter.confirmPassword) {
         data.error = "Password do not match.";
     } else {

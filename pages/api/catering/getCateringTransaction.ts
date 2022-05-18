@@ -42,8 +42,8 @@ export default async function getCateringTransaction(request: NextApiRequest, re
                         },
                         participant: {
                             select: {
-                                fullname: true,
-                                username: true
+                                username: true,
+                                alias: true
                             }
                         },
                         note: true,
@@ -55,14 +55,14 @@ export default async function getCateringTransaction(request: NextApiRequest, re
                 },
                 createdBy: {
                     select: {
-                        fullname: true,
-                        username: true
+                        username: true,
+                        alias: true
                     }
                 },
                 lastUpdatedBy: {
                     select: {
-                        fullname: true,
-                        username: true
+                        username: true,
+                        alias: true
                     }
                 }
             }

@@ -56,14 +56,14 @@ export default async function createCateringFood(request: NextApiRequest, respon
                 include: {
                     createdBy: {
                         select: {
-                            fullname: true,
-                            username: true
+                            username: true,
+                            alias: true
                         }
                     },
                     lastUpdatedBy: {
                         select: {
-                            fullname: true,
-                            username: true
+                            username: true,
+                            alias: true
                         }
                     },
                 }

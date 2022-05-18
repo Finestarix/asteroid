@@ -57,8 +57,8 @@ export default async function createCateringTransaction(request: NextApiRequest,
                 header: true,
                 participant: {
                     select: {
-                        fullname: true,
-                        username: true
+                        username: true,
+                        alias: true
                     }
                 },
                 foods: true

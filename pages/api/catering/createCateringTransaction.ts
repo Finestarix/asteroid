@@ -65,22 +65,22 @@ export default async function createCateringTransaction(request: NextApiRequest,
                             },
                             participant: {
                                 select: {
-                                    fullname: true,
-                                    username: true
+                                    username: true,
+                                    alias: true
                                 }
                             }
                         }
                     },
                     createdBy: {
                         select: {
-                            fullname: true,
-                            username: true
+                            username: true,
+                            alias: true
                         }
                     },
                     lastUpdatedBy: {
                         select: {
-                            fullname: true,
-                            username: true
+                            username: true,
+                            alias: true
                         }
                     }
                 }

@@ -104,10 +104,8 @@ export default function ManageCateringFoodPage() {
         let filteredFoods = foods;
         if (event.target.value.length > 0) {
             filteredFoods = foods.filter((food) =>
-                food.name.toLowerCase().indexOf(event.target.value) !== -1 ||
-                food.category.toLowerCase().indexOf(event.target.value) !== -1 ||
-                food.additionalPrice.toString().indexOf(event.target.value) !== -1 ||
-                food.reductionPrice.toString().indexOf(event.target.value) !== -1);
+                food.name.toLowerCase().indexOf(event.target.value.toLowerCase()) !== -1 ||
+                food.category.toLowerCase().indexOf(event.target.value.toLowerCase()) !== -1);
         }
 
         setPage(0);

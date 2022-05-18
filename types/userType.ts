@@ -41,3 +41,9 @@ export enum UserRole {
     DebtAdmin = "DebtAdmin",
     Owner = "Owner"
 }
+
+export enum UserStatus {
+    Requested = "Requested",
+    Accepted = "Accepted",
+    Blocked = "Blocked"
+}

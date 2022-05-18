@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 
-import {LoginParameter, TokenData} from "types/userType";
+import {UserStatus, LoginParameter, TokenData} from "types/userType";
 import {prisma} from "utils/database";
 import {compareHashString} from "utils/hash";
 import {generateToken} from "utils/token";
@@ -30,6 +30,12 @@ export default async function authLogin(request: NextApiRequest, response: NextA
         let userData;
         try {
             userData = await prisma.user.findUnique({
+                select: {
+                    password: true,
+                    role: true,
+                    status: true,
+                    deleted: true
+                },
                 where: {
                     username: userParameter.username,
                 },
@@ -41,7 +47,11 @@ export default async function authLogin(request: NextApiRequest, response: NextA
         if (!userData) {
             data.error = "Invalid user credential.";
         } else if (userData.deleted) {
-            data.error = "Your account has been disabled.";
+            data.error = "Your account has been deleted.";
+        } else if (userData.status === UserStatus.Requested) {
+            data.error = "Your account is waiting to be approved by the admin.";
+        } else if (userData.status === UserStatus.Blocked) {
+            data.error = "Your account has been blocked.";
         } else {
             const compareResult = await compareHashString(userParameter.password, userData.password);
             if (!compareResult) {

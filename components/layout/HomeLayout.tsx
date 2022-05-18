@@ -1,11 +1,12 @@
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
 
-import RestaurantOutlinedIcon from "@mui/icons-material/RestaurantOutlined";
-import MicrowaveOutlinedIcon from "@mui/icons-material/MicrowaveOutlined";
 import DinnerDiningOutlinedIcon from "@mui/icons-material/DinnerDiningOutlined";
+import GroupIcon from "@mui/icons-material/Group";
+import MicrowaveOutlinedIcon from "@mui/icons-material/MicrowaveOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import RestaurantOutlinedIcon from "@mui/icons-material/RestaurantOutlined";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
@@ -45,6 +46,7 @@ export default function HomeLayout(props: LayoutProps) {
 
     const cateringAdminRole: string[] = [UserRole.CateringAdmin, UserRole.Owner];
     const debtAdminRole: string[] = [UserRole.DebtAdmin, UserRole.Owner];
+    const userAdminRole: string[] = [UserRole.Owner];
 
     const router = useRouter();
     const gotoHome = async () => await router.push("/home");
@@ -53,6 +55,7 @@ export default function HomeLayout(props: LayoutProps) {
     const gotoCateringFood = () => router.push("/home/catering/manage/food");
     const gotoCateringTransaction = () => router.push("/home/catering/manage/transaction");
     const gotoCateringPayment = () => router.push("/home/catering/manage/payment");
+    const gotoUser = () => router.push("/home/user");
     const gotoLogout = async () => {
         removeSessionToken();
         removeSessionData("role");
@@ -109,6 +112,19 @@ export default function HomeLayout(props: LayoutProps) {
                                 <PointOfSaleIcon fontSize="medium"/>
                             </ListItemIcon>
                             <ListItemText primary="Catering Payment"/>
+                        </ListItem>
+                    </List>
+                    <Divider/>
+                </>}
+            {(userAdminRole.includes(role)) &&
+                <>
+                    <List>
+                        <ListItem button={true}
+                                  onClick={gotoUser}>
+                            <ListItemIcon>
+                                <GroupIcon fontSize="medium"/>
+                            </ListItemIcon>
+                            <ListItemText primary="User"/>
                         </ListItem>
                     </List>
                     <Divider/>

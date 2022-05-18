@@ -108,7 +108,7 @@ export default function ManageCateringTransactionPage() {
         let filteredTransactionsTemp = transactions;
         if (event.target.value.length > 0) {
             filteredTransactionsTemp = transactions.filter((transaction) =>
-                convertDateGeneral(transaction.date).toLowerCase().indexOf(event.target.value) !== -1);
+                convertDateGeneral(transaction.date).toLowerCase().indexOf(event.target.value.toLowerCase()) !== -1);
         }
         setFilter(event.target.value);
         setFilteredTransactions(filteredTransactionsTemp);
@@ -279,7 +279,7 @@ export default function ManageCateringTransactionPage() {
 
         transaction.details.forEach((detail, index) => {
             copyTemp += (index + 1) + ". " + detail.participant.username +
-                ((detail.onlyAdditional) ? " (HANYA TAMBAHAN)" : "") + "\n";
+                ((detail.onlyAdditional) ? " (TAMBAHAN)" : "") + "\n";
             detail.foods.forEach((food) => {
                 copyTemp += "- " + food.food.name + "\n";
             });
@@ -438,15 +438,10 @@ export default function ManageCateringTransactionPage() {
                                                     ({convertToIDR(transaction.realDeliveryPrice)})
                                                 </Typography>
                                             </Box>
-                                            <Box sx={{
-                                                marginTop: 2,
-                                                marginBottom: 2,
-                                                display: "flex",
-                                                alignItems: "center",
-                                            }}>
+                                            <Box sx={{marginTop: 2, display: "flex", alignItems: "center"}}>
                                                 <TextField type="number" label="Real Delivery Price" size="small"
                                                            disabled={showLoading} value={deliveryPrice}
-                                                           sx={{maxWidth: "180px"}}
+                                                           sx={{maxWidth: "160px"}}
                                                            onChange={changeDeliveryPrice}
                                                            onKeyDown={(event) => handleEnterChangeDelivery(event, transaction.id)}
                                                            InputProps={{
@@ -458,9 +453,9 @@ export default function ManageCateringTransactionPage() {
                                                                    </IconButton>
                                                                )
                                                            }}/>
-
                                             </Box>
-                                            <Typography variant="caption">
+                                            <Typography variant="caption"
+                                                        sx={{marginTop: 1}}>
                                                 Created by <b>{transaction.createdBy.username}</b>
                                             </Typography>
                                             <Typography variant="caption">
@@ -483,7 +478,7 @@ export default function ManageCateringTransactionPage() {
                                                                                 sx={{marginRight: 0.5}}>
                                                                         {detail.participant.username}&nbsp;
                                                                     </Typography>
-                                                                    {(detail.onlyAdditional) ?
+                                                                    {(!detail.onlyAdditional) ?
                                                                         <Chip variant="outlined" size="small"
                                                                               label="Full Set"/> :
                                                                         <Chip variant="outlined" size="small"

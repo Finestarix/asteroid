@@ -142,15 +142,21 @@ export default function ManageCateringTransactionPage() {
             setTotalTransaction(totalTransactionTemp);
             setTotal(totalTemp);
 
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             const summaryTransactionTemp= [];
-            cateringTransactionData.data.forEach((transaction, index1) => {
+            cateringTransactionData.data.forEach((transaction) => {
                 const summaryTemp = {};
                 transaction.details.forEach((detail) => {
                     for (const food of detail.foods) {
                         if (food.food.category !== CateringFoodCategory.Rice) {
                             if (!(food.food.name in summaryTemp)) {
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
                                 summaryTemp[food.food.name] = 1;
                             } else {
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
                                 summaryTemp[food.food.name]++;
                             }
                         }
@@ -158,6 +164,8 @@ export default function ManageCateringTransactionPage() {
                 });
                 summaryTransactionTemp.push(summaryTemp);
             });
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             setSummaryTransaction(summaryTransactionTemp);
 
             setShowLoading(false);

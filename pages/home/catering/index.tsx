@@ -496,7 +496,7 @@ export default function CateringOrderPage() {
                                         <Box>
                                             <TextField label="Note (Optional)"
                                                        placeholder="e.g. vegetables can be replaced with the main dish or side dish."
-                                                       multiline={true} rows={3} value={note}
+                                                       multiline={true} rows={2} value={note}
                                                        sx={{width: "500px", marginTop: 2, marginBottom: 2}}
                                                        onChange={handleNote}
                                                        InputProps={{
@@ -614,16 +614,17 @@ export default function CateringOrderPage() {
                                             </Table>
                                         </TableContainer>
                                         <Box>
-                                            <TextField label="Note"
-                                                       disabled={true} multiline={true} rows={3} value={note}
-                                                       sx={{width: "500px", marginTop: 1, marginBottom: 2}}
-                                                       InputProps={{
-                                                           startAdornment: (
-                                                               <InputAdornment position="start">
-                                                                   <StickyNote2Icon/>
-                                                               </InputAdornment>
-                                                           ),
-                                                       }}/>
+                                            {(note.length > 0) &&
+                                              <TextField label="Note"
+                                                         disabled={true} multiline={true} rows={2} value={note}
+                                                         sx={{width: "500px", marginTop: 1, marginBottom: 2}}
+                                                         InputProps={{
+                                                             startAdornment: (
+                                                                 <InputAdornment position="start">
+                                                                     <StickyNote2Icon/>
+                                                                 </InputAdornment>
+                                                             ),
+                                                         }}/>}
                                         </Box>
                                         <Alert variant="outlined" severity="info"
                                                sx={{maxWidth: "500px", marginBottom: 2}}>
@@ -659,7 +660,7 @@ export default function CateringOrderPage() {
                                                     onClick={handleBack}>
                                                 Back
                                             </Button>
-                                            <Button variant="contained"
+                                            <Button variant="outlined" color="error"
                                                     endIcon={<ArrowRightIcon/>}
                                                     onClick={handleCreateCateringOrder}>
                                                 Order

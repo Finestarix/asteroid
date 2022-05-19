@@ -1,4 +1,4 @@
-import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
+import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 
 import CancelIcon from "@mui/icons-material/Cancel";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
@@ -13,7 +13,7 @@ import SendIcon from "@mui/icons-material/Send";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import Alert, {AlertColor} from "@mui/material/Alert";
+import Alert, { AlertColor } from "@mui/material/Alert";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -27,39 +27,61 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
 import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
-import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
-import {DatePicker} from "@mui/x-date-pickers/DatePicker";
-import {CopyToClipboard} from "react-copy-to-clipboard";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import HomeLayout from "@components/layout/HomeLayout";
 import {
+    CateringFoodCategory,
     CateringTransaction,
-    ViewCateringTransactionData,
-    ChangeCateringTransactionData
+    ChangeCateringTransactionData,
+    ViewCateringTransactionData
 } from "types/cateringType";
-import {AlertTypeEnum} from "types/generalType";
-import {convertToIDR} from "utils/currency";
-import {convertDateGeneral} from "utils/date";
-import {decryptData} from "utils/encryption";
-import {getSessionToken} from "utils/storage";
+import { AlertTypeEnum, TableHeadKey } from "types/generalType";
+import { convertToIDR } from "utils/currency";
+import { convertDateGeneral } from "utils/date";
+import { decryptData } from "utils/encryption";
+import { getSessionToken } from "utils/storage";
 
 
 export default function ManageCateringTransactionPage() {
+
+    const transactionTableHeader: TableHeadKey[] = [
+        { id: "alias", label: "Buyer", sort: false },
+        { id: "rice", label: "Rice Portion", sort: false },
+        { id: "mainDish", label: "Main Dish", sort: false },
+        { id: "sideDish", label: "Side Dish", sort: false },
+        { id: "vegetable", label: "Vegetable", sort: false },
+        { id: "additional", label: "Additional", sort: false },
+        { id: "price", label: "Price", sort: false }
+    ];
+
+    const transactionSummaryTableHeader: TableHeadKey[] = [
+        { id: "detail", label: "Detail", sort: false },
+        { id: "total", label: "Total", sort: false }
+    ];
 
     const [transactions, setTransactions] = useState<CateringTransaction[]>([]);
     const [transactionCopy, setTransactionCopy] = useState<string>("");
     const [selectedDeleteTransaction, setSelectedDeleteTransaction] = useState<number>(-1);
     const [filter, setFilter] = useState<string>("");
     const [filteredTransactions, setFilteredTransactions] = useState<CateringTransaction[]>([]);
+    const [total, setTotal] = useState<number[][]>([[]]);
+    const [totalTransaction, setTotalTransaction] = useState<number[]>([]);
+    const [summaryTransaction, setSummaryTransaction] = useState();
     const [date, setDate] = useState<Date | null>(new Date());
     const [minDate, setMinDate] = useState<Date>(new Date());
     const [maxDate, setMaxDate] = useState<Date>(new Date());
@@ -94,6 +116,50 @@ export default function ManageCateringTransactionPage() {
             const cateringTransactionData: ViewCateringTransactionData = await cateringTransactionFetch.json();
             setTransactions(cateringTransactionData.data);
             setFilteredTransactions(cateringTransactionData.data);
+
+            const totalTransactionTemp: number[] = [];
+            const totalTemp: number[][] = [[]];
+            cateringTransactionData.data.forEach((transaction, index1) => {
+                let priceTransactionTemp = 0;
+                transaction.details.forEach((detail) => {
+                    let priceTemp = 0;
+
+                    if (!detail.onlyAdditional) {
+                        priceTemp = transaction.basePrice;
+                    }
+
+                    for (const food of detail.foods) {
+                        if (food.food.additionalPrice) priceTemp += food.food.additionalPrice;
+                        if (food.food.reductionPrice) priceTemp -= food.food.reductionPrice;
+                    }
+                    priceTemp += transaction.deliveryPrice;
+
+                    totalTemp[index1].push(priceTemp);
+                    priceTransactionTemp += priceTemp;
+                });
+                totalTransactionTemp.push(priceTransactionTemp);
+            });
+            setTotalTransaction(totalTransactionTemp);
+            setTotal(totalTemp);
+
+            const summaryTransactionTemp= [];
+            cateringTransactionData.data.forEach((transaction, index1) => {
+                const summaryTemp = {};
+                transaction.details.forEach((detail) => {
+                    for (const food of detail.foods) {
+                        if (food.food.category !== CateringFoodCategory.Rice) {
+                            if (!(food.food.name in summaryTemp)) {
+                                summaryTemp[food.food.name] = 1;
+                            } else {
+                                summaryTemp[food.food.name]++;
+                            }
+                        }
+                    }
+                });
+                summaryTransactionTemp.push(summaryTemp);
+            });
+            setSummaryTransaction(summaryTransactionTemp);
+
             setShowLoading(false);
         };
         handleViewCateringTransaction().then();
@@ -144,7 +210,7 @@ export default function ManageCateringTransactionPage() {
             body: JSON.stringify({
                 date: date,
                 basePrice: basePrice
-            }),
+            })
         });
 
         const createCateringTransactionData: ChangeCateringTransactionData = await createCateringTransactionFetch.json();
@@ -172,7 +238,7 @@ export default function ManageCateringTransactionPage() {
             },
             body: JSON.stringify({
                 id: id
-            }),
+            })
         });
 
         const updateActiveCateringTransactionData: ChangeCateringTransactionData = await updateActiveCateringTransactionFetch.json();
@@ -199,7 +265,7 @@ export default function ManageCateringTransactionPage() {
             },
             body: JSON.stringify({
                 id: id
-            }),
+            })
         });
 
         const updateDeliveryCateringTransactionData: ChangeCateringTransactionData = await updateDeliveryCateringTransactionFetch.json();
@@ -227,7 +293,7 @@ export default function ManageCateringTransactionPage() {
             body: JSON.stringify({
                 id: id,
                 deliveryPrice: deliveryPrice
-            }),
+            })
         });
 
         const updateRealDeliveryCateringTransactionData: ChangeCateringTransactionData = await updateRealDeliveryCateringTransactionFetch.json();
@@ -256,7 +322,7 @@ export default function ManageCateringTransactionPage() {
             },
             body: JSON.stringify({
                 id: selectedDeleteTransaction
-            }),
+            })
         });
 
         const deleteCateringTransactionData: ChangeCateringTransactionData = await deleteCateringTransactionFetch.json();
@@ -297,7 +363,7 @@ export default function ManageCateringTransactionPage() {
             <>
 
                 <Backdrop open={showLoading}
-                          sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
+                          sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                     <CircularProgress size={50}
                                       sx={{
                                           position: "absolute",
@@ -305,11 +371,11 @@ export default function ManageCateringTransactionPage() {
                                           left: "50%",
                                           marginTop: "-25px",
                                           marginLeft: "-25px"
-                                      }}/>
+                                      }} />
                 </Backdrop>
 
                 <Snackbar open={showAlert} autoHideDuration={5000}
-                          anchorOrigin={{vertical: "top", horizontal: "center"}}
+                          anchorOrigin={{ vertical: "top", horizontal: "center" }}
                           onClose={handleCloseAlert}>
                     <Alert severity={typeAlert}
                            onClose={handleCloseAlert}>
@@ -339,14 +405,14 @@ export default function ManageCateringTransactionPage() {
                     </DialogActions>
                 </Dialog>
 
-                <Paper sx={{padding: 2, paddingBottom: 3, marginBottom: 2}}>
+                <Paper sx={{ padding: 2, paddingBottom: 3, marginBottom: 2 }}>
 
                     <Typography variant="body1">
                         Create Catering Transaction
                     </Typography>
 
                     <Box component="form"
-                         sx={{paddingTop: 2}}>
+                         sx={{ paddingTop: 2 }}>
 
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
                             <DatePicker label="Date" inputFormat="eeee, MMMM d" mask=""
@@ -356,22 +422,22 @@ export default function ManageCateringTransactionPage() {
                                         renderInput={(params) =>
                                             <TextField variant="outlined" size="medium"
                                                        fullWidth={true}
-                                                       sx={{marginBottom: 2}}
+                                                       sx={{ marginBottom: 2 }}
                                                        {...params} />}
                             />
                         </LocalizationProvider>
 
                         <TextField type="number" label="Base Price" variant="outlined" size="medium"
                                    fullWidth={true} disabled={showLoadingForm} value={basePrice}
-                                   sx={{marginBottom: 2}}
+                                   sx={{ marginBottom: 2 }}
                                    onChange={changeBasePrice} onKeyDown={handleEnterCreateCatering}
                                    InputProps={{
                                        startAdornment: (
                                            <InputAdornment position="start">Rp.</InputAdornment>
-                                       ),
-                                   }}/>
+                                       )
+                                   }} />
 
-                        <Box sx={{position: "relative"}}>
+                        <Box sx={{ position: "relative" }}>
                             <Button variant="contained" size="large"
                                     fullWidth={true} disabled={showLoadingForm}
                                     onClick={handleCreateCateringTransaction}>
@@ -385,7 +451,7 @@ export default function ManageCateringTransactionPage() {
                                                       left: "50%",
                                                       marginTop: "-12px",
                                                       marginLeft: "-12px"
-                                                  }}/>)}
+                                                  }} />)}
                         </Box>
 
                     </Box>
@@ -396,52 +462,54 @@ export default function ManageCateringTransactionPage() {
                     <>
                         <TextField type="text" label="Filter" variant="standard" size="medium"
                                    fullWidth={true} value={filter}
-                                   sx={{marginBottom: 2}}
-                                   onChange={handleFilterCateringTransaction}/>
+                                   onChange={handleFilterCateringTransaction} />
+
                         {filteredTransactions
-                            .map((transaction, index) => (
-                                <Accordion key={transaction.id} expanded={expanded === "accordion" + index}
-                                           onChange={handleAccordion("accordion" + index)}>
-                                    <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
-                                        <Typography
-                                            sx={{width: "100%", display: "flex", justifyContent: "space-between"}}>
-                                            {convertDateGeneral(transaction.date)}
-                                        </Typography>
-                                        <Box sx={{display: "flex"}}>
-                                            <Chip variant="filled" size="small"
-                                                  label={transaction.details.length + " pax"}
-                                                  sx={{marginRight: 0.5}}/>
-                                            {(transaction.active) ?
-                                                <Tooltip title="Active">
-                                                    <CheckCircleIcon color="info"
-                                                                     sx={{marginRight: 2}}/>
-                                                </Tooltip> :
-                                                <Tooltip title="Inactive">
-                                                    <CancelIcon color="primary"
-                                                                sx={{marginRight: 2}}/>
-                                                </Tooltip>}
-                                        </Box>
-                                    </AccordionSummary>
-                                    <AccordionDetails sx={{display: "flex", justifyContent: "space-between"}}>
-                                        <Box sx={{display: "flex", flexDirection: "column"}}>
-                                            <Box sx={{display: "flex"}}>
-                                                <SellIcon sx={{marginRight: 1}}/>
+                        .map((transaction, index1) => (
+                            <Accordion key={transaction.id} expanded={expanded === "accordion" + index1}
+                                       onChange={handleAccordion("accordion" + index1)}>
+                                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                    <Typography
+                                        sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+                                        {convertDateGeneral(transaction.date)}
+                                    </Typography>
+                                    <Box sx={{ display: "flex" }}>
+                                        <Chip variant="filled" size="small"
+                                              label={transaction.details.length + " pax"}
+                                              sx={{ marginRight: 0.5 }} />
+                                        {(transaction.active) ?
+                                            <Tooltip title="Active">
+                                                <CheckCircleIcon color="info"
+                                                                 sx={{ marginRight: 2 }} />
+                                            </Tooltip> :
+                                            <Tooltip title="Inactive">
+                                                <CancelIcon color="primary"
+                                                            sx={{ marginRight: 2 }} />
+                                            </Tooltip>}
+                                    </Box>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                                        <Box sx={{ display: "flex", flexDirection: "column" }}>
+                                            <Box sx={{ display: "flex" }}>
+                                                <SellIcon sx={{ marginRight: 1 }} />
                                                 <Typography variant="body1"
-                                                            sx={{marginBottom: 1}}>
+                                                            sx={{ marginBottom: 1 }}>
                                                     {convertToIDR(transaction.basePrice)}
                                                 </Typography>
                                             </Box>
-                                            <Box sx={{display: "flex", alignItems: "center"}}>
-                                                <DeliveryDiningIcon sx={{marginRight: 1}}/>
+                                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                                                <DeliveryDiningIcon sx={{ marginRight: 1 }} />
                                                 <Typography variant="body1">
                                                     {convertToIDR(transaction.deliveryPrice)}/pax
                                                     ({convertToIDR(transaction.realDeliveryPrice)})
                                                 </Typography>
                                             </Box>
-                                            <Box sx={{marginTop: 2, display: "flex", alignItems: "center"}}>
-                                                <TextField type="number" label="Real Delivery Price" size="small"
+                                            <Box sx={{ marginTop: 2, display: "flex", alignItems: "center" }}>
+                                                <TextField type="number" label="Delivery Price" size="small"
+                                                           variant="standard"
                                                            disabled={showLoading} value={deliveryPrice}
-                                                           sx={{maxWidth: "160px"}}
+                                                           sx={{ maxWidth: "160px" }}
                                                            onChange={changeDeliveryPrice}
                                                            onKeyDown={(event) => handleEnterChangeDelivery(event, transaction.id)}
                                                            InputProps={{
@@ -449,80 +517,27 @@ export default function ManageCateringTransactionPage() {
                                                                    <IconButton color="primary" size="small"
                                                                                disabled={showLoading}
                                                                                onClick={() => handleChangeRealDeliveryCateringTransaction(transaction.id)}>
-                                                                       <SendIcon/>
+                                                                       <SendIcon />
                                                                    </IconButton>
                                                                )
-                                                           }}/>
+                                                           }} />
                                             </Box>
                                             <Typography variant="caption"
-                                                        sx={{marginTop: 1}}>
+                                                        sx={{ marginTop: 1 }}>
                                                 Created by <b>{transaction.createdBy.username}</b>
                                             </Typography>
                                             <Typography variant="caption">
                                                 Last Updated by <b>{transaction.lastUpdatedBy.username}</b>
                                             </Typography>
-                                            <List dense={true}
-                                                  sx={{marginTop: 1}}>
-                                                {transaction.details.map((detail) => (
-                                                    <ListItem key={detail.id} disableGutters={true}
-                                                              sx={{
-                                                                  width: "100%",
-                                                                  display: "flex",
-                                                                  flexDirection: "column",
-                                                                  alignItems: "flex-start"
-                                                              }}>
-                                                        <ListItemText
-                                                            primary={
-                                                                <Box>
-                                                                    <Typography variant="overline"
-                                                                                sx={{marginRight: 0.5}}>
-                                                                        {detail.participant.username}&nbsp;
-                                                                    </Typography>
-                                                                    {(!detail.onlyAdditional) ?
-                                                                        <Chip variant="outlined" size="small"
-                                                                              label="Full Set"/> :
-                                                                        <Chip variant="outlined" size="small"
-                                                                              label="Only Additional"/>}
-                                                                </Box>}
-                                                            sx={{marginBottom: 0}}/>
-                                                        <ListItemText
-                                                            primary={
-                                                                <Box>
-                                                                    <Box sx={{
-                                                                        width: "100%",
-                                                                        display: "flex",
-                                                                        flexDirection: "row"
-                                                                    }}>
-                                                                        <Box>
-                                                                            {detail.foods.map((food) => (
-                                                                                <Chip variant="filled" size="small"
-                                                                                      key={food.id}
-                                                                                      label={food.food.name}
-                                                                                      sx={{
-                                                                                          marginRight: 1,
-                                                                                          marginBottom: 1
-                                                                                      }}/>
-                                                                            ))}
-                                                                        </Box>
-                                                                    </Box>
-                                                                    {(detail.note) && (
-                                                                        <Typography variant="caption">
-                                                                            Notes: {detail.note}
-                                                                        </Typography>
-                                                                    )}
-                                                                </Box>}/>
-                                                    </ListItem>
-                                                ))}
-                                            </List>
                                         </Box>
-                                        <Box sx={{display: "flex", flexDirection: "column"}}>
+                                        <Box sx={{ display: "flex", flexDirection: "column" }}>
                                             <ButtonGroup orientation="vertical">
                                                 <CopyToClipboard text={transactionCopy}
                                                                  onCopy={() => handleCopyClipboard(transaction)}>
                                                     <Tooltip title="Copy Catering" placement="left">
                                                         <IconButton color="primary"
                                                                     disabled={showLoading}>
-                                                            <ContentPasteIcon/>
+                                                            <ContentPasteIcon />
                                                         </IconButton>
                                                     </Tooltip>
                                                 </CopyToClipboard>
@@ -530,28 +545,154 @@ export default function ManageCateringTransactionPage() {
                                                     <IconButton color="primary"
                                                                 disabled={showLoading}
                                                                 onClick={() => handleChangeActiveCateringTransaction(transaction.id)}>
-                                                        <ChangeCircleIcon/>
+                                                        <ChangeCircleIcon />
                                                     </IconButton>
                                                 </Tooltip>
                                                 <Tooltip title="Update Delivery Price" placement="left">
                                                     <IconButton color="primary"
                                                                 disabled={showLoading}
                                                                 onClick={() => handleChangeDeliveryCateringTransaction(transaction.id)}>
-                                                        <LocalOfferIcon/>
+                                                        <LocalOfferIcon />
                                                     </IconButton>
                                                 </Tooltip>
                                                 <Tooltip title="Delete Transaction" placement="left">
                                                     <IconButton color="error"
                                                                 disabled={showLoading}
                                                                 onClick={() => handleOpenDialog(transaction.id)}>
-                                                        <DeleteIcon/>
+                                                        <DeleteIcon />
                                                     </IconButton>
                                                 </Tooltip>
                                             </ButtonGroup>
                                         </Box>
-                                    </AccordionDetails>
-                                </Accordion>
-                            ))}
+                                    </Box>
+
+                                    <Typography sx={{ marginTop: 2 }}>
+                                        Details:
+                                    </Typography>
+                                    <TableContainer>
+                                        <Table size="small" sx={{ whiteSpace: "nowrap" }}>
+                                            <TableHead>
+                                                <TableRow>
+                                                    {transactionTableHeader.map((tableHeader) => (
+                                                        <TableCell key={tableHeader.id}>
+                                                            {tableHeader.label}
+                                                        </TableCell>
+                                                    ))}
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {transaction.details
+                                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                // @ts-ignore
+                                                .map((detail, index2) => (
+                                                    <TableRow key={detail.id} tabIndex={-1}
+                                                              hover={!showLoading}>
+                                                        <TableCell>
+                                                            {(detail.participant.alias) ? detail.participant.alias : detail.participant.username}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {detail.foods
+                                                            .filter((food) => food.food.category === CateringFoodCategory.Rice)
+                                                            .map((food) => food.food.name)
+                                                            .join("")}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {detail.foods
+                                                            .filter((food) => food.food.category === CateringFoodCategory.MainDish)
+                                                            .map((food) => food.food.name)
+                                                            .join("")}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {detail.foods
+                                                            .filter((food) => food.food.category === CateringFoodCategory.SideDish)
+                                                            .map((food) => food.food.name)
+                                                            .join("")}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {detail.foods
+                                                            .filter((food) => food.food.category === CateringFoodCategory.Vegetable)
+                                                            .map((food) => food.food.name)
+                                                            .join("")}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {detail.foods
+                                                            .filter((food) => [CateringFoodCategory.Additional, CateringFoodCategory.OnlyAdditional].includes(food.food.category))
+                                                            .map((food) => food.food.name)
+                                                            .join(", ")}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {convertToIDR(total[index1][index2])}
+                                                        </TableCell>
+                                                    </TableRow>))}
+                                                <TableRow>
+                                                    <TableCell />
+                                                    <TableCell />
+                                                    <TableCell />
+                                                    <TableCell />
+                                                    <TableCell />
+                                                    <TableCell />
+                                                    <TableCell>
+                                                        <Typography variant="body1" color="primary">
+                                                            {convertToIDR(totalTransaction[index1])}
+                                                        </Typography>
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+
+                                    <Typography sx={{ marginTop: 2 }}>
+                                        Notes:
+                                    </Typography>
+                                    {transaction.details
+                                    .map((detail) =>
+                                        (detail.note) && (
+                                            <Typography key={detail.id}>
+                                                {(detail.participant.alias) ?
+                                                    detail.participant.alias :
+                                                    detail.participant.username} - {detail.note}
+                                            </Typography>
+                                        ))}
+
+                                    {(summaryTransaction) && (
+                                        <>
+                                            <Typography sx={{ marginTop: 2 }}>
+                                                Summary:
+                                            </Typography>
+                                            <TableContainer>
+                                                <Table size="small" sx={{ whiteSpace: "nowrap" }}>
+                                                    <TableHead>
+                                                        <TableRow>
+                                                            {transactionSummaryTableHeader.map((tableHeader) => (
+                                                                <TableCell key={tableHeader.id}>
+                                                                    {tableHeader.label}
+                                                                </TableCell>
+                                                            ))}
+                                                        </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {Object.keys(summaryTransaction[index1]).sort()
+                                                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                        // @ts-ignore
+                                                        .map((summary) => (
+                                                            <TableRow key={summary} tabIndex={-1}
+                                                                      hover={!showLoading}>
+                                                                <TableCell width={70}>
+                                                                    {summary}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {summaryTransaction[index1][summary]} pax
+                                                                </TableCell>
+                                                            </TableRow>))}
+                                                    </TableBody>
+                                                </Table>
+                                            </TableContainer>
+                                        </>
+                                    )}
+
+                                </AccordionDetails>
+                            </Accordion>
+                        ))}
                     </>
                 ) : (
                     <Alert variant="outlined" severity="info">

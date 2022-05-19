@@ -26,6 +26,9 @@ export default async function updateStatusUser(request: NextApiRequest, response
 
     try {
         userData = await prisma.user.findFirst({
+            select: {
+                id: true
+            },
             where: {
                 id: userParameter.id,
                 deleted: false
@@ -53,7 +56,7 @@ export default async function updateStatusUser(request: NextApiRequest, response
         } catch (_) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            data.error = "Failed to updated " + data.data.name + ".";
+            data.error = "Failed to updated " + data.data.name + " status.";
         }
     }
 

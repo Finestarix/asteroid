@@ -4,8 +4,9 @@ import {SyntheticEvent, useEffect, useState} from "react";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import StickyNote2Icon from "@mui/icons-material/StickyNote2";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -13,7 +14,9 @@ import Alert, {AlertColor} from "@mui/material/Alert";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
+import InputAdornment from "@mui/material/InputAdornment";
 import Modal from "@mui/material/Modal";
 import Paper from "@mui/material/Paper";
 import Snackbar from "@mui/material/Snackbar";
@@ -23,6 +26,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import {CopyToClipboard} from "react-copy-to-clipboard";
@@ -207,7 +211,7 @@ export default function CateringHistoryPage() {
                                sx={{margin: 1}}>
                             Click on <b>Notify Payment</b> so your payment can be checked.
                         </Alert>
-                        <Button variant="contained" size="small"
+                        <Button variant="contained" size="small" color="error"
                                 onClick={handleChangeCateringTransactionDetail}>
                             Notify Payment
                         </Button>
@@ -238,19 +242,28 @@ export default function CateringHistoryPage() {
                                 <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                                     <Typography sx={{width: "100%", display: "flex", justifyContent: "space-between"}}>
                                         {convertDateGeneral(transaction.header.date)}
-                                        {(transaction.paymentType === CateringPaymentType.NotPaid) ?
-                                            <Tooltip title="Unpaid">
-                                                <CancelIcon color="info"
-                                                            sx={{marginRight: 2}}/>
-                                            </Tooltip> : (transaction.paymentType === CateringPaymentType.Paid) ?
-                                                <Tooltip title="Paid">
-                                                    <CheckCircleIcon color="disabled"
-                                                                     sx={{marginRight: 2}}/>
-                                                </Tooltip> :
-                                                <Tooltip title="Pending">
-                                                    <RemoveCircleIcon color="primary"
-                                                                      sx={{marginRight: 2}}/>
-                                                </Tooltip>}
+                                        <Box sx={{display: "flex", alignItems: "center"}}>
+                                            {(!transaction.onlyAdditional) ?
+                                                <Chip variant="filled" size="small"
+                                                      label="Full Set"
+                                                      sx={{marginRight: 0.5}}/> :
+                                                <Chip variant="filled" size="small"
+                                                      label="Additional"
+                                                      sx={{marginRight: 0.5}}/>}
+                                            {(transaction.paymentType === CateringPaymentType.NotPaid) ?
+                                                <Tooltip title="Unpaid">
+                                                    <CancelIcon color="error"
+                                                                sx={{marginRight: 2}}/>
+                                                </Tooltip> : (transaction.paymentType === CateringPaymentType.Paid) ?
+                                                    <Tooltip title="Paid">
+                                                        <CheckCircleIcon color="disabled"
+                                                                         sx={{marginRight: 2}}/>
+                                                    </Tooltip> :
+                                                    <Tooltip title="Pending">
+                                                        <RemoveCircleIcon color="primary"
+                                                                          sx={{marginRight: 2}}/>
+                                                    </Tooltip>}
+                                        </Box>
                                     </Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
@@ -294,6 +307,18 @@ export default function CateringHistoryPage() {
                                                 </TableBody>
                                             </Table>
                                         </TableContainer>
+                                        {(transaction.note.length > 0) &&
+                                          <TextField label="Note"
+                                                     disabled={true} multiline={true} rows={2} value={transaction.note}
+                                                     fullWidth={true}
+                                                     sx={{marginTop: 1.5}}
+                                                     InputProps={{
+                                                         startAdornment: (
+                                                             <InputAdornment position="start">
+                                                                 <StickyNote2Icon/>
+                                                             </InputAdornment>
+                                                         ),
+                                                     }}/>}
                                     </Box>
                                 </AccordionDetails>
                             </Accordion>

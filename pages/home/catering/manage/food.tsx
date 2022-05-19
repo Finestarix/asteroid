@@ -1,11 +1,10 @@
 import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
 
-import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
-import DeleteIcon from "@mui/icons-material/Delete";
 import Alert, {AlertColor} from "@mui/material/Alert";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
 import Dialog from "@mui/material/Dialog";
@@ -13,7 +12,6 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
@@ -27,7 +25,6 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import TextField from "@mui/material/TextField";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 
 import HomeLayout from "@components/layout/HomeLayout";
@@ -47,7 +44,7 @@ import {getSessionToken} from "utils/storage";
 export default function ManageCateringFoodPage() {
 
     const foodTableHeader: TableHeadKey[] = [
-        {id: "action", label: "Action", sort: false},
+        {id: "action", label: "", sort: false},
         {id: "name", label: "Name", sort: true},
         {id: "active", label: "Status", sort: true},
         {id: "category", label: "Category", sort: true},
@@ -362,13 +359,11 @@ export default function ManageCateringFoodPage() {
                                                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                                             // @ts-ignore
                                                                         onClick={handleRequestSort(tableHeader.id)}>
-                                                            {tableHeader.id}
                                                             {tableHeader.label}
                                                         </TableSortLabel>
                                                     </TableCell>
                                                 ) : (
                                                     <TableCell key={tableHeader.id}>
-                                                        {tableHeader.id}
                                                         {tableHeader.label}
                                                     </TableCell>
                                                 )
@@ -385,21 +380,25 @@ export default function ManageCateringFoodPage() {
                                             .map((food) => {
                                                 return (
                                                     <TableRow key={food.id} tabIndex={-1} hover={!showLoading}>
-                                                        <TableCell width={120} sx={{paddingTop: 0, paddingBottom: 0}}>
-                                                            <Tooltip title={(food.active) ? "Change to Inactive" : "Change to Active"}>
-                                                                <IconButton color="primary"
+                                                        <TableCell width={100}>
+                                                            <Box sx={{display: "flex", flexDirection: "column"}}>
+                                                                <ButtonGroup orientation="vertical" size="small"
+                                                                             sx={{marginBottom: 0.25}}>
+                                                                    <Button color="warning" variant="contained"
                                                                             disabled={showLoading}
                                                                             onClick={() => handleChangeActiveCateringFood(food.id)}>
-                                                                    <ChangeCircleIcon/>
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                            <Tooltip title="Delete Transaction">
-                                                                <IconButton color="error"
+                                                                        {(food.active) ? "Set Inactive" : "Set Active"}
+                                                                    </Button>
+                                                                </ButtonGroup>
+                                                                <ButtonGroup orientation="vertical" size="small"
+                                                                             sx={{marginTop: 0.25}}>
+                                                                    <Button color="error" variant="outlined"
                                                                             disabled={showLoading}
                                                                             onClick={() => handleOpenDialog(food.id)}>
-                                                                    <DeleteIcon/>
-                                                                </IconButton>
-                                                            </Tooltip>
+                                                                        Delete
+                                                                    </Button>
+                                                                </ButtonGroup>
+                                                            </Box>
                                                         </TableCell>
                                                         <TableCell width={200}>
                                                             {food.name}
@@ -409,10 +408,10 @@ export default function ManageCateringFoodPage() {
                                                                 <Chip size="small" color="primary" label="Active"/> :
                                                                 <Chip size="small" label="Inactive"/>}
                                                         </TableCell>
-                                                        <TableCell width={180}>
+                                                        <TableCell width={100}>
                                                             {food.category}
                                                         </TableCell>
-                                                        <TableCell width={150}>
+                                                        <TableCell width={100}>
                                                             {(food.additionalPrice) ?
                                                                 "+ " + convertToIDR(food.additionalPrice) :
                                                                 (food.reductionPrice) ?

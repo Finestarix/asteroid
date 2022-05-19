@@ -4,9 +4,10 @@ import {TokenData, UpdateDeleteUserParameter} from "types/userType";
 import {prisma} from "utils/database";
 import {getTokenData} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";
+import { hashString } from "../../../utils/hash";
 
 
-export default async function updateDeleteUser(request: NextApiRequest, response: NextApiResponse) {
+export default async function updatePasswordUser(request: NextApiRequest, response: NextApiResponse) {
 
     const data = {data: {}, error: "", success: ""};
     let tokenData: TokenData;
@@ -28,10 +29,11 @@ export default async function updateDeleteUser(request: NextApiRequest, response
         userData = await prisma.user.findFirst({
             select: {
                 id: true,
-                deleted: true
+                username: true
             },
             where: {
-                id: userParameter.id
+                id: userParameter.id,
+                deleted: false
             }
         });
     } catch (_) {
@@ -42,21 +44,22 @@ export default async function updateDeleteUser(request: NextApiRequest, response
         data.error = "Invalid user id.";
     } else {
         try {
+            const newPassword = await hashString(userData.username + userData.username + userData.username);
             data.data = await prisma.user.update({
                 where: {
                     id: userParameter.id
                 },
                 data: {
-                    deleted: !userData.deleted
+                    password: newPassword
                 }
             });
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            data.success = "Successfully " + ((!userData.deleted) ? "deleted " : "restored ") + data.data.username + ".";
+            data.success = "Successfully changed " + data.data.username + " password.";
         } catch (_) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            data.error = "Failed to " + ((!userData.deleted) ? "deleted " : "restored ") + data.data.username + ".";
+            data.error = "Failed to changed " + data.data.name + " password.";
         }
     }
 

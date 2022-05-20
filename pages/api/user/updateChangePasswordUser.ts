@@ -5,7 +5,7 @@ import owasp from "owasp-password-strength-test";
 import {TokenData, UpdatePasswordUserParameter} from "types/userType";
 import {prisma} from "utils/database";
 import {compareHashString, hashString} from "utils/hash";
-import {generateToken, getTokenData} from "utils/token";
+import {getTokenData} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";
 
 

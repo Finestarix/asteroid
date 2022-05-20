@@ -1,27 +1,27 @@
+import { useRouter } from "next/router";
 import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 
+import KeyIcon from "@mui/icons-material/Key";
+import PersonIcon from "@mui/icons-material/Person";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Visibility from "@mui/icons-material/Visibility";
 import Alert, { AlertColor } from "@mui/material/Alert";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import Paper from "@mui/material/Paper";
 import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 
 import HomeLayout from "@components/layout/HomeLayout";
 import { AlertTypeEnum } from "types/generalType";
 import { UpdateDeleteUserData, User, ViewUserData } from "types/userType";
 import { decryptData } from "utils/encryption";
 import { getSessionToken, removeSessionData, removeSessionToken } from "utils/storage";
-import PersonIcon from "@mui/icons-material/Person";
-import { useRouter } from "next/router";
-import Typography from "@mui/material/Typography";
-import KeyIcon from "@mui/icons-material/Key";
-import IconButton from "@mui/material/IconButton";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Visibility from "@mui/icons-material/Visibility";
 
 
 export default function ProfileUserPage() {
@@ -40,7 +40,7 @@ export default function ProfileUserPage() {
     const [messageAlert, setMessageAlert] = useState<string>("");
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [showLoading, setShowLoading] = useState<boolean>(false);
-    const [showLoadingUsernameForm, setShowLoadingUsernameForm] = useState<boolean>(false)
+    const [showLoadingUsernameForm, setShowLoadingUsernameForm] = useState<boolean>(false);
     const [showLoadingPasswordForm, setShowLoadingPasswordForm] = useState<boolean>(false);
 
     useEffect(() => {

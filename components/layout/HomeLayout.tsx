@@ -1,7 +1,8 @@
-import {useRouter} from "next/router";
-import {useEffect, useState} from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 import DinnerDiningOutlinedIcon from "@mui/icons-material/DinnerDiningOutlined";
+import FaceIcon from "@mui/icons-material/Face";
 import GroupIcon from "@mui/icons-material/Group";
 import MicrowaveOutlinedIcon from "@mui/icons-material/MicrowaveOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
@@ -24,10 +25,11 @@ import Typography from "@mui/material/Typography";
 import MainLayout from "@components/layout/MainLayout";
 import ThemeButton from "@components/themes/ThemeButton";
 import ThemeImage from "@components/themes/ThemeImage";
-import {LayoutProps} from "types/generalType";
-import {UserRole} from "types/userType";
-import {decryptData} from "utils/encryption";
-import {getSessionData, removeSessionData, removeSessionToken} from "utils/storage";
+import { LayoutProps } from "types/generalType";
+import { UserRole } from "types/userType";
+import { decryptData } from "utils/encryption";
+import { getSessionData, removeSessionData, removeSessionToken } from "utils/storage";
+import { ListItemButton } from "@mui/material";
 
 
 export default function HomeLayout(props: LayoutProps) {
@@ -52,10 +54,11 @@ export default function HomeLayout(props: LayoutProps) {
     const gotoHome = async () => await router.push("/home");
     const gotoCatering = async () => await router.push("/home/catering");
     const gotoCateringHistory = async () => await router.push("/home/catering/history");
+    const gotoProfile = async () => await router.push("/home/user");
     const gotoCateringFood = () => router.push("/home/catering/manage/food");
     const gotoCateringTransaction = () => router.push("/home/catering/manage/transaction");
     const gotoCateringPayment = () => router.push("/home/catering/manage/payment");
-    const gotoUser = () => router.push("/home/user");
+    const gotoUser = () => router.push("/home/user/manage");
     const gotoLogout = async () => {
         removeSessionToken();
         removeSessionData("role");
@@ -66,77 +69,80 @@ export default function HomeLayout(props: LayoutProps) {
         <>
             <Toolbar>
                 <Typography component="h4" variant="h4"
-                            sx={{display: "flex", alignItems: "center", fontWeight: "bold", cursor: "pointer"}}
+                            sx={{ display: "flex", alignItems: "center", fontWeight: "bold", cursor: "pointer" }}
                             onClick={gotoHome}>
-                    ASTER<ThemeImage/>ID
+                    ASTER<ThemeImage />ID
                 </Typography>
             </Toolbar>
-            <Divider/>
+            <Divider />
             <List>
-                <ListItem button={true}
-                          onClick={gotoCatering}>
+                <ListItemButton selected={router.pathname === "/home/catering"}
+                                onClick={gotoCatering}>
                     <ListItemIcon>
-                        <RestaurantOutlinedIcon fontSize="medium"/>
+                        <RestaurantOutlinedIcon fontSize="medium" />
                     </ListItemIcon>
-                    <ListItemText primary="Catering Order"/>
-                </ListItem>
-                <ListItem button={true}
-                          onClick={gotoCateringHistory}>
+                    <ListItemText primary="Catering Order" />
+                </ListItemButton>
+                <ListItemButton selected={router.pathname === "/home/catering/history"}
+                                onClick={gotoCateringHistory}>
                     <ListItemIcon>
-                        <ReceiptLongOutlinedIcon fontSize="medium"/>
+                        <ReceiptLongOutlinedIcon fontSize="medium" />
                     </ListItemIcon>
-                    <ListItemText primary="Catering History"/>
-                </ListItem>
+                    <ListItemText primary="Catering History" />
+                </ListItemButton>
+                {(cateringAdminRole.includes(role)) &&
+                  <>
+                    <ListItemButton selected={router.pathname === "/home/catering/manage/transaction"}
+                                    onClick={gotoCateringTransaction}>
+                      <ListItemIcon>
+                        <MicrowaveOutlinedIcon fontSize="medium" />
+                      </ListItemIcon>
+                      <ListItemText primary="Manage Transaction" />
+                    </ListItemButton>
+                    <ListItemButton selected={router.pathname === "/home/catering/manage/food"}
+                                    onClick={gotoCateringFood}>
+                      <ListItemIcon>
+                        <DinnerDiningOutlinedIcon fontSize="medium" />
+                      </ListItemIcon>
+                      <ListItemText primary="Manage Food" />
+                    </ListItemButton>
+                    <ListItemButton selected={router.pathname === "/home/catering/manage/payment"}
+                                    onClick={gotoCateringPayment}>
+                      <ListItemIcon>
+                        <PointOfSaleIcon fontSize="medium" />
+                      </ListItemIcon>
+                      <ListItemText primary="Manage Payment" />
+                    </ListItemButton>
+                  </>}
             </List>
-            <Divider/>
-            {(cateringAdminRole.includes(role)) &&
-                <>
-                    <List>
-                        <ListItem button={true}
-                                  onClick={gotoCateringTransaction}>
-                            <ListItemIcon>
-                                <MicrowaveOutlinedIcon fontSize="medium"/>
-                            </ListItemIcon>
-                            <ListItemText primary="Catering Transaction"/>
-                        </ListItem>
-                        <ListItem button={true}
-                                  onClick={gotoCateringFood}>
-                            <ListItemIcon>
-                                <DinnerDiningOutlinedIcon fontSize="medium"/>
-                            </ListItemIcon>
-                            <ListItemText primary="Catering Food"/>
-                        </ListItem>
-                        <ListItem button={true}
-                                  onClick={gotoCateringPayment}>
-                            <ListItemIcon>
-                                <PointOfSaleIcon fontSize="medium"/>
-                            </ListItemIcon>
-                            <ListItemText primary="Catering Payment"/>
-                        </ListItem>
-                    </List>
-                    <Divider/>
-                </>}
-            {(userAdminRole.includes(role)) &&
-                <>
-                    <List>
-                        <ListItem button={true}
-                                  onClick={gotoUser}>
-                            <ListItemIcon>
-                                <GroupIcon fontSize="medium"/>
-                            </ListItemIcon>
-                            <ListItemText primary="User"/>
-                        </ListItem>
-                    </List>
-                    <Divider/>
-                </>}
+            <Divider />
             <List>
-                <ListItem button={true}
-                          onClick={gotoLogout}>
+                <ListItemButton selected={router.pathname === "/home/user"}
+                                onClick={gotoProfile}>
                     <ListItemIcon>
-                        <LogoutIcon fontSize="medium"/>
+                        <FaceIcon fontSize="medium" />
                     </ListItemIcon>
-                    <ListItemText primary="Logout"/>
-                </ListItem>
+                    <ListItemText primary="Profile" />
+                </ListItemButton>
+                {(userAdminRole.includes(role)) &&
+                  <>
+                    <ListItemButton selected={router.pathname === "/home/user/manage"}
+                                    onClick={gotoUser}>
+                      <ListItemIcon>
+                        <GroupIcon fontSize="medium" />
+                      </ListItemIcon>
+                      <ListItemText primary="Manage User" />
+                    </ListItemButton>
+                  </>}
+            </List>
+            <Divider />
+            <List>
+                <ListItemButton onClick={gotoLogout}>
+                    <ListItemIcon>
+                        <LogoutIcon fontSize="medium" />
+                    </ListItemIcon>
+                    <ListItemText primary="Logout" />
+                </ListItemButton>
             </List>
         </>
     );
@@ -144,33 +150,33 @@ export default function HomeLayout(props: LayoutProps) {
     return (
         <MainLayout title={props.title}>
 
-            <Box sx={{display: "flex"}}>
+            <Box sx={{ display: "flex" }}>
 
                 <AppBar position="fixed"
-                        sx={{width: {md: `calc(100% - ${drawerWidth}px)`}, marginLeft: {md: `${drawerWidth}px`}}}>
+                        sx={{ width: { md: `calc(100% - ${drawerWidth}px)` }, marginLeft: { md: `${drawerWidth}px` } }}>
                     <Toolbar>
                         <IconButton edge="start" color="inherit"
-                                    sx={{marginRight: 2, display: {md: "none"}}}
+                                    sx={{ marginRight: 2, display: { md: "none" } }}
                                     onClick={toggleDrawerMobile}>
-                            <MenuIcon/>
+                            <MenuIcon />
                         </IconButton>
-                        <Box sx={{width: "100%"}}>
+                        <Box sx={{ width: "100%" }}>
                             <Typography component="div" variant="h6">
                                 {props.title}
                             </Typography>
                         </Box>
-                        <ThemeButton/>
+                        <ThemeButton />
                     </Toolbar>
                 </AppBar>
 
                 <Box component="nav"
-                     sx={{width: {md: drawerWidth}, flexShrink: {md: 0}}}>
+                     sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
                     <Drawer variant="temporary"
                             open={drawerMobileOpen}
-                            ModalProps={{keepMounted: true}}
+                            ModalProps={{ keepMounted: true }}
                             sx={{
-                                display: {xs: "block", md: "none"},
-                                "& .MuiDrawer-paper": {boxSizing: "border-box", width: drawerWidth}
+                                display: { xs: "block", md: "none" },
+                                "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth }
                             }}
                             onClose={toggleDrawerMobile}>
                         {drawerMenu}
@@ -178,16 +184,21 @@ export default function HomeLayout(props: LayoutProps) {
                     <Drawer variant="permanent"
                             open={true}
                             sx={{
-                                display: {xs: "none", md: "block"},
-                                "& .MuiDrawer-paper": {boxSizing: "border-box", width: drawerWidth}
+                                display: { xs: "none", md: "block" },
+                                "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth }
                             }}>
                         {drawerMenu}
                     </Drawer>
                 </Box>
 
                 <Box component="main"
-                     sx={{padding: 3, width: {md: `calc(100% - ${drawerWidth}px)`}, flexGrow: 1, overflowX: "auto"}}>
-                    <Toolbar/>
+                     sx={{
+                         padding: 3,
+                         width: { md: `calc(100% - ${drawerWidth}px)` },
+                         flexGrow: 1,
+                         overflowX: "auto"
+                     }}>
+                    <Toolbar />
                     {props.children}
                 </Box>
 

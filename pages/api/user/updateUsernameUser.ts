@@ -1,24 +1,23 @@
 import {NextApiRequest, NextApiResponse} from "next";
 
-import {TokenData, UpdateDeleteUserParameter} from "types/userType";
+import { TokenData, UpdateUsernameUserParameter } from "types/userType";
 import {prisma} from "utils/database";
 import {getTokenData} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";
-import { hashString } from "../../../utils/hash";
 
 
-export default async function updatePasswordUser(request: NextApiRequest, response: NextApiResponse) {
+export default async function updateAliasUser(request: NextApiRequest, response: NextApiResponse) {
 
     const data = {data: {}, error: "", success: ""};
     let tokenData: TokenData;
-    let userParameter: UpdateDeleteUserParameter;
+    let userParameter: UpdateUsernameUserParameter;
     let userData;
 
     try {
         tokenData = getTokenData(request);
         userParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, userParameter.id))
+            checkMultipleUndefined(tokenData.username, userParameter.username))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";
@@ -32,7 +31,7 @@ export default async function updatePasswordUser(request: NextApiRequest, respon
                 username: true
             },
             where: {
-                id: userParameter.id,
+                username: tokenData.username,
                 deleted: false
             }
         });
@@ -44,22 +43,21 @@ export default async function updatePasswordUser(request: NextApiRequest, respon
         data.error = "Invalid user id.";
     } else {
         try {
-            const newPassword = await hashString(userData.username + userData.username + userData.username);
             data.data = await prisma.user.update({
                 where: {
-                    id: userParameter.id
+                    username: tokenData.username
                 },
                 data: {
-                    password: newPassword
+                    username: userParameter.username
                 }
             });
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            data.success = "Successfully changed " + data.data.username + " password.";
+            data.success = "Successfully updated " + tokenData.username + " to " + data.data.username + ".";
         } catch (_) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            data.error = "Failed to changed " + data.data.name + " password.";
+            data.error = "Failed to updated " + tokenData.username + " username.";
         }
     }
 

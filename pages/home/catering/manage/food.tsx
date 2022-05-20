@@ -225,7 +225,7 @@ export default function ManageCateringFoodPage() {
     };
 
     return (
-        <HomeLayout title="Manage Catering Food">
+        <HomeLayout title="Manage Food">
             <>
 
                 <Backdrop open={showLoading}

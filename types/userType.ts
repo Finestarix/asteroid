@@ -37,8 +37,23 @@ export interface TokenData {
 }
 
 export interface ViewUserData {
+    data: User,
+    error: string
+}
+
+export interface ViewUsersData {
     data: User[],
     error: string
+}
+
+export interface UpdatePasswordUserParameter {
+    oldPassword: string,
+    newPassword: string,
+    confirmNewPassword: string
+}
+
+export interface UpdateUsernameUserParameter {
+    username: string
 }
 
 export interface UpdateAliasUserParameter {

@@ -6,9 +6,9 @@ import {getTokenData} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";
 
 
-export default async function getUser(request: NextApiRequest, response: NextApiResponse) {
+export default async function getUsers(request: NextApiRequest, response: NextApiResponse) {
 
-    const data = {data: {}, error: ""};
+    const data = {data: [], error: ""};
     let tokenData: TokenData;
 
     try {
@@ -24,10 +24,7 @@ export default async function getUser(request: NextApiRequest, response: NextApi
     try {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        data.data = await prisma.user.findFirst({
-            where: {
-                username: tokenData.username
-            },
+        data.data = await prisma.user.findMany({
             select: {
                 id: true,
                 alias: true,
@@ -35,10 +32,13 @@ export default async function getUser(request: NextApiRequest, response: NextApi
                 role: true,
                 status: true,
                 deleted: true
+            },
+            orderBy: {
+                id: "asc"
             }
         });
     } catch (_) {
-        data.error = "Failed to fetch user data.";
+        data.error = "Failed to fetch users data.";
     }
 
     return response.status(200).json(data);

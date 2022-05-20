@@ -20,6 +20,7 @@ import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
+import Divider from "@mui/material/Divider";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -367,7 +368,7 @@ export default function ManageCateringTransactionPage() {
     };
 
     return (
-        <HomeLayout title="Manage Catering Transaction">
+        <HomeLayout title="Manage Transaction">
             <>
 
                 <Backdrop open={showLoading}
@@ -550,14 +551,14 @@ export default function ManageCateringTransactionPage() {
                                                     </Tooltip>
                                                 </CopyToClipboard>
                                                 <Tooltip title="Change Status" placement="left">
-                                                    <IconButton color="primary"
+                                                    <IconButton color="warning"
                                                                 disabled={showLoading}
                                                                 onClick={() => handleChangeActiveCateringTransaction(transaction.id)}>
                                                         <ChangeCircleIcon />
                                                     </IconButton>
                                                 </Tooltip>
                                                 <Tooltip title="Update Delivery Price" placement="left">
-                                                    <IconButton color="primary"
+                                                    <IconButton color="warning"
                                                                 disabled={showLoading}
                                                                 onClick={() => handleChangeDeliveryCateringTransaction(transaction.id)}>
                                                         <LocalOfferIcon />
@@ -643,6 +644,10 @@ export default function ManageCateringTransactionPage() {
                                                         <Typography variant="body1" color="primary">
                                                             {convertToIDR(totalTransaction[index1])}
                                                         </Typography>
+                                                        <Typography variant="body1" color="secondary">
+                                                            ({convertToIDR(transaction.deliveryPrice * transaction.details.length)})
+                                                        </Typography>
+                                                        <Divider/>
                                                     </TableCell>
                                                 </TableRow>
                                             </TableBody>
@@ -655,7 +660,7 @@ export default function ManageCateringTransactionPage() {
                                     {transaction.details
                                     .map((detail) =>
                                         (detail.note) && (
-                                            <Typography key={detail.id}>
+                                            <Typography variant="body2" key={detail.id}>
                                                 {(detail.participant.alias) ?
                                                     detail.participant.alias :
                                                     detail.participant.username} - {detail.note}

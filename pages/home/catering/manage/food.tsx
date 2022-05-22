@@ -418,13 +418,15 @@ export default function ManageCateringFoodPage() {
                                                                     "- " + convertToIDR(food.reductionPrice) :
                                                                     convertToIDR(0)}
                                                         </TableCell>
-                                                        <TableCell >
+                                                        <TableCell>
                                                             <Box sx={{display: "flex", flexDirection: "column"}}>
                                                                 <Typography variant="caption">
-                                                                    Created by <b>{food.createdBy.username}</b>
+                                                                    Created by&nbsp;
+                                                                    <b>{(food.createdBy.alias) ? food.createdBy.alias : food.createdBy.username}</b>
                                                                 </Typography>
                                                                 <Typography variant="caption">
-                                                                    Last Updated by <b>{food.lastUpdatedBy.username}</b>
+                                                                    Last Updated by&nbsp;
+                                                                    <b>{(food.lastUpdatedBy.alias) ? food.lastUpdatedBy.alias : food.lastUpdatedBy.username}</b>
                                                                 </Typography>
                                                             </Box>
                                                         </TableCell>

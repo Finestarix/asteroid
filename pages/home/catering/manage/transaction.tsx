@@ -20,7 +20,6 @@ import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
-import Divider from "@mui/material/Divider";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -476,6 +475,7 @@ export default function ManageCateringTransactionPage() {
                         {filteredTransactions
                         .map((transaction, index1) => (
                             <Accordion key={transaction.id} expanded={expanded === "accordion" + index1}
+                                       sx={{ marginTop: 2 }}
                                        onChange={handleAccordion("accordion" + index1)}>
                                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                     <Typography
@@ -533,10 +533,12 @@ export default function ManageCateringTransactionPage() {
                                             </Box>
                                             <Typography variant="caption"
                                                         sx={{ marginTop: 1 }}>
-                                                Created by <b>{transaction.createdBy.username}</b>
+                                                Created by&nbsp;
+                                                <b>{(transaction.createdBy.alias) ? transaction.createdBy.alias : transaction.createdBy.username}</b>
                                             </Typography>
                                             <Typography variant="caption">
-                                                Last Updated by <b>{transaction.lastUpdatedBy.username}</b>
+                                                Last Updated by&nbsp;
+                                                <b>{(transaction.lastUpdatedBy.alias) ? transaction.lastUpdatedBy.alias : transaction.lastUpdatedBy.username}</b>
                                             </Typography>
                                         </Box>
                                         <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -647,7 +649,6 @@ export default function ManageCateringTransactionPage() {
                                                         <Typography variant="body1" color="secondary">
                                                             ({convertToIDR(transaction.deliveryPrice * transaction.details.length)})
                                                         </Typography>
-                                                        <Divider/>
                                                     </TableCell>
                                                 </TableRow>
                                             </TableBody>

@@ -32,7 +32,9 @@ export interface CateringTransactionDetail {
     foods: CateringTransactionParticipant[],
     createdAt: Date,
     deletedAt: Date,
-    deleted: boolean
+    deleted: boolean,
+    subTotal: number,
+    total: number
 }
 
 export interface CateringTransactionParticipant {

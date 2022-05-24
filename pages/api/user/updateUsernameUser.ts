@@ -41,23 +41,40 @@ export default async function updateAliasUser(request: NextApiRequest, response:
 
     if (!userData) {
         data.error = "Invalid user id.";
+    } else if (tokenData.username === userParameter.username) {
+        data.error = "Username you want to change must be different.";
     } else {
+        let userData;
         try {
-            data.data = await prisma.user.update({
+            userData = await prisma.user.findUnique({
                 where: {
-                    username: tokenData.username
+                    username: userParameter.username,
                 },
-                data: {
-                    username: userParameter.username
-                }
             });
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            data.success = "Successfully updated " + tokenData.username + " to " + data.data.username + ".";
         } catch (_) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            data.error = "Failed to updated " + tokenData.username + " username.";
+            data.error = "Failed to fetch user data.";
+        }
+
+        if (userData) {
+            data.error = "Username has already been taken.";
+        } else {
+            try {
+                data.data = await prisma.user.update({
+                    where: {
+                        username: tokenData.username
+                    },
+                    data: {
+                        username: userParameter.username
+                    }
+                });
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                data.success = "Successfully updated " + tokenData.username + " to " + data.data.username + ".";
+            } catch (_) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                data.error = "Failed to updated " + tokenData.username + " username.";
+            }
         }
     }
 

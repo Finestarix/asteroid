@@ -48,8 +48,6 @@ import {getSessionToken} from "utils/storage";
 export default function CateringHistoryPage() {
 
     const [transactions, setTransaction] = useState<CateringTransactionDetail[]>([]);
-    const [subTotal, setSubTotal] = useState<number[]>([]);
-    const [total, setTotal] = useState<number[]>([]);
     const [totalUnpaid, setTotalUnpaid] = useState<number>(0);
     const [expanded, setExpanded] = useState<string | false>(false);
     const [showLoading, setShowLoading] = useState<boolean>(false);
@@ -70,31 +68,23 @@ export default function CateringHistoryPage() {
             });
 
             const cateringTransactionHistoryData: ViewCateringTransactionDetailData = await cateringTransactionHistoryFetch.json();
-            setTransaction(cateringTransactionHistoryData.data);
 
             let totalUnpaidTemp = 0;
-            const subTotalTemp = [];
-            const totalTemp = [];
-            for (const transaction of cateringTransactionHistoryData.data) {
+            cateringTransactionHistoryData.data.map((transaction, index) => {
                 let priceTemp = 0;
-
                 if (!transaction.onlyAdditional) {
                     priceTemp = transaction.header.basePrice;
                 }
-
                 for (const food of transaction.foods) {
                     if (food.food.additionalPrice) priceTemp += food.food.additionalPrice;
                     if (food.food.reductionPrice) priceTemp -= food.food.reductionPrice;
                 }
-                subTotalTemp.push(priceTemp);
+                cateringTransactionHistoryData.data[index].subTotal = priceTemp;
                 priceTemp += transaction.header.deliveryPrice;
-                totalTemp.push(priceTemp);
-                if (transaction.paymentType === CateringPaymentType.NotPaid) {
-                    totalUnpaidTemp += priceTemp;
-                }
-            }
-            setSubTotal(subTotalTemp);
-            setTotal(totalTemp);
+                cateringTransactionHistoryData.data[index].total = priceTemp;
+                totalUnpaidTemp += priceTemp;
+            });
+            setTransaction(cateringTransactionHistoryData.data);
             setTotalUnpaid(totalUnpaidTemp);
             setShowLoading(false);
         };
@@ -240,16 +230,21 @@ export default function CateringHistoryPage() {
                             <Accordion key={transaction.id} expanded={expanded === "accordion" + index}
                                        onChange={handleAccordion("accordion" + index)}>
                                 <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
-                                    <Typography sx={{width: "100%", display: "flex", justifyContent: "space-between"}}>
-                                        {convertDateGeneral(transaction.header.date)}
-                                        <Box sx={{display: "flex", alignItems: "center"}}>
+                                    <Box sx={{width: "100%", display: "flex", justifyContent: "space-between"}}>
+                                        <Box>
+                                            {convertDateGeneral(transaction.header.date)}
                                             {(!transaction.onlyAdditional) ?
                                                 <Chip variant="filled" size="small"
                                                       label="Full Set"
-                                                      sx={{marginRight: 0.5}}/> :
+                                                      sx={{marginLeft: 0.5}}/> :
                                                 <Chip variant="filled" size="small"
                                                       label="Additional"
-                                                      sx={{marginRight: 0.5}}/>}
+                                                      sx={{marginLeft: 0.5}}/>}
+                                        </Box>
+                                        <Box sx={{display: "flex", alignItems: "center"}}>
+                                            <Chip variant="outlined" size="small"
+                                                  label={convertToIDR(transaction.total)}
+                                                  sx={{marginRight: 0.5}}/>
                                             {(transaction.paymentType === CateringPaymentType.NotPaid) ?
                                                 <Tooltip title="Unpaid">
                                                     <CancelIcon color="error"
@@ -264,7 +259,7 @@ export default function CateringHistoryPage() {
                                                                           sx={{marginRight: 2}}/>
                                                     </Tooltip>}
                                         </Box>
-                                    </Typography>
+                                    </Box>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                     <Box>
@@ -294,7 +289,7 @@ export default function CateringHistoryPage() {
                                                     <TableRow>
                                                         <TableCell rowSpan={3}/>
                                                         <TableCell align="right" width={100}>Sub-Total</TableCell>
-                                                        <TableCell>{convertToIDR(subTotal[index])}</TableCell>
+                                                        <TableCell>{convertToIDR(transaction.subTotal)}</TableCell>
                                                     </TableRow>
                                                     <TableRow>
                                                         <TableCell align="right" width={100}>Delivery</TableCell>
@@ -302,7 +297,7 @@ export default function CateringHistoryPage() {
                                                     </TableRow>
                                                     <TableRow>
                                                         <TableCell align="right" width={100}>Total</TableCell>
-                                                        <TableCell>{convertToIDR(total[index])}</TableCell>
+                                                        <TableCell>{convertToIDR(transaction.total)}</TableCell>
                                                     </TableRow>
                                                 </TableBody>
                                             </Table>

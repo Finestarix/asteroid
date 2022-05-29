@@ -28,7 +28,7 @@ export interface RegisterParameter {
 }
 
 export interface RegisterData {
-    error: string
+    error: string;
 }
 
 export interface TokenData {
@@ -53,7 +53,7 @@ export interface UpdatePasswordUserParameter {
 }
 
 export interface UpdateUsernameUserParameter {
-    username: string
+    username: string;
 }
 
 export interface UpdateAliasUserParameter {
@@ -72,7 +72,7 @@ export interface UpdateStatusUserParameter {
 }
 
 export interface UpdateDeleteUserParameter {
-    id: number
+    id: number;
 }
 
 export interface UpdateDeleteUserData {

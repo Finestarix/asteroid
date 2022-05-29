@@ -1,11 +1,11 @@
-import { useRouter } from "next/router";
-import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
+import {useRouter} from "next/router";
+import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
 
 import KeyIcon from "@mui/icons-material/Key";
 import PersonIcon from "@mui/icons-material/Person";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Visibility from "@mui/icons-material/Visibility";
-import Alert, { AlertColor } from "@mui/material/Alert";
+import Alert, {AlertColor} from "@mui/material/Alert";
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -18,10 +18,10 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
 import HomeLayout from "@components/layout/HomeLayout";
-import { AlertTypeEnum } from "types/generalType";
-import { UpdateDeleteUserData, User, ViewUserData } from "types/userType";
-import { decryptData } from "utils/encryption";
-import { getSessionToken, removeSessionData, removeSessionToken } from "utils/storage";
+import {AlertTypeEnum} from "types/generalType";
+import {UpdateDeleteUserData, User, ViewUserData} from "types/userType";
+import {decryptData} from "utils/encryption";
+import {getSessionToken, removeSessionData, removeSessionToken} from "utils/storage";
 
 
 export default function ProfileUserPage() {
@@ -155,7 +155,7 @@ export default function ProfileUserPage() {
             <>
 
                 <Backdrop open={showLoading}
-                          sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                          sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
                     <CircularProgress size={50}
                                       sx={{
                                           position: "absolute",
@@ -163,11 +163,11 @@ export default function ProfileUserPage() {
                                           left: "50%",
                                           marginTop: "-25px",
                                           marginLeft: "-25px"
-                                      }} />
+                                      }}/>
                 </Backdrop>
 
                 <Snackbar open={showAlert} autoHideDuration={5000}
-                          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                          anchorOrigin={{vertical: "top", horizontal: "center"}}
                           onClose={handleCloseAlert}>
                     <Alert severity={typeAlert}
                            onClose={handleCloseAlert}>
@@ -177,33 +177,33 @@ export default function ProfileUserPage() {
 
                 {(user) && (
                     <>
-                        <Paper sx={{ padding: 2, marginBottom: 2 }}>
+                        <Paper sx={{padding: 2, marginBottom: 2}}>
 
                             <Typography variant="body1">
                                 Change Username
                             </Typography>
 
                             <Box component="form"
-                                 sx={{ paddingTop: 2 }}>
+                                 sx={{paddingTop: 2}}>
 
                                 <TextField type="text" label="Username" variant="outlined" size="medium"
                                            fullWidth={true} disabled={showLoadingUsernameForm} value={username}
-                                           sx={{ marginBottom: 2 }}
+                                           sx={{marginBottom: 2}}
                                            onChange={changeUsername} onKeyDown={handleEnterChangeUsername}
                                            InputProps={{
                                                startAdornment: (
                                                    <InputAdornment position="start">
-                                                       <PersonIcon />
+                                                       <PersonIcon/>
                                                    </InputAdornment>
                                                )
-                                           }} />
+                                           }}/>
 
                                 <Alert variant="outlined" severity="info"
-                                       sx={{ marginBottom: 2 }}>
+                                       sx={{marginBottom: 2}}>
                                     You will be <b>signed out</b> when you change your username.
                                 </Alert>
 
-                                <Box sx={{ position: "relative" }}>
+                                <Box sx={{position: "relative"}}>
                                     <Button variant="contained" size="large" color="warning"
                                             fullWidth={true} disabled={showLoadingUsernameForm}
                                             onClick={handleChangeUsernameUser}>
@@ -217,26 +217,26 @@ export default function ProfileUserPage() {
                                                               left: "50%",
                                                               marginTop: "-12px",
                                                               marginLeft: "-12px"
-                                                          }} />)}
+                                                          }}/>)}
                                 </Box>
 
                             </Box>
 
                         </Paper>
 
-                        <Paper sx={{ padding: 2 }}>
+                        <Paper sx={{padding: 2}}>
 
                             <Typography variant="body1">
                                 Change Password
                             </Typography>
 
                             <Box component="form"
-                                 sx={{ paddingTop: 2 }}>
+                                 sx={{paddingTop: 2}}>
 
                                 <TextField type={oldPasswordVisibility ? "text" : "password"}
                                            label="Old Password" variant="outlined" size="medium"
                                            fullWidth={true} disabled={showLoadingPasswordForm} value={oldPassword}
-                                           sx={{ marginBottom: 2 }}
+                                           sx={{marginBottom: 2}}
                                            onChange={changeOldPassword} onKeyDown={handleEnterChangePassword}
                                            InputProps={{
                                                startAdornment: (
@@ -253,12 +253,12 @@ export default function ProfileUserPage() {
                                                        </IconButton>
                                                    </InputAdornment>
                                                ),
-                                           }} />
+                                           }}/>
 
                                 <TextField type={newPasswordVisibility ? "text" : "password"}
                                            label="New Password" variant="outlined" size="medium"
                                            fullWidth={true} disabled={showLoadingPasswordForm} value={newPassword}
-                                           sx={{ marginBottom: 2 }}
+                                           sx={{marginBottom: 2}}
                                            onChange={changeNewPassword} onKeyDown={handleEnterChangePassword}
                                            InputProps={{
                                                startAdornment: (
@@ -275,12 +275,13 @@ export default function ProfileUserPage() {
                                                        </IconButton>
                                                    </InputAdornment>
                                                ),
-                                           }} />
+                                           }}/>
 
                                 <TextField type={confirmNewPasswordVisibility ? "text" : "password"}
                                            label="Confirm New Password" variant="outlined" size="medium"
-                                           fullWidth={true} disabled={showLoadingPasswordForm} value={confirmNewPassword}
-                                           sx={{ marginBottom: 2 }}
+                                           fullWidth={true} disabled={showLoadingPasswordForm}
+                                           value={confirmNewPassword}
+                                           sx={{marginBottom: 2}}
                                            onChange={changeConfirmNewPassword} onKeyDown={handleEnterChangePassword}
                                            InputProps={{
                                                startAdornment: (
@@ -293,13 +294,14 @@ export default function ProfileUserPage() {
                                                        <IconButton edge="end"
                                                                    sx={{marginRight: 0}}
                                                                    onClick={changeConfirmNewPasswordVisibility}>
-                                                           {!confirmNewPasswordVisibility ? <VisibilityOff/> : <Visibility/>}
+                                                           {!confirmNewPasswordVisibility ? <VisibilityOff/> :
+                                                               <Visibility/>}
                                                        </IconButton>
                                                    </InputAdornment>
                                                ),
-                                           }} />
+                                           }}/>
 
-                                <Box sx={{ position: "relative" }}>
+                                <Box sx={{position: "relative"}}>
                                     <Button variant="contained" size="large" color="warning"
                                             fullWidth={true} disabled={showLoadingPasswordForm}
                                             onClick={handleChangePasswordUser}>
@@ -313,7 +315,7 @@ export default function ProfileUserPage() {
                                                               left: "50%",
                                                               marginTop: "-12px",
                                                               marginLeft: "-12px"
-                                                          }} />)}
+                                                          }}/>)}
                                 </Box>
 
                             </Box>

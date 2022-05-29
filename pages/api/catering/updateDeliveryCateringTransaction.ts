@@ -44,7 +44,7 @@ export default async function updateDeliveryCateringTransaction(request: NextApi
 
     if (!transactionData) {
         data.error = "Invalid catering transaction id.";
-    }  else {
+    } else {
         const deliveryPrice = calculateDeliveryPrice(transactionData._count.details);
         try {
             data.data = await prisma.cateringHeader.update({

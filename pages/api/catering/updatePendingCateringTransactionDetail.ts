@@ -1,4 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
+
+import {CateringPaymentType} from "types/cateringType";
 import {TokenData} from "types/userType";
 import {prisma} from "utils/database";
 import {getTokenData} from "utils/token";
@@ -30,12 +32,12 @@ export default async function updatePendingCateringTransactionDetail(request: Ne
                         }
                     },
                     {
-                        paymentType: "NotPaid"
+                        paymentType: CateringPaymentType.NotPaid
                     }
                 ]
             },
             data: {
-                paymentType: "Pending",
+                paymentType: CateringPaymentType.Pending,
                 payTime: new Date()
             }
         });

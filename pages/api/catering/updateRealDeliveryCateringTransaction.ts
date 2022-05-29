@@ -42,7 +42,7 @@ export default async function updateRealDeliveryCateringTransaction(request: Nex
 
     if (!transactionData) {
         data.error = "Invalid catering transaction id.";
-    }  else {
+    } else {
         try {
             data.data = await prisma.cateringHeader.update({
                 where: {

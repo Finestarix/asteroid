@@ -75,7 +75,8 @@ export default function RegisterPage() {
             <Box height="100vh"
                  sx={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
 
-                <Snackbar open={showAlert} autoHideDuration={5000} anchorOrigin={{vertical: "top", horizontal: "center"}}
+                <Snackbar open={showAlert} autoHideDuration={5000}
+                          anchorOrigin={{vertical: "top", horizontal: "center"}}
                           onClose={handleCloseAlert}>
                     <Alert severity="error"
                            onClose={handleCloseAlert}>

@@ -1,6 +1,6 @@
-import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
+import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
 
-import Alert, { AlertColor } from "@mui/material/Alert";
+import Alert, {AlertColor} from "@mui/material/Alert";
 import Backdrop from "@mui/material/Backdrop";
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
@@ -24,22 +24,22 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import TextField from "@mui/material/TextField";
 
 import HomeLayout from "@components/layout/HomeLayout";
-import { AlertTypeEnum, OrderTypeEnum, TableHeadKey } from "types/generalType";
-import { UpdateDeleteUserData, User, UserRole, UserStatus, ViewUsersData } from "types/userType";
-import { getComparator } from "utils/comparator";
-import { decryptData } from "utils/encryption";
-import { getSessionToken } from "utils/storage";
+import {AlertTypeEnum, OrderTypeEnum, TableHeadKey} from "types/generalType";
+import {UpdateDeleteUserData, User, UserRole, UserStatus, ViewUsersData} from "types/userType";
+import {getComparator} from "utils/comparator";
+import {decryptData} from "utils/encryption";
+import {getSessionToken} from "utils/storage";
 import Box from "@mui/material/Box";
 
 
 export default function ManageUserPage() {
 
     const userTableHeader: TableHeadKey[] = [
-        { id: "action", label: "", sort: false },
-        { id: "alias", label: "Alias", sort: true },
-        { id: "username", label: "Username", sort: true },
-        { id: "status", label: "Status", sort: true },
-        { id: "role", label: "Role", sort: true }
+        {id: "action", label: "", sort: false},
+        {id: "alias", label: "Alias", sort: true},
+        {id: "username", label: "Username", sort: true},
+        {id: "status", label: "Status", sort: true},
+        {id: "role", label: "Role", sort: true}
     ];
 
     const [users, setUsers] = useState<User[]>([]);
@@ -265,7 +265,7 @@ export default function ManageUserPage() {
         <HomeLayout title="Manage User">
             <>
                 <Backdrop open={showLoading}
-                          sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                          sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
                     <CircularProgress size={50}
                                       sx={{
                                           position: "absolute",
@@ -273,11 +273,11 @@ export default function ManageUserPage() {
                                           left: "50%",
                                           marginTop: "-25px",
                                           marginLeft: "-25px"
-                                      }} />
+                                      }}/>
                 </Backdrop>
 
                 <Snackbar open={showAlert} autoHideDuration={5000}
-                          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                          anchorOrigin={{vertical: "top", horizontal: "center"}}
                           onClose={handleCloseAlert}>
                     <Alert severity={typeAlert}
                            onClose={handleCloseAlert}>
@@ -296,8 +296,8 @@ export default function ManageUserPage() {
                         <DialogContent>
                             <TextField type="text" label="Alias" variant="outlined" size="medium"
                                        fullWidth={true} disabled={showLoading} value={alias}
-                                       sx={{ marginTop: 1 }}
-                                       onChange={changeAlias} onKeyDown={handleEnter} />
+                                       sx={{marginTop: 1}}
+                                       onChange={changeAlias} onKeyDown={handleEnter}/>
                         </DialogContent>
                         <DialogActions>
                             <Button variant="text"
@@ -315,13 +315,13 @@ export default function ManageUserPage() {
                     <>
                         <TextField type="text" label="Filter" variant="standard" size="medium"
                                    fullWidth={true} value={filter}
-                                   sx={{ marginBottom: 2 }}
-                                   onChange={handleFilterUser} />
+                                   sx={{marginBottom: 2}}
+                                   onChange={handleFilterUser}/>
 
                         <Paper>
 
                             <TableContainer>
-                                <Table size="small" sx={{ whiteSpace: "nowrap" }}>
+                                <Table size="small" sx={{whiteSpace: "nowrap"}}>
 
                                     <TableHead>
                                         <TableRow>
@@ -348,96 +348,101 @@ export default function ManageUserPage() {
 
                                     <TableBody>
                                         {filteredUsers
-                                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                        // @ts-ignore
-                                        .sort(getComparator(orderType, orderBy))
-                                        .slice(getFirstDataInPage(), getLastDataInPage())
-                                        .map((user) => {
-                                            return (
-                                                <TableRow key={user.id} tabIndex={-1} hover={!showLoading}>
-                                                    <TableCell width={100}>
-                                                        <Box sx={{ display: "flex", flexDirection: "column" }}>
-                                                            {(!user.deleted) && (
-                                                                <>
-                                                                    <ButtonGroup orientation="vertical" size="small"
-                                                                                 sx={{
-                                                                                     maxWidth: "150px",
-                                                                                     minWidth: "150px",
-                                                                                     marginBottom: 0.5
-                                                                                 }}>
-                                                                        <Button variant="contained"
-                                                                                onClick={() => handleOpenDialog(user)}>
-                                                                            Change Alias
-                                                                        </Button>
-                                                                    </ButtonGroup>
-                                                                    <ButtonGroup orientation="vertical" size="small"
-                                                                                 sx={{
-                                                                                     maxWidth: "150px",
-                                                                                     minWidth: "150px",
-                                                                                     marginBottom: 0.5
-                                                                                 }}>
-                                                                        {([UserStatus.Requested, UserStatus.Blocked].includes(user.status)) &&
-                                                                          <Button color="warning" variant="contained"
-                                                                                  onClick={() => handleChangeStatusUser(user.id, UserStatus.Accepted)}>
-                                                                            Accept
-                                                                          </Button>}
-                                                                        {([UserStatus.Requested, UserStatus.Accepted].includes(user.status)) &&
-                                                                          <Button color="warning" variant="contained"
-                                                                                  onClick={() => handleChangeStatusUser(user.id, UserStatus.Blocked)}>
-                                                                            Block
-                                                                          </Button>}
-                                                                    </ButtonGroup>
-                                                                </>)}
-                                                            <ButtonGroup orientation="vertical" size="small"
-                                                                         sx={{ maxWidth: "150px", minWidth: "150px" }}>
-                                                                {(!user.deleted) &&
-                                                                  <Button color="error" variant="outlined"
-                                                                          onClick={() => handleChangePasswordUser(user.id)}>
-                                                                    Reset Password
-                                                                  </Button>}
-                                                                {(user.deleted) ?
-                                                                    <Button color="error" variant="outlined"
-                                                                            onClick={() => handleChangeDeleteUser(user.id)}>
-                                                                        Restore
-                                                                    </Button> :
-                                                                    <Button color="error" variant="outlined"
-                                                                            onClick={() => handleChangeDeleteUser(user.id)}>
-                                                                        Delete
-                                                                    </Button>}
-                                                            </ButtonGroup>
-                                                        </Box>
-                                                    </TableCell>
-                                                    <TableCell width={130}>
-                                                        {(user.alias) ?
-                                                            <Chip size="small" variant="filled"
-                                                                  label={user.alias} /> :
-                                                            <Chip color="error" size="small" variant="outlined"
-                                                                  label="Not Set Yet" />}
-                                                    </TableCell>
-                                                    <TableCell width={100}>
-                                                        {user.username}
-                                                    </TableCell>
-                                                    <TableCell width={100}>
-                                                        {(user.deleted) ?
-                                                            <Chip color="error" size="small" variant="filled"
-                                                                  label="Deleted" /> :
-                                                            <Chip color="primary" size="small" variant="filled"
-                                                                  label={user.status} />}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <TextField select variant="outlined" size="small"
-                                                                   disabled={showLoading} value={user.role}
-                                                                   sx={{ minWidth: "180px" }}
-                                                                   onChange={(event) => handleChangeRoleUser(event, user.id)}>
-                                                            {Object.keys(UserRole).map((option, index) => (
-                                                                <MenuItem key={index} value={option}>
-                                                                    {option}
-                                                                </MenuItem>))}
-                                                        </TextField>
-                                                    </TableCell>
-                                                </TableRow>
-                                            );
-                                        })}
+                                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                            // @ts-ignore
+                                            .sort(getComparator(orderType, orderBy))
+                                            .slice(getFirstDataInPage(), getLastDataInPage())
+                                            .map((user) => {
+                                                return (
+                                                    <TableRow key={user.id} tabIndex={-1} hover={!showLoading}>
+                                                        <TableCell width={100}>
+                                                            <Box sx={{display: "flex", flexDirection: "column"}}>
+                                                                {(!user.deleted) && (
+                                                                    <>
+                                                                        <ButtonGroup orientation="vertical" size="small"
+                                                                                     sx={{
+                                                                                         maxWidth: "150px",
+                                                                                         minWidth: "150px",
+                                                                                         marginBottom: 0.5
+                                                                                     }}>
+                                                                            <Button variant="contained"
+                                                                                    onClick={() => handleOpenDialog(user)}>
+                                                                                Change Alias
+                                                                            </Button>
+                                                                        </ButtonGroup>
+                                                                        <ButtonGroup orientation="vertical" size="small"
+                                                                                     sx={{
+                                                                                         maxWidth: "150px",
+                                                                                         minWidth: "150px",
+                                                                                         marginBottom: 0.5
+                                                                                     }}>
+                                                                            {([UserStatus.Requested, UserStatus.Blocked].includes(user.status)) &&
+                                                                                <Button color="warning"
+                                                                                        variant="contained"
+                                                                                        onClick={() => handleChangeStatusUser(user.id, UserStatus.Accepted)}>
+                                                                                    Accept
+                                                                                </Button>}
+                                                                            {([UserStatus.Requested, UserStatus.Accepted].includes(user.status)) &&
+                                                                                <Button color="warning"
+                                                                                        variant="contained"
+                                                                                        onClick={() => handleChangeStatusUser(user.id, UserStatus.Blocked)}>
+                                                                                    Block
+                                                                                </Button>}
+                                                                        </ButtonGroup>
+                                                                    </>)}
+                                                                <ButtonGroup orientation="vertical" size="small"
+                                                                             sx={{
+                                                                                 maxWidth: "150px",
+                                                                                 minWidth: "150px"
+                                                                             }}>
+                                                                    {(!user.deleted) &&
+                                                                        <Button color="error" variant="outlined"
+                                                                                onClick={() => handleChangePasswordUser(user.id)}>
+                                                                            Reset Password
+                                                                        </Button>}
+                                                                    {(user.deleted) ?
+                                                                        <Button color="error" variant="outlined"
+                                                                                onClick={() => handleChangeDeleteUser(user.id)}>
+                                                                            Restore
+                                                                        </Button> :
+                                                                        <Button color="error" variant="outlined"
+                                                                                onClick={() => handleChangeDeleteUser(user.id)}>
+                                                                            Delete
+                                                                        </Button>}
+                                                                </ButtonGroup>
+                                                            </Box>
+                                                        </TableCell>
+                                                        <TableCell width={130}>
+                                                            {(user.alias) ?
+                                                                <Chip size="small" variant="filled"
+                                                                      label={user.alias}/> :
+                                                                <Chip color="error" size="small" variant="outlined"
+                                                                      label="Not Set Yet"/>}
+                                                        </TableCell>
+                                                        <TableCell width={100}>
+                                                            {user.username}
+                                                        </TableCell>
+                                                        <TableCell width={100}>
+                                                            {(user.deleted) ?
+                                                                <Chip color="error" size="small" variant="filled"
+                                                                      label="Deleted"/> :
+                                                                <Chip color="primary" size="small" variant="filled"
+                                                                      label={user.status}/>}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <TextField select variant="outlined" size="small"
+                                                                       disabled={showLoading} value={user.role}
+                                                                       sx={{minWidth: "180px"}}
+                                                                       onChange={(event) => handleChangeRoleUser(event, user.id)}>
+                                                                {Object.keys(UserRole).map((option, index) => (
+                                                                    <MenuItem key={index} value={option}>
+                                                                        {option}
+                                                                    </MenuItem>))}
+                                                            </TextField>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            })}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
@@ -445,7 +450,7 @@ export default function ManageUserPage() {
                             <TablePagination component="div" rowsPerPageOptions={[5, 10, 15, 20]}
                                              count={filteredUsers.length} page={page} rowsPerPage={dataPerPage}
                                              onPageChange={handleChangePage}
-                                             onRowsPerPageChange={handleChangeDataPerPage} />
+                                             onRowsPerPageChange={handleChangeDataPerPage}/>
 
                         </Paper>
                     </>

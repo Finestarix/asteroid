@@ -35,7 +35,7 @@ export default async function createCateringTransaction(request: NextApiRequest,
         data.error = "Transaction date must be between today and the next one week.";
     } else if (transactionParameter.basePrice < 0) {
         data.error = "Base price value must be an positive number.";
-    }  else {
+    } else {
         try {
             data.data = await prisma.cateringHeader.create({
                 data: {

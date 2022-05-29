@@ -82,7 +82,9 @@ export default function CateringHistoryPage() {
                 cateringTransactionHistoryData.data[index].subTotal = priceTemp;
                 priceTemp += transaction.header.deliveryPrice;
                 cateringTransactionHistoryData.data[index].total = priceTemp;
-                totalUnpaidTemp += priceTemp;
+                if (transaction.paymentType === CateringPaymentType.NotPaid) {
+                    totalUnpaidTemp += priceTemp;
+                }
             });
             setTransaction(cateringTransactionHistoryData.data);
             setTotalUnpaid(totalUnpaidTemp);
@@ -209,9 +211,8 @@ export default function CateringHistoryPage() {
                 </Modal>
 
                 {(transactions.length > 0) ? (
-                    <>
+                    <Paper sx={{padding: 2}}>
                         <Box sx={{
-                            marginBottom: 2,
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center"
@@ -226,99 +227,104 @@ export default function CateringHistoryPage() {
                                     Pay
                                 </Button>)}
                         </Box>
-                        {transactions.map((transaction, index) => (
-                            <Accordion key={transaction.id} expanded={expanded === "accordion" + index}
-                                       onChange={handleAccordion("accordion" + index)}>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
-                                    <Box sx={{width: "100%", display: "flex", justifyContent: "space-between"}}>
+
+                        <Box sx={{marginTop: 2}}>
+                            {transactions.map((transaction, index) => (
+                                <Accordion variant="outlined"
+                                           key={transaction.id} expanded={expanded === "accordion" + index}
+                                           onChange={handleAccordion("accordion" + index)}>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
+                                        <Box sx={{width: "100%", display: "flex", justifyContent: "space-between"}}>
+                                            <Box>
+                                                {convertDateGeneral(transaction.header.date)}
+                                                {(!transaction.onlyAdditional) ?
+                                                    <Chip variant="filled" size="small"
+                                                          label="Full Set"
+                                                          sx={{marginLeft: 0.5}}/> :
+                                                    <Chip variant="filled" size="small"
+                                                          label="Additional"
+                                                          sx={{marginLeft: 0.5}}/>}
+                                            </Box>
+                                            <Box sx={{display: "flex", alignItems: "center"}}>
+                                                <Chip variant="outlined" size="small"
+                                                      label={convertToIDR(transaction.total)}
+                                                      sx={{marginRight: 0.5}}/>
+                                                {(transaction.paymentType === CateringPaymentType.NotPaid) ?
+                                                    <Tooltip title="Unpaid">
+                                                        <CancelIcon color="secondary"
+                                                                    sx={{marginRight: 2}}/>
+                                                    </Tooltip> : (transaction.paymentType === CateringPaymentType.Paid) ?
+                                                        <Tooltip title="Paid">
+                                                            <CheckCircleIcon color="disabled"
+                                                                             sx={{marginRight: 2}}/>
+                                                        </Tooltip> :
+                                                        <Tooltip title="Pending">
+                                                            <RemoveCircleIcon color="primary"
+                                                                              sx={{marginRight: 2}}/>
+                                                        </Tooltip>}
+                                            </Box>
+                                        </Box>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
                                         <Box>
-                                            {convertDateGeneral(transaction.header.date)}
-                                            {(!transaction.onlyAdditional) ?
-                                                <Chip variant="filled" size="small"
-                                                      label="Full Set"
-                                                      sx={{marginLeft: 0.5}}/> :
-                                                <Chip variant="filled" size="small"
-                                                      label="Additional"
-                                                      sx={{marginLeft: 0.5}}/>}
-                                        </Box>
-                                        <Box sx={{display: "flex", alignItems: "center"}}>
-                                            <Chip variant="outlined" size="small"
-                                                  label={convertToIDR(transaction.total)}
-                                                  sx={{marginRight: 0.5}}/>
-                                            {(transaction.paymentType === CateringPaymentType.NotPaid) ?
-                                                <Tooltip title="Unpaid">
-                                                    <CancelIcon color="error"
-                                                                sx={{marginRight: 2}}/>
-                                                </Tooltip> : (transaction.paymentType === CateringPaymentType.Paid) ?
-                                                    <Tooltip title="Paid">
-                                                        <CheckCircleIcon color="disabled"
-                                                                         sx={{marginRight: 2}}/>
-                                                    </Tooltip> :
-                                                    <Tooltip title="Pending">
-                                                        <RemoveCircleIcon color="primary"
-                                                                          sx={{marginRight: 2}}/>
-                                                    </Tooltip>}
-                                        </Box>
-                                    </Box>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <Box>
-                                        <TableContainer sx={{marginBottom: 1, whiteSpace: "nowrap"}}>
-                                            <Table size="small">
-                                                <TableHead>
-                                                    <TableRow>
-                                                        <TableCell colSpan={2}>Details</TableCell>
-                                                        <TableCell width={150}>Price</TableCell>
-                                                    </TableRow>
-                                                </TableHead>
-                                                <TableBody>
-                                                    {(!transaction.onlyAdditional) && (
+                                            <TableContainer sx={{marginBottom: 1, whiteSpace: "nowrap"}}>
+                                                <Table size="small">
+                                                    <TableHead>
                                                         <TableRow>
-                                                            <TableCell colSpan={2}>Catering</TableCell>
-                                                            <TableCell>{convertToIDR(transaction.header.basePrice)}</TableCell>
-                                                        </TableRow>)}
-                                                    {transaction.foods.map((food) => (
-                                                        <TableRow key={food.id}>
-                                                            <TableCell colSpan={2}>{food.food.name}</TableCell>
-                                                            <TableCell>
-                                                                {(food.food.additionalPrice !== 0) ? convertToIDR(food.food.additionalPrice) :
-                                                                    (food.food.reductionPrice !== 0) ? "(" + convertToIDR(food.food.reductionPrice) + ")" :
-                                                                        convertToIDR(0)}
-                                                            </TableCell>
-                                                        </TableRow>))}
-                                                    <TableRow>
-                                                        <TableCell rowSpan={3}/>
-                                                        <TableCell align="right" width={100}>Sub-Total</TableCell>
-                                                        <TableCell>{convertToIDR(transaction.subTotal)}</TableCell>
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableCell align="right" width={100}>Delivery</TableCell>
-                                                        <TableCell>{convertToIDR(transaction.header.deliveryPrice)}</TableCell>
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableCell align="right" width={100}>Total</TableCell>
-                                                        <TableCell>{convertToIDR(transaction.total)}</TableCell>
-                                                    </TableRow>
-                                                </TableBody>
-                                            </Table>
-                                        </TableContainer>
-                                        {(transaction.note.length > 0) &&
-                                          <TextField label="Note"
-                                                     disabled={true} multiline={true} rows={2} value={transaction.note}
-                                                     fullWidth={true}
-                                                     sx={{marginTop: 1.5}}
-                                                     InputProps={{
-                                                         startAdornment: (
-                                                             <InputAdornment position="start">
-                                                                 <StickyNote2Icon/>
-                                                             </InputAdornment>
-                                                         ),
-                                                     }}/>}
-                                    </Box>
-                                </AccordionDetails>
-                            </Accordion>
-                        ))}
-                    </>
+                                                            <TableCell colSpan={2}>Details</TableCell>
+                                                            <TableCell width={150}>Price</TableCell>
+                                                        </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {(!transaction.onlyAdditional) && (
+                                                            <TableRow>
+                                                                <TableCell colSpan={2}>Catering</TableCell>
+                                                                <TableCell>{convertToIDR(transaction.header.basePrice)}</TableCell>
+                                                            </TableRow>)}
+                                                        {transaction.foods.map((food) => (
+                                                            <TableRow key={food.id}>
+                                                                <TableCell colSpan={2}>{food.food.name}</TableCell>
+                                                                <TableCell>
+                                                                    {(food.food.additionalPrice !== 0) ? convertToIDR(food.food.additionalPrice) :
+                                                                        (food.food.reductionPrice !== 0) ? "(" + convertToIDR(food.food.reductionPrice) + ")" :
+                                                                            convertToIDR(0)}
+                                                                </TableCell>
+                                                            </TableRow>))}
+                                                        <TableRow>
+                                                            <TableCell rowSpan={3}/>
+                                                            <TableCell align="right" width={100}>Sub-Total</TableCell>
+                                                            <TableCell>{convertToIDR(transaction.subTotal)}</TableCell>
+                                                        </TableRow>
+                                                        <TableRow>
+                                                            <TableCell align="right" width={100}>Delivery</TableCell>
+                                                            <TableCell>{convertToIDR(transaction.header.deliveryPrice)}</TableCell>
+                                                        </TableRow>
+                                                        <TableRow>
+                                                            <TableCell align="right" width={100}>Total</TableCell>
+                                                            <TableCell>{convertToIDR(transaction.total)}</TableCell>
+                                                        </TableRow>
+                                                    </TableBody>
+                                                </Table>
+                                            </TableContainer>
+                                            {(transaction.note.length > 0) &&
+                                                <TextField label="Note"
+                                                           disabled={true} multiline={true} rows={2}
+                                                           value={transaction.note}
+                                                           fullWidth={true}
+                                                           sx={{marginTop: 1.5}}
+                                                           InputProps={{
+                                                               startAdornment: (
+                                                                   <InputAdornment position="start">
+                                                                       <StickyNote2Icon/>
+                                                                   </InputAdornment>
+                                                               ),
+                                                           }}/>}
+                                        </Box>
+                                    </AccordionDetails>
+                                </Accordion>
+                            ))}
+                        </Box>
+                    </Paper>
                 ) : (
                     <Alert variant="outlined" severity="info">
                         There is no catering transaction history.

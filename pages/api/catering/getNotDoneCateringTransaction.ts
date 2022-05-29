@@ -7,7 +7,7 @@ import {getTokenData} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";
 
 
-export default async function getNotDoneCateringTransaction (request: NextApiRequest, response: NextApiResponse) {
+export default async function getNotDoneCateringTransaction(request: NextApiRequest, response: NextApiResponse) {
 
     const data = {data: [], error: ""};
     let tokenData: TokenData;

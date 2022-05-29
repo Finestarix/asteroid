@@ -48,7 +48,7 @@ export default async function updateChangePasswordUser(request: NextApiRequest, 
 
     if (!userData) {
         data.error = "Invalid user id.";
-    }  else if (passwordCheck.requiredTestErrors.length > 0) {
+    } else if (passwordCheck.requiredTestErrors.length > 0) {
         data.error = "Password is too weak. " + passwordCheck.requiredTestErrors[0];
     } else if (userParameter.newPassword !== userParameter.confirmNewPassword) {
         data.error = "Password do not match.";

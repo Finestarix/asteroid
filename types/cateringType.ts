@@ -15,7 +15,8 @@ export interface CateringTransaction {
     details: CateringTransactionDetail[],
     createdAt: Date,
     deletedAt: Date,
-    deleted: boolean
+    deleted: boolean,
+    total: number
 }
 
 export interface CateringTransactionDetail {
@@ -64,6 +65,11 @@ export interface CateringFood {
     deleted: boolean
 }
 
+export interface ViewRangeDateCateringTransactionParameter {
+    startDate: Date,
+    endDate: Date
+}
+
 export interface ViewActiveCateringTransactionData {
     data: CateringTransaction,
     error: string
@@ -75,7 +81,7 @@ export interface ViewCateringTransactionData {
 }
 
 export interface ViewTotalCateringTransactionParameter {
-    id: number
+    id: number;
 }
 
 export interface ViewTotalCateringTransactionData {
@@ -90,12 +96,16 @@ export interface InsertCateringTransactionParameter {
 }
 
 export interface UpdateDeleteCateringTransactionParameter {
-    id: number
+    id: number;
 }
 
 export interface UpdateDeliveryCateringTransactionParameter {
     id: number,
     deliveryPrice: number
+}
+
+export interface UpdatePaymentCateringTransactionParameter {
+    ids: number[];
 }
 
 export interface ChangeCateringTransactionData {
@@ -153,7 +163,7 @@ export interface InsertCateringFoodParameter {
 }
 
 export interface UpdateDeleteCateringFoodParameter {
-    id: number
+    id: number;
 }
 
 export interface ChangeCateringFoodData {

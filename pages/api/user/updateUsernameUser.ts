@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 
-import { TokenData, UpdateUsernameUserParameter } from "types/userType";
+import {TokenData, UpdateUsernameUserParameter} from "types/userType";
 import {prisma} from "utils/database";
 import {getTokenData} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";

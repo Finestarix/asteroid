@@ -1,5 +1,5 @@
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import {useRouter} from "next/router";
+import {useEffect, useState} from "react";
 
 import DinnerDiningOutlinedIcon from "@mui/icons-material/DinnerDiningOutlined";
 import FaceIcon from "@mui/icons-material/Face";
@@ -25,10 +25,10 @@ import Typography from "@mui/material/Typography";
 import MainLayout from "@components/layout/MainLayout";
 import ThemeButton from "@components/themes/ThemeButton";
 import ThemeImage from "@components/themes/ThemeImage";
-import { LayoutProps } from "types/generalType";
-import { UserRole } from "types/userType";
-import { decryptData } from "utils/encryption";
-import { getSessionData, removeSessionData, removeSessionToken } from "utils/storage";
+import {LayoutProps} from "types/generalType";
+import {UserRole} from "types/userType";
+import {decryptData} from "utils/encryption";
+import {getSessionData, removeSessionData, removeSessionToken} from "utils/storage";
 
 
 export default function HomeLayout(props: LayoutProps) {
@@ -46,7 +46,6 @@ export default function HomeLayout(props: LayoutProps) {
     const toggleDrawerMobile = () => setDrawerMobileOpen(!drawerMobileOpen);
 
     const cateringAdminRole: string[] = [UserRole.CateringAdmin, UserRole.Owner];
-    const debtAdminRole: string[] = [UserRole.DebtAdmin, UserRole.Owner];
     const userAdminRole: string[] = [UserRole.Owner];
 
     const router = useRouter();
@@ -68,79 +67,79 @@ export default function HomeLayout(props: LayoutProps) {
         <>
             <Toolbar>
                 <Typography component="h4" variant="h4"
-                            sx={{ display: "flex", alignItems: "center", fontWeight: "bold", cursor: "pointer" }}
+                            sx={{display: "flex", alignItems: "center", fontWeight: "bold", cursor: "pointer"}}
                             onClick={gotoHome}>
-                    ASTER<ThemeImage />ID
+                    ASTER<ThemeImage/>ID
                 </Typography>
             </Toolbar>
-            <Divider />
+            <Divider/>
             <List>
                 <ListItemButton selected={router.pathname === "/home/catering"}
                                 onClick={gotoCatering}>
                     <ListItemIcon>
-                        <RestaurantOutlinedIcon fontSize="medium" />
+                        <RestaurantOutlinedIcon fontSize="medium"/>
                     </ListItemIcon>
-                    <ListItemText primary="Catering Order" />
+                    <ListItemText primary="Catering Order"/>
                 </ListItemButton>
                 <ListItemButton selected={router.pathname === "/home/catering/history"}
                                 onClick={gotoCateringHistory}>
                     <ListItemIcon>
-                        <ReceiptLongOutlinedIcon fontSize="medium" />
+                        <ReceiptLongOutlinedIcon fontSize="medium"/>
                     </ListItemIcon>
-                    <ListItemText primary="Catering History" />
+                    <ListItemText primary="Catering History"/>
                 </ListItemButton>
                 {(cateringAdminRole.includes(role)) &&
-                  <>
-                    <ListItemButton selected={router.pathname === "/home/catering/manage/transaction"}
-                                    onClick={gotoCateringTransaction}>
-                      <ListItemIcon>
-                        <MicrowaveOutlinedIcon fontSize="medium" />
-                      </ListItemIcon>
-                      <ListItemText primary="Manage Transaction" />
-                    </ListItemButton>
-                    <ListItemButton selected={router.pathname === "/home/catering/manage/food"}
-                                    onClick={gotoCateringFood}>
-                      <ListItemIcon>
-                        <DinnerDiningOutlinedIcon fontSize="medium" />
-                      </ListItemIcon>
-                      <ListItemText primary="Manage Food" />
-                    </ListItemButton>
-                    <ListItemButton selected={router.pathname === "/home/catering/manage/payment"}
-                                    onClick={gotoCateringPayment}>
-                      <ListItemIcon>
-                        <PointOfSaleIcon fontSize="medium" />
-                      </ListItemIcon>
-                      <ListItemText primary="Manage Payment" />
-                    </ListItemButton>
-                  </>}
+                    <>
+                        <ListItemButton selected={router.pathname === "/home/catering/manage/transaction"}
+                                        onClick={gotoCateringTransaction}>
+                            <ListItemIcon>
+                                <MicrowaveOutlinedIcon fontSize="medium"/>
+                            </ListItemIcon>
+                            <ListItemText primary="Manage Transaction"/>
+                        </ListItemButton>
+                        <ListItemButton selected={router.pathname === "/home/catering/manage/food"}
+                                        onClick={gotoCateringFood}>
+                            <ListItemIcon>
+                                <DinnerDiningOutlinedIcon fontSize="medium"/>
+                            </ListItemIcon>
+                            <ListItemText primary="Manage Food"/>
+                        </ListItemButton>
+                        <ListItemButton selected={router.pathname === "/home/catering/manage/payment"}
+                                        onClick={gotoCateringPayment}>
+                            <ListItemIcon>
+                                <PointOfSaleIcon fontSize="medium"/>
+                            </ListItemIcon>
+                            <ListItemText primary="Manage Payment"/>
+                        </ListItemButton>
+                    </>}
             </List>
-            <Divider />
+            <Divider/>
             <List>
                 <ListItemButton selected={router.pathname === "/home/user"}
                                 onClick={gotoProfile}>
                     <ListItemIcon>
-                        <FaceIcon fontSize="medium" />
+                        <FaceIcon fontSize="medium"/>
                     </ListItemIcon>
-                    <ListItemText primary="Profile" />
+                    <ListItemText primary="Profile"/>
                 </ListItemButton>
                 {(userAdminRole.includes(role)) &&
-                  <>
-                    <ListItemButton selected={router.pathname === "/home/user/manage"}
-                                    onClick={gotoUser}>
-                      <ListItemIcon>
-                        <GroupIcon fontSize="medium" />
-                      </ListItemIcon>
-                      <ListItemText primary="Manage User" />
-                    </ListItemButton>
-                  </>}
+                    <>
+                        <ListItemButton selected={router.pathname === "/home/user/manage"}
+                                        onClick={gotoUser}>
+                            <ListItemIcon>
+                                <GroupIcon fontSize="medium"/>
+                            </ListItemIcon>
+                            <ListItemText primary="Manage User"/>
+                        </ListItemButton>
+                    </>}
             </List>
-            <Divider />
+            <Divider/>
             <List>
                 <ListItemButton onClick={gotoLogout}>
                     <ListItemIcon>
-                        <LogoutIcon fontSize="medium" />
+                        <LogoutIcon fontSize="medium"/>
                     </ListItemIcon>
-                    <ListItemText primary="Logout" />
+                    <ListItemText primary="Logout"/>
                 </ListItemButton>
             </List>
         </>
@@ -149,33 +148,33 @@ export default function HomeLayout(props: LayoutProps) {
     return (
         <MainLayout title={props.title}>
 
-            <Box sx={{ display: "flex" }}>
+            <Box sx={{display: "flex"}}>
 
                 <AppBar position="fixed"
-                        sx={{ width: { md: `calc(100% - ${drawerWidth}px)` }, marginLeft: { md: `${drawerWidth}px` } }}>
+                        sx={{width: {md: `calc(100% - ${drawerWidth}px)`}, marginLeft: {md: `${drawerWidth}px`}}}>
                     <Toolbar>
                         <IconButton edge="start" color="inherit"
-                                    sx={{ marginRight: 2, display: { md: "none" } }}
+                                    sx={{marginRight: 2, display: {md: "none"}}}
                                     onClick={toggleDrawerMobile}>
-                            <MenuIcon />
+                            <MenuIcon/>
                         </IconButton>
-                        <Box sx={{ width: "100%" }}>
+                        <Box sx={{width: "100%"}}>
                             <Typography component="div" variant="h6">
                                 {props.title}
                             </Typography>
                         </Box>
-                        <ThemeButton />
+                        <ThemeButton/>
                     </Toolbar>
                 </AppBar>
 
                 <Box component="nav"
-                     sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
+                     sx={{width: {md: drawerWidth}, flexShrink: {md: 0}}}>
                     <Drawer variant="temporary"
                             open={drawerMobileOpen}
-                            ModalProps={{ keepMounted: true }}
+                            ModalProps={{keepMounted: true}}
                             sx={{
-                                display: { xs: "block", md: "none" },
-                                "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth }
+                                display: {xs: "block", md: "none"},
+                                "& .MuiDrawer-paper": {boxSizing: "border-box", width: drawerWidth}
                             }}
                             onClose={toggleDrawerMobile}>
                         {drawerMenu}
@@ -183,8 +182,8 @@ export default function HomeLayout(props: LayoutProps) {
                     <Drawer variant="permanent"
                             open={true}
                             sx={{
-                                display: { xs: "none", md: "block" },
-                                "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth }
+                                display: {xs: "none", md: "block"},
+                                "& .MuiDrawer-paper": {boxSizing: "border-box", width: drawerWidth}
                             }}>
                         {drawerMenu}
                     </Drawer>
@@ -193,11 +192,11 @@ export default function HomeLayout(props: LayoutProps) {
                 <Box component="main"
                      sx={{
                          padding: 3,
-                         width: { md: `calc(100% - ${drawerWidth}px)` },
+                         width: {md: `calc(100% - ${drawerWidth}px)`},
                          flexGrow: 1,
                          overflowX: "auto"
                      }}>
-                    <Toolbar />
+                    <Toolbar/>
                     {props.children}
                 </Box>
 

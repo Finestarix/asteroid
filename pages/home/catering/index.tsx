@@ -615,16 +615,16 @@ export default function CateringOrderPage() {
                                         </TableContainer>
                                         <Box>
                                             {(note.length > 0) &&
-                                              <TextField label="Note"
-                                                         disabled={true} multiline={true} rows={2} value={note}
-                                                         sx={{width: "500px", marginTop: 1, marginBottom: 2}}
-                                                         InputProps={{
-                                                             startAdornment: (
-                                                                 <InputAdornment position="start">
-                                                                     <StickyNote2Icon/>
-                                                                 </InputAdornment>
-                                                             ),
-                                                         }}/>}
+                                                <TextField label="Note"
+                                                           disabled={true} multiline={true} rows={2} value={note}
+                                                           sx={{width: "500px", marginTop: 1, marginBottom: 2}}
+                                                           InputProps={{
+                                                               startAdornment: (
+                                                                   <InputAdornment position="start">
+                                                                       <StickyNote2Icon/>
+                                                                   </InputAdornment>
+                                                               ),
+                                                           }}/>}
                                         </Box>
                                         <Alert variant="outlined" severity="info"
                                                sx={{maxWidth: "500px", marginBottom: 2}}>

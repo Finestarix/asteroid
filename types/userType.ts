@@ -16,6 +16,7 @@ export interface LoginParameter {
 }
 
 export interface LoginData {
+    username: string,
     role: string,
     token: string,
     error: string
@@ -32,6 +33,7 @@ export interface RegisterData {
 }
 
 export interface TokenData {
+    id: number,
     username: string,
     role: UserRole
 }

@@ -59,6 +59,7 @@ export default function HomeLayout(props: LayoutProps) {
     const gotoUser = () => router.push("/home/user/manage");
     const gotoLogout = async () => {
         removeSessionToken();
+        removeSessionData("username");
         removeSessionData("role");
         await router.push("/auth/login");
     };

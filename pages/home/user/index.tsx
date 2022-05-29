@@ -111,6 +111,7 @@ export default function ProfileUserPage() {
             setMessageAlert(updateUsernameUserData.success);
             setTypeAlert(AlertTypeEnum.SUCCESS);
             removeSessionToken();
+            removeSessionData("username");
             removeSessionData("role");
             await router.push("/auth/login");
         }

@@ -55,6 +55,7 @@ export default function LoginPage() {
             setShowAlert(true);
         } else {
             setSessionToken(encryptData(loginData.token));
+            setSessionData("username", encryptData(loginData.username));
             setSessionData("role", encryptData(loginData.role));
             await router.push("/home");
         }

@@ -40,6 +40,7 @@ export default function MainLayout(props: LayoutProps) {
                 router.push("/home").then();
         } catch (_) {
             removeSessionToken();
+            removeSessionData("username");
             removeSessionData("role");
             router.push("/auth/login").then();
         }

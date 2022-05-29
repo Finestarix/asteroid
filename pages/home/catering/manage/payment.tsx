@@ -456,6 +456,7 @@ export default function ManageCateringPaymentPage() {
                         {rangeTransactions.map((transaction, index) => (
                             <Accordion variant="outlined"
                                        key={transaction.id} expanded={expanded === "accordion" + index}
+                                       sx={{marginBottom: 0.5}}
                                        onChange={handleAccordion("accordion" + index)}>
                                 <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
                                     <Box sx={{width: "100%", display: "flex", justifyContent: "space-between"}}>

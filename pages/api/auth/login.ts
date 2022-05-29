@@ -9,7 +9,7 @@ import {checkMultipleUndefined} from "utils/validate";
 
 export default async function authLogin(request: NextApiRequest, response: NextApiResponse) {
 
-    const data = {role: "", token: "", error: ""};
+    const data = {username: "", role: "", token: "", error: ""};
     let userParameter: LoginParameter;
 
     try {
@@ -31,6 +31,7 @@ export default async function authLogin(request: NextApiRequest, response: NextA
         try {
             userData = await prisma.user.findUnique({
                 select: {
+                    id: true,
                     password: true,
                     role: true,
                     status: true,
@@ -58,14 +59,14 @@ export default async function authLogin(request: NextApiRequest, response: NextA
                 data.error = "Invalid user credential.";
             } else {
                 const tokenData: TokenData = {
+                    id: userData.id,
                     username: userParameter.username,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     role: userData.role,
                 };
                 data.token = generateToken(tokenData);
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
+                data.username = userParameter.username;
                 data.role = userData.role;
             }
         }

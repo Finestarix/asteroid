@@ -180,7 +180,7 @@ export default function CateringHistoryPage() {
                         <Typography sx={{marginBottom: 1}}>
                             <b>RENALDY</b>
                         </Typography>
-                        <Image src="/qr_code.png" alt="QR Code"
+                        <Image src="/qr_code.jpg" alt="QR Code"
                                width={250} height={250}/>
                         <CopyToClipboard text="5271638231"
                                          onCopy={handleOpenAlertClipboard}>

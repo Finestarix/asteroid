@@ -4,11 +4,9 @@ import {ChangeEvent, SyntheticEvent, useEffect, useState} from "react";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import DeleteIcon from "@mui/icons-material/Delete";
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import StickyNote2Icon from "@mui/icons-material/StickyNote2";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -17,11 +15,9 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
-import InputAdornment from "@mui/material/InputAdornment";
 import MenuItem from "@mui/material/MenuItem";
 import Modal from "@mui/material/Modal";
 import Paper from "@mui/material/Paper";
@@ -282,7 +278,7 @@ export default function ManageCateringPaymentPage() {
                         <Typography sx={{marginBottom: 1}}>
                             <b>RENALDY</b>
                         </Typography>
-                        <Image src="/qr_code.png" alt="QR Code"
+                        <Image src="/qr_code.jpg" alt="QR Code"
                                width={250} height={250}/>
                         <CopyToClipboard text="5271638231"
                                          onCopy={handleOpenAlertClipboard}>

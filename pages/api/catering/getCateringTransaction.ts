@@ -49,6 +49,9 @@ export default async function getCateringTransaction(request: NextApiRequest, re
                         note: true,
                         onlyAdditional: true
                     },
+                    where: {
+                        deleted: false
+                    },
                     orderBy: {
                         id: "asc"
                     }

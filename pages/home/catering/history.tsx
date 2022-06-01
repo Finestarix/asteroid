@@ -182,7 +182,7 @@ export default function CateringHistoryPage() {
                         </Typography>
                         <Image src="/qr_code.jpg" alt="QR Code"
                                width={250} height={250}/>
-                        <CopyToClipboard text="5271638231"
+                        <CopyToClipboard text="5271956593"
                                          onCopy={handleOpenAlertClipboard}>
                             <Box sx={{
                                 marginTop: 1,
@@ -192,7 +192,7 @@ export default function CateringHistoryPage() {
                                 cursor: "pointer"
                             }}>
                                 <Typography>
-                                    <b>BCA - 5271638231</b>
+                                    <b>BCA - 5271956593</b>
                                 </Typography>
                                 <Typography variant="caption">
                                     (click to copy)

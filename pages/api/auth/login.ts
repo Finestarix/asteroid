@@ -35,13 +35,14 @@ export default async function authLogin(request: NextApiRequest, response: NextA
             userData = await prisma.user.findUnique({
                 select: {
                     id: true,
+                    username: true,
                     password: true,
                     role: true,
                     status: true,
                     deleted: true
                 },
                 where: {
-                    username: userParameter.username,
+                    username: userParameter.username.toLowerCase(),
                 },
             });
         } catch (_) {
@@ -73,7 +74,7 @@ export default async function authLogin(request: NextApiRequest, response: NextA
                     role: userData.role,
                 };
                 data.token = generateToken(tokenData);
-                data.username = userParameter.username;
+                data.username = userData.username;
                 data.role = userData.role;
             }
         }

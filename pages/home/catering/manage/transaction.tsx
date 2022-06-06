@@ -344,8 +344,8 @@ export default function ManageCateringTransactionPage() {
         let copyTemp = "Catering " + convertDateGeneral(transaction.date) + "\n\n";
 
         transaction.details.forEach((detail, index) => {
-            copyTemp += (index + 1) + ". " + detail.participant.username +
-                ((detail.onlyAdditional) ? " (TAMBAHAN)" : "") + "\n";
+            copyTemp += (index + 1) + ". " +
+                ((detail.participant.alias) ? detail.participant.alias : detail.participant.username) + "\n";
             detail.foods.forEach((food) => {
                 copyTemp += "- " + food.food.name + "\n";
             });

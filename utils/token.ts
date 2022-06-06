@@ -9,7 +9,7 @@ import {TokenData} from "types/userType";
 // @ts-ignore
 const key: string = process.env.JWT_KEY;
 
-export const generateToken = (data: TokenData) => sign({data: data}, key, {expiresIn: "1d"});
+export const generateToken = (data: TokenData) => sign({data: data}, key, {expiresIn: "7d"});
 
 export const getTokenData = (request: NextApiRequest) => {
     const token = request.headers.authorization;

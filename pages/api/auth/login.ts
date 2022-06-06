@@ -32,7 +32,7 @@ export default async function authLogin(request: NextApiRequest, response: NextA
     } else {
         let userData;
         try {
-            userData = await prisma.user.findUnique({
+            userData = await prisma.user.findFirst({
                 select: {
                     id: true,
                     username: true,
@@ -42,8 +42,11 @@ export default async function authLogin(request: NextApiRequest, response: NextA
                     deleted: true
                 },
                 where: {
-                    username: userParameter.username.toLowerCase(),
-                },
+                    username: {
+                        equals: userParameter.username,
+                        mode: "insensitive"
+                    }
+                }
             });
         } catch (_) {
             data.error = "Failed to fetch user data.";

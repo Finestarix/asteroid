@@ -17,7 +17,7 @@ export default async function getTotalCateringTransactionDetail(request: NextApi
         tokenData = getTokenData(request);
         totalCateringTransactionParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, totalCateringTransactionParameter.id))
+            checkMultipleUndefined(tokenData.id, totalCateringTransactionParameter.id))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";

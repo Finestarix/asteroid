@@ -15,7 +15,7 @@ export default async function getNotDoneCateringTransaction(request: NextApiRequ
     try {
         tokenData = getTokenData(request);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username))
+            checkMultipleUndefined(tokenData.id))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";
@@ -28,6 +28,9 @@ export default async function getNotDoneCateringTransaction(request: NextApiRequ
         data.data = await prisma.cateringDetail.findMany({
             where: {
                 deleted: false,
+                header: {
+                    deleted: false
+                },
                 NOT: {
                     paymentType: CateringPaymentType.Paid
                 }
@@ -57,6 +60,11 @@ export default async function getNotDoneCateringTransaction(request: NextApiRequ
                     participant: {
                         username: "asc"
                     },
+                },
+                {
+                    header: {
+                        date: "asc"
+                    }
                 }
             ]
         });

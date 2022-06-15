@@ -19,7 +19,7 @@ export default async function createDebt(request: NextApiRequest, response: Next
         tokenData = getTokenData(request);
         debtParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, debtParameter.title, debtParameter.lendingTime, debtParameter.details))
+            checkMultipleUndefined(tokenData.id, debtParameter.title, debtParameter.lendingTime, debtParameter.details))
             throw new Error();
         currentDate = new Date().getTime();
         lendingDate = new Date(debtParameter.lendingTime).getTime();
@@ -62,7 +62,7 @@ export default async function createDebt(request: NextApiRequest, response: Next
         try {
             lenderData = await prisma.user.findUnique({
                 where: {
-                    username: tokenData.username
+                    id: tokenData.id
                 }
             });
         } catch (_) {

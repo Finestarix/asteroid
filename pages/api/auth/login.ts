@@ -35,6 +35,7 @@ export default async function authLogin(request: NextApiRequest, response: NextA
             userData = await prisma.user.findFirst({
                 select: {
                     id: true,
+                    alias: true,
                     username: true,
                     password: true,
                     role: true,
@@ -42,10 +43,20 @@ export default async function authLogin(request: NextApiRequest, response: NextA
                     deleted: true
                 },
                 where: {
-                    username: {
-                        equals: userParameter.username,
-                        mode: "insensitive"
-                    }
+                    OR: [
+                        {
+                            username: {
+                                equals: userParameter.username,
+                                mode: "insensitive"
+                            }
+                        },
+                        {
+                            alias: {
+                                equals: userParameter.username,
+                                mode: "insensitive"
+                            }
+                        }
+                    ]
                 }
             });
         } catch (_) {
@@ -71,7 +82,6 @@ export default async function authLogin(request: NextApiRequest, response: NextA
             if (data.error === "") {
                 const tokenData: TokenData = {
                     id: userData.id,
-                    username: userParameter.username,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     role: userData.role,

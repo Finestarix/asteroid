@@ -20,7 +20,7 @@ export default async function createCateringTransaction(request: NextApiRequest,
         tokenData = getTokenData(request);
         transactionParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, transactionParameter.date, transactionParameter.basePrice))
+            checkMultipleUndefined(tokenData.id, transactionParameter.date, transactionParameter.basePrice))
             throw Error();
         const currentDate = new Date();
         currentDate.setDate(currentDate.getDate() + 6);
@@ -41,17 +41,17 @@ export default async function createCateringTransaction(request: NextApiRequest,
                 data: {
                     date: transactionParameter.date,
                     basePrice: transactionParameter.basePrice,
-                    deliveryPrice: 0,
-                    realDeliveryPrice: 0,
+                    deliveryPrice: 5000,
+                    realDeliveryPrice: 30000,
                     active: false,
                     createdBy: {
                         connect: {
-                            username: tokenData.username
+                            id: tokenData.id
                         }
                     },
                     lastUpdatedBy: {
                         connect: {
-                            username: tokenData.username
+                            id: tokenData.id
                         }
                     }
                 },

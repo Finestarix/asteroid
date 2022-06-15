@@ -14,7 +14,7 @@ export default async function getUser(request: NextApiRequest, response: NextApi
     try {
         tokenData = getTokenData(request);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username))
+            checkMultipleUndefined(tokenData.id))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";
@@ -26,7 +26,7 @@ export default async function getUser(request: NextApiRequest, response: NextApi
         // @ts-ignore
         data.data = await prisma.user.findFirst({
             where: {
-                username: tokenData.username
+                id: tokenData.id
             },
             select: {
                 id: true,

@@ -34,7 +34,6 @@ export interface RegisterData {
 
 export interface TokenData {
     id: number,
-    username: string,
     role: UserRole
 }
 

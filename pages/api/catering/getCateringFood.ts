@@ -14,7 +14,7 @@ export default async function getCateringFood(request: NextApiRequest, response:
     try {
         tokenData = getTokenData(request);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username))
+            checkMultipleUndefined(tokenData.id))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";
@@ -41,6 +41,9 @@ export default async function getCateringFood(request: NextApiRequest, response:
                         alias: true
                     }
                 }
+            },
+            orderBy: {
+                active: "asc"
             }
         });
     } catch (_) {

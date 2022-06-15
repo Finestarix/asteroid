@@ -17,7 +17,7 @@ export default async function updateAliasUser(request: NextApiRequest, response:
         tokenData = getTokenData(request);
         userParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, userParameter.username))
+            checkMultipleUndefined(tokenData.id, userParameter.username))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";
@@ -31,7 +31,7 @@ export default async function updateAliasUser(request: NextApiRequest, response:
                 username: true
             },
             where: {
-                username: tokenData.username,
+                id: tokenData.id,
                 deleted: false
             }
         });
@@ -41,7 +41,7 @@ export default async function updateAliasUser(request: NextApiRequest, response:
 
     if (!userData) {
         data.error = "Invalid user id.";
-    } else if (tokenData.username === userParameter.username) {
+    } else if (userData.username === userParameter.username) {
         data.error = "Username you want to change must be different.";
     } else {
         let userData;
@@ -61,7 +61,7 @@ export default async function updateAliasUser(request: NextApiRequest, response:
             try {
                 data.data = await prisma.user.update({
                     where: {
-                        username: tokenData.username
+                        id: tokenData.id
                     },
                     data: {
                         username: userParameter.username

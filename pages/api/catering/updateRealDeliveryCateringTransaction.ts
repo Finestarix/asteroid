@@ -19,7 +19,7 @@ export default async function updateRealDeliveryCateringTransaction(request: Nex
         tokenData = getTokenData(request);
         transactionParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, transactionParameter.id, transactionParameter.deliveryPrice))
+            checkMultipleUndefined(tokenData.id, transactionParameter.id, transactionParameter.deliveryPrice))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";
@@ -52,7 +52,7 @@ export default async function updateRealDeliveryCateringTransaction(request: Nex
                     realDeliveryPrice: transactionParameter.deliveryPrice,
                     lastUpdatedBy: {
                         connect: {
-                            username: tokenData.username
+                            id: tokenData.id
                         }
                     }
                 }

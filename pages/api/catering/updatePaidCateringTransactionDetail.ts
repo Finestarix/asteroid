@@ -17,7 +17,7 @@ export default async function updatePaidCateringTransactionDetail(request: NextA
         tokenData = getTokenData(request);
         transactionParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, transactionParameter.ids))
+            checkMultipleUndefined(tokenData.id, transactionParameter.ids))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";

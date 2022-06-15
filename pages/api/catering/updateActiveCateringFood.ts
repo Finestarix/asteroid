@@ -18,7 +18,7 @@ export default async function updateActiveCateringFood(request: NextApiRequest, 
         tokenData = getTokenData(request);
         foodParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, foodParameter.id))
+            checkMultipleUndefined(tokenData.id, foodParameter.id))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";
@@ -48,7 +48,7 @@ export default async function updateActiveCateringFood(request: NextApiRequest, 
                     active: !foodData.active,
                     lastUpdatedBy: {
                         connect: {
-                            username: tokenData.username
+                            id: tokenData.id
                         }
                     }
                 },

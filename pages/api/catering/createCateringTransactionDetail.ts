@@ -17,7 +17,7 @@ export default async function createCateringTransaction(request: NextApiRequest,
         tokenData = getTokenData(request);
         transactionDetailParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, transactionDetailParameter.header, transactionDetailParameter.foods,
+            checkMultipleUndefined(tokenData.id, transactionDetailParameter.header, transactionDetailParameter.foods,
                 transactionDetailParameter.note, transactionDetailParameter.onlyAdditional))
             throw Error();
     } catch (_) {
@@ -35,7 +35,7 @@ export default async function createCateringTransaction(request: NextApiRequest,
                 },
                 participant: {
                     connect: {
-                        username: tokenData.username
+                        id: tokenData.id
                     }
                 },
                 note: transactionDetailParameter.note,

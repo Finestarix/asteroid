@@ -20,7 +20,7 @@ export default async function updateDeliveryCateringTransaction(request: NextApi
         tokenData = getTokenData(request);
         transactionParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, transactionParameter.id))
+            checkMultipleUndefined(tokenData.id, transactionParameter.id))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";
@@ -55,7 +55,7 @@ export default async function updateDeliveryCateringTransaction(request: NextApi
                     deliveryPrice: deliveryPrice,
                     lastUpdatedBy: {
                         connect: {
-                            username: tokenData.username
+                            id: tokenData.id
                         }
                     }
                 }

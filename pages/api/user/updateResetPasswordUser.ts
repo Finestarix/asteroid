@@ -18,7 +18,7 @@ export default async function updateResetPasswordUser(request: NextApiRequest, r
         tokenData = getTokenData(request);
         userParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, userParameter.id))
+            checkMultipleUndefined(tokenData.id, userParameter.id))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";

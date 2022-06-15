@@ -497,7 +497,7 @@ export default function CateringOrderPage() {
                                             <TextField label="Note (Optional)"
                                                        placeholder="e.g. vegetables can be replaced with the main dish or side dish."
                                                        multiline={true} rows={2} value={note}
-                                                       sx={{width: "500px", marginTop: 2, marginBottom: 2}}
+                                                       sx={{maxWidth: "500px", marginTop: 2, marginBottom: 2}}
                                                        onChange={handleNote}
                                                        InputProps={{
                                                            startAdornment: (

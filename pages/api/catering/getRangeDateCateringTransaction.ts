@@ -17,7 +17,7 @@ export default async function getCateringTransaction(request: NextApiRequest, re
         tokenData = getTokenData(request);
         transactionData = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, transactionData.startDate, transactionData.endDate))
+            checkMultipleUndefined(tokenData.id, transactionData.startDate, transactionData.endDate))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";
@@ -60,6 +60,9 @@ export default async function getCateringTransaction(request: NextApiRequest, re
                             }
                         },
                         onlyAdditional: true
+                    },
+                    where: {
+                        deleted: false
                     },
                     orderBy: {
                         id: "asc"

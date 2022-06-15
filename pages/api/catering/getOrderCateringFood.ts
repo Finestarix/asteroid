@@ -15,7 +15,7 @@ export default async function getOrderCateringFood(request: NextApiRequest, resp
     try {
         tokenData = getTokenData(request);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username))
+            checkMultipleUndefined(tokenData.id))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";

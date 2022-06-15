@@ -20,7 +20,7 @@ export default async function updateChangePasswordUser(request: NextApiRequest, 
         tokenData = getTokenData(request);
         userParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, userParameter.newPassword,
+            checkMultipleUndefined(tokenData.id, userParameter.newPassword,
                 userParameter.oldPassword, userParameter.confirmNewPassword))
             throw Error();
     } catch (_) {
@@ -36,7 +36,7 @@ export default async function updateChangePasswordUser(request: NextApiRequest, 
                 password: true
             },
             where: {
-                username: tokenData.username,
+                id: tokenData.id,
                 deleted: false
             }
         });
@@ -61,7 +61,7 @@ export default async function updateChangePasswordUser(request: NextApiRequest, 
                 const newPassword = await hashString(userParameter.newPassword);
                 data.data = await prisma.user.update({
                     where: {
-                        username: tokenData.username
+                        id: tokenData.id
                     },
                     data: {
                         password: newPassword

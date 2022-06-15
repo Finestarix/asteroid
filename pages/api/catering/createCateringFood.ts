@@ -17,7 +17,7 @@ export default async function createCateringFood(request: NextApiRequest, respon
         tokenData = getTokenData(request);
         foodParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, foodParameter.name, foodParameter.category,
+            checkMultipleUndefined(tokenData.id, foodParameter.name, foodParameter.category,
                 foodParameter.additionalPrice, foodParameter.reductionPrice))
             throw Error();
     } catch (_) {
@@ -44,12 +44,12 @@ export default async function createCateringFood(request: NextApiRequest, respon
                     active: false,
                     createdBy: {
                         connect: {
-                            username: tokenData.username
+                            id: tokenData.id
                         }
                     },
                     lastUpdatedBy: {
                         connect: {
-                            username: tokenData.username
+                            id: tokenData.id
                         }
                     }
                 },

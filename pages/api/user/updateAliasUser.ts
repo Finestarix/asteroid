@@ -17,7 +17,7 @@ export default async function updateAliasUser(request: NextApiRequest, response:
         tokenData = getTokenData(request);
         userParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.username, userParameter.id, userParameter.alias))
+            checkMultipleUndefined(tokenData.id, userParameter.id, userParameter.alias))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";

@@ -157,8 +157,24 @@ export default function CateringOrderPage() {
         setActiveStep(5);
     };
 
-    const handleBack = () => setActiveStep((prevActiveStep) => (isOnlyAdditional && prevActiveStep === 5) ? 0 : prevActiveStep - 1);
-    const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    const handleBack = () => setActiveStep((prevActiveStep) => {
+        let nextActiveStep = (isOnlyAdditional && prevActiveStep === 5) ? 0 : prevActiveStep - 1;
+        if (nextActiveStep > 0) {
+            if (nextActiveStep === 5 && additional.length === 0) nextActiveStep--;
+            if (nextActiveStep === 4 && vegetable.length === 0) nextActiveStep--;
+            if (nextActiveStep === 3 && sideDish.length === 0) nextActiveStep--;
+            if (nextActiveStep === 2 && mainDish.length === 0) nextActiveStep--;
+        }
+        return nextActiveStep;
+    });
+    const handleNext = () => setActiveStep((prevActiveStep) => {
+        let nextActiveStep = prevActiveStep + 1;
+        if (nextActiveStep === 2 && mainDish.length === 0) nextActiveStep++;
+        if (nextActiveStep === 3 && sideDish.length === 0) nextActiveStep++;
+        if (nextActiveStep === 4 && vegetable.length === 0) nextActiveStep++;
+        if (nextActiveStep === 5 && additional.length === 0) nextActiveStep++;
+        return nextActiveStep;
+    });
     const handleFinalNext = () => {
         let subTotalTemp = 0;
         if (!isOnlyAdditional) {
@@ -336,6 +352,13 @@ export default function CateringOrderPage() {
                                     <Box>
                                         <RadioGroup sx={{marginBottom: 2}}
                                                     onChange={handleSelectedMainDish}>
+                                            <Box width="fit-content"
+                                                 sx={{display: "flex", flexDirection: "column"}}>
+                                                <FormControlLabel
+                                                    label="Without Main Dish"
+                                                    value={-1}
+                                                    control={<Radio color="error" checked={selectedMainDish === -1}/>}/>
+                                            </Box>
                                             {mainDish.map((food) => (
                                                 <Box width="fit-content"
                                                      key={food.id}
@@ -497,7 +520,7 @@ export default function CateringOrderPage() {
                                             <TextField label="Note (Optional)"
                                                        placeholder="e.g. vegetables can be replaced with the main dish or side dish."
                                                        multiline={true} rows={2} value={note}
-                                                       sx={{maxWidth: "500px", marginTop: 2, marginBottom: 2}}
+                                                       sx={{width: "100%", maxWidth: "500px", marginTop: 2, marginBottom: 2}}
                                                        onChange={handleNote}
                                                        InputProps={{
                                                            startAdornment: (

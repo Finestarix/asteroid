@@ -1,24 +1,24 @@
 import {NextApiRequest, NextApiResponse} from "next";
 
-import {InsertCateringTransactionDetailParameter} from "types/cateringType";
+import {InsertCateringTransactionDetailAutoParameter} from "types/cateringType";
 import {TokenData} from "types/userType";
 import {prisma} from "utils/database";
 import {getTokenData} from "utils/token";
 import {checkMultipleUndefined} from "utils/validate";
 
 
-export default async function createCateringTransactionDetail(request: NextApiRequest, response: NextApiResponse) {
+export default async function createCateringTransactionDetailAuto(request: NextApiRequest, response: NextApiResponse) {
 
     const data = {data: {}, error: "", success: ""};
     let tokenData: TokenData;
-    let transactionDetailParameter: InsertCateringTransactionDetailParameter;
+    let transactionDetailParameter: InsertCateringTransactionDetailAutoParameter;
 
     try {
         tokenData = getTokenData(request);
         transactionDetailParameter = JSON.parse(request.body);
         if (request.method !== "POST" ||
-            checkMultipleUndefined(tokenData.id, transactionDetailParameter.header, transactionDetailParameter.foods,
-                transactionDetailParameter.note, transactionDetailParameter.onlyAdditional))
+            checkMultipleUndefined(tokenData.id, transactionDetailParameter.header, transactionDetailParameter.username,
+                transactionDetailParameter.foods, transactionDetailParameter.note))
             throw Error();
     } catch (_) {
         data.error = "Oops. Something went wrong.";
@@ -35,11 +35,11 @@ export default async function createCateringTransactionDetail(request: NextApiRe
                 },
                 participant: {
                     connect: {
-                        id: tokenData.id
+                        username: transactionDetailParameter.username
                     }
                 },
                 note: transactionDetailParameter.note,
-                onlyAdditional: transactionDetailParameter.onlyAdditional,
+                onlyAdditional: false,
                 paymentType: "NotPaid",
                 foods: {
                     create: transactionDetailParameter.foods.map((food) => {

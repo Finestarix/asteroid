@@ -1,6 +1,7 @@
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
 
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import DinnerDiningOutlinedIcon from "@mui/icons-material/DinnerDiningOutlined";
 import FaceIcon from "@mui/icons-material/Face";
 import GroupIcon from "@mui/icons-material/Group";
@@ -51,6 +52,7 @@ export default function HomeLayout(props: LayoutProps) {
     const router = useRouter();
     const gotoHome = async () => await router.push("/home");
     const gotoCatering = async () => await router.push("/home/catering");
+    const gotoCateringAuto = async () => await router.push("/home/catering/auto");
     const gotoCateringHistory = async () => await router.push("/home/catering/history");
     const gotoProfile = async () => await router.push("/home/user");
     const gotoCateringFood = () => router.push("/home/catering/manage/food");
@@ -82,6 +84,16 @@ export default function HomeLayout(props: LayoutProps) {
                     </ListItemIcon>
                     <ListItemText primary="Catering Order"/>
                 </ListItemButton>
+                {(cateringAdminRole.includes(role)) &&
+                    <>
+                        <ListItemButton selected={router.pathname === "/home/catering/manage/transaction"}
+                                        onClick={gotoCateringAuto}>
+                            <ListItemIcon>
+                                <AutoFixHighIcon fontSize="medium"/>
+                            </ListItemIcon>
+                            <ListItemText primary="Catering Order Auto"/>
+                        </ListItemButton>
+                    </>}
                 <ListItemButton selected={router.pathname === "/home/catering/history"}
                                 onClick={gotoCateringHistory}>
                     <ListItemIcon>

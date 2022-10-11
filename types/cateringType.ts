@@ -126,6 +126,13 @@ export interface InsertCateringTransactionDetailParameter {
     foods: number[]
 }
 
+export interface InsertCateringTransactionDetailAutoParameter {
+    header: number,
+    username: string,
+    note: string,
+    foods: number[]
+}
+
 export interface ChangeCateringTransactionDetailData {
     data: CateringTransactionDetail,
     error: string,

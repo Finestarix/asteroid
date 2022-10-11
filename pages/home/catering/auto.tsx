@@ -141,8 +141,7 @@ export default function CateringOrderPage() {
                 header: transaction.id,
                 username: selectedUser,
                 note: note,
-                foods: [selectedRice, selectedMainDish, selectedSideDish, selectedVegetable,
-                    ...(additional).map((food) => food.id)]
+                foods: [selectedRice, selectedMainDish, selectedSideDish, selectedVegetable, ...selectedAdditional]
                     .filter((food) => food != 0 && food != -1)
             }),
         });

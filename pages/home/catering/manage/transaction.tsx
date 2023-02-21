@@ -341,16 +341,11 @@ export default function ManageCateringTransactionPage() {
     };
 
     const handleCopyClipboard = (transaction: CateringTransaction) => {
-        let copyTemp = "Catering " + convertDateGeneral(transaction.date) + "\n\n";
+        let copyTemp = "Catering " + convertDateGeneral(transaction.date) + "\n";
 
         transaction.details.forEach((detail, index) => {
             copyTemp += (index + 1) + ". " +
                 ((detail.participant.alias) ? detail.participant.alias : detail.participant.username) + "\n";
-            detail.foods.forEach((food) => {
-                copyTemp += "- " + food.food.name + "\n";
-            });
-            if (detail.note) copyTemp += "Catatan: " + detail.note + "\n";
-            copyTemp += "\n";
         });
         setTransactionCopy(copyTemp);
         setTypeAlert("success");
